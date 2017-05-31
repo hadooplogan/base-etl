@@ -1,10 +1,6 @@
-package com.chinadaas.association.util;
+package com.chinadaas.common.util;
 
-import java.util.HashMap;
 
-import com.chinadaas.association.common.CommonConfig;
-import com.chinadaas.association.common.Constants;
-import com.chinadaas.association.common.DatabaseValues;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
@@ -12,6 +8,8 @@ import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.hive.HiveContext;
 import org.apache.spark.sql.types.DataTypes;
+
+import java.util.HashMap;
 
 public class DataFrameUtil {
 	/*

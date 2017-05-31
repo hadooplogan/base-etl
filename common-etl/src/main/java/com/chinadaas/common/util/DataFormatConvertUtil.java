@@ -1,4 +1,8 @@
-package com.chinadaas.association.util;
+package com.chinadaas.common.util;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -6,11 +10,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import com.chinadaas.association.common.CommonConfig;
-import com.chinadaas.association.common.DatabaseValues;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+
 public class DataFormatConvertUtil {
 	
 	private static final boolean DEBUG_FLAG = true;

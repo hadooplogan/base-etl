@@ -1,6 +1,6 @@
 package com.chinadaas.association.etl.sparksql;
 
-import com.chinadaas.association.util.DataFrameUtil;
+import com.chinadaas.common.util.DataFrameUtil;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
 
