@@ -1,4 +1,4 @@
-package com.chinadaas.association.util;
+package com.chinadaas.common.util;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;

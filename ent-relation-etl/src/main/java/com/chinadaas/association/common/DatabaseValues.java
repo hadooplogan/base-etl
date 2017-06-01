@@ -26,13 +26,15 @@ public class DatabaseValues {
     public static final String CHINADAAS_ASSOCIATION_NODE_ENTADDR="chinadaas.association.node.entaddr";
     public static final String CHINADAAS_ASSOCIATION_NODE_ENTTEL="chinadaas.association.node.enttel";
     public static final String CHINADAAS_ASSOCIATION_NODE_PERSONADDR="chinadaas.association.node.personaddr";
-    public static final String CHINADAAS_ASSOCIATION_RELATION_INV="chinadaas.association.relation.inv";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_ENTINV="chinadaas.association.relation.entinv";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_PERSONINV="chinadaas.association.relation.personinv";
     public static final String CHINADAAS_ASSOCIATION_RELATION_LEGAL="chinadaas.association.relation.legal";
     public static final String CHINADAAS_ASSOCIATION_RELATION_ENTTEL = "chinadaas.association.relation.enttel";
     public static final String CHINADAAS_ASSOCIATION_RELATION_ENTADDR="chinadaas.association.relation.entaddr";
     public static final String CHINADAAS_ASSOCIATION_RELATION_STAFF="chinadaas.association.relation.staff";
     public static final String CHINADAAS_ASSOCIATION_RELATION_PERADDR="chinadaas.association.relation.peraddr";
-    public static final String CHINADAAS_ASSOCIATION_RELATION_INV_HEADER="chinadaas.association.relation.inv.header";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_ENTINV_HEADER="chinadaas.association.relation.entinv.header";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_PERSONINV_HEADER="chinadaas.association.relation.personinv.header";
     public static final String CHINADAAS_ASSOCIATION_RELATION_LEGAL_HEADER="chinadaas.association.relation.legal.header";
     public static final String CHINADAAS_ASSOCIATION_RELATION_ENTTEL_HEADER="chinadaas.association.relation.enttel.header";
     public static final String CHINADAAS_ASSOCIATION_RELATION_ENTADDR_HEADER="chinadaas.association.relation.entaddr.header";

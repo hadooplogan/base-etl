@@ -1,15 +1,13 @@
-package com.chinadaas.association.util;
+package com.chinadaas.common.util;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
-import com.chinadaas.association.common.CommonConfig;
-import com.chinadaas.association.common.DatabaseValues;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class Parquet2CSV {
 	public static void main(String[] args) {

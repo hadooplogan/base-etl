@@ -1,4 +1,4 @@
-package com.chinadaas.association.util;
+package com.chinadaas.common.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

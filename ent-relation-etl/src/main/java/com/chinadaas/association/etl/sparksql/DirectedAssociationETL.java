@@ -1,6 +1,6 @@
 package com.chinadaas.association.etl.sparksql;
-import com.chinadaas.association.util.DataFormatConvertUtil;
-import com.chinadaas.association.util.DataFrameUtil;
+import com.chinadaas.common.util.DataFormatConvertUtil;
+import com.chinadaas.common.util.DataFrameUtil;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
 
@@ -24,17 +24,14 @@ public class DirectedAssociationETL implements Serializable {
 
     private DataFrame getPersonInfo01(HiveContext sqlContext) {
          StringBuffer sql = new StringBuffer();
-        sql.append(" SELECT zspid AS key, inv AS name                  ");
+        sql.append(" SELECT case when (zspid='null' and pripid<>'null'  and inv<>'') then concat_ws('-',pripid,inv) else zspid end key, inv AS name                  ");
         sql.append("   FROM default.e_inv_investment_hdfs_ext_20170508 ");
-        sql.append(" WHERE  zspid <> 'null'                            ");
+        sql.append(" WHERE  invtype in('20','21','22','30','35','36')  ");
         sql.append("   AND inv <> ''                                   ");
-        sql.append("   AND length(zspid) > 30                          ");
         sql.append(" UNION                                             ");
-        sql.append(" SELECT zspid as key, name                         ");
+        sql.append(" SELECT case when (zspid='null' and  pripid<>'null' and name<>'') then concat_ws('-',pripid,name) else zspid end  key, name                         ");
         sql.append(" FROM default.e_pri_person_hdfs_ext_20170508       ");
         sql.append(" WHERE name <> ''                                  ");
-        sql.append("   AND zspid <> 'null'                             ");
-        sql.append("   AND LENGTH(zspid) > 30                         ");
         return DataFrameUtil.getDataFrame(sqlContext, sql.toString(), "personInfoTmp01");
     }
 
@@ -71,8 +68,9 @@ public class DirectedAssociationETL implements Serializable {
                 "                               esdate,\n" +
                 "                               industryphy,\n" +
                 "                               regcap,\n" +
-                "                               entstatus\n" +
-                "                          FROM enterprisebaseinfocollect_hdfs_ext_20170427\n" +
+                "                               entstatus,\n" +
+                "                               regcapcur\n" +
+                "                          FROM enterprisebaseinfocollect_hdfs_ext_20170508\n" +
                 "                         WHERE pripid <> '' ";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "entInfoTmp01");
     }
@@ -90,7 +88,8 @@ public class DirectedAssociationETL implements Serializable {
                 "       esdate,\n" +
                 "       industryphy,\n" +
                 "       regcap,\n" +
-                "       entstatus\n" +
+                "       entstatus,\n" +
+                "       regcapcur\n" +
                 "  FROM entInfoTmp02 b\n" +
                 " WHERE b.rk = 1 ";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "entInfoTmp03");
@@ -109,7 +108,7 @@ public class DirectedAssociationETL implements Serializable {
 
     private DataFrame getPseronAddrInfo01(HiveContext sqlContext) {
         String hql = "select *\n" +
-                "  from e_pri_person_hdfs_ext_20170427 a\n" +
+                "  from e_pri_person_hdfs_ext_20170508 a\n" +
                 " where (length(a.DOM) > 4 AND\n" +
                 "       (a.dom LIKE '%号%' OR a.dom LIKE '%村%组%' OR a.dom LIKE '%楼%') and\n" +
                 "       a.dom not like '%集体%')";
@@ -117,12 +116,18 @@ public class DirectedAssociationETL implements Serializable {
     }
 
     private DataFrame getPseronAddrInfo02(HiveContext sqlContext) {
-        String hql = "select pre.*\n" +
+        String hql = "select pre.dom,case\n" +
+                "                         when (pre.zspid = 'null' and pre.pripid <> 'null' and\n" +
+                "                              pre.name <> '') then\n" +
+                "                          concat_ws('-', pre.pripid, pre.name)\n" +
+                "                         else\n" +
+                "                          pre.zspid\n" +
+                "                       end zspid\n" +
                 "  from personAddrInfoTmp01 pre\n" +
-                " inner join enterprisebaseinfocollect_hdfs_ext_20170427 ent\n" +
+                " inner join enterprisebaseinfocollect_hdfs_ext_20170508 ent\n" +
                 "    on pre.pripid = ent.pripid\n" +
                 " where ent.entstatus = '1' ";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "personAddrInfoTmp02");
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "personAddrInfoTmp02",DataFrameUtil.CACHETABLE_EAGER);
     }
 
     private DataFrame getPseronAddrInfo03(HiveContext sqlContext) {
@@ -130,10 +135,8 @@ public class DirectedAssociationETL implements Serializable {
                 "  from personAddrInfoTmp02 pri\n" +
                 " where pri.dom is not null\n" +
                 "   and pri.dom <> ''\n" +
-                "   and zspid <> ''\n" +
-                "   and zspid is not null\n" +
                 " group by dom\n" +
-                "having count(distinct zspid) > 1 and count(distinct zspid) < 5";
+                "having count(distinct zspid) > 1 and count(distinct zspid) <= 5";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "personAddrInfoTmp03");
     }
 
@@ -144,22 +147,14 @@ public class DirectedAssociationETL implements Serializable {
      * @return
      */
     public DataFrame getPersonAddrRelaDF(HiveContext sqlContext) {
-        getPseronAddrRela01(sqlContext);
-        return getPseronAddrRela02(sqlContext);
+        return getPseronAddrRela(sqlContext);
     }
 
-    private DataFrame getPseronAddrRela01(HiveContext sqlContext) {
-        String hql = "SELECT DISTINCT dom, zspid FROM e_pri_person_hdfs_ext_20170427 ";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "personAddrRelaTmp01");
-    }
-
-    private DataFrame getPseronAddrRela02(HiveContext sqlContext) {
+    private DataFrame getPseronAddrRela(HiveContext sqlContext) {
         String hql = "select pr.zspid, ai.dom\n" +
                 "  from personAddrInfoTmp03 ai\n" +
-                " inner join personAddrRelaTmp01 pr\n" +
-                "    on pr.dom = ai.dom\n" +
-                "   and pr.zspid is not null\n" +
-                "   and pr.zspid <> ''";
+                " inner join (select distinct dom,zspid from personAddrInfoTmp02) pr\n" +
+                "    on pr.dom = ai.dom " ;
         return DataFrameUtil.getDataFrame(sqlContext, hql, "personAddrRelaTmp01");
     }
 
@@ -176,26 +171,25 @@ public class DirectedAssociationETL implements Serializable {
 
     private DataFrame getTelInfoDF01(HiveContext sqlContext) {
         String hql = " select tel, pripid, entstatus\n" +
-                "   from enterprisebaseinfocollect_merge_20170427\n" +
+                "   from enterprisebaseinfocollect_hdfs_ext_20170508\n" +
                 "  where tel regexp '^(13|15|18|17)[0-9]{9}$'\n" +
                 "     or tel regexp '^[(|（]?(13|15|18|17)[0-9]{9}[-|(|)|）|\\\\|*| |,|，|/]{1,6}+(13|15|18|17)[0-9]{9}'\n" +
                 "     or tel regexp '^[(|（]?(13|15|18|17)[0-9]{9}[-|(|)}）|\\\\|*| |,|，|/]{1,6}+(0[0-9]{2,3}[\\-|\\(\\\\|\\*|\\-|-|\\ ]?)?([2-9][0-9]{6,7})(\\-[0-9]{1,4})?'\n" +
                 "     or tel regexp '^[(|（]?(0[0-9]{2,3}[-|)|)|）|\\\\|*|\\-|-|\\ }/]?)?([2-9]{1}[0-9]{1}{5,7})(\\-[0-9]{1,4})?'\n" +
                 "     or tel regexp '^[(|（]?(0[0-9]{2,3}[-|)|)|）|\\\\|*|\\-|-|\\ ]?)?([2-9]{1}[0-9]{1}{5,7})(\\-[0-9]{1,4})?+(13|15|18|17)[0-9]{9}'\n" +
                 "     or tel regexp\n" +
-                "  '^[(|（]?(0[0-9]{2,3}[-|)|)|）|\\\\|*|\\-|-|\\ ]?)?([2-9]{1}[0-9]{1}{5,7})(\\-[0-9]{1,4})?[-|(|)}）|\\\\|*| |,|，|/]+[(|（]?(0[0-9]{2,3}[-|)|)|）|\\\\|*|\\-|-|\\ ]?)?([2-9]{1}[0-9]{1}{5,7})(\\-[0-9]{1,4})?'\n";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "telInfoTmp01");
+                "  '^[(|（]?(0[0-9]{2,3}[-|)|)|）|\\\\|*|\\-|-|\\ ]?)?([2-9]{1}[0-9]{1}{5,7})(\\-[0-9]{1,4})?[-|(|)}）|\\\\|*| |,|，|/]+[(|（]?(0[0-9]{2,3}[-|)|)|）|\\\\|*|\\-|-|\\ ]?)?([2-9]{1}[0-9]{1}{5,7})(\\-[0-9]{1,4})?' and entstatus = '1' \n";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "telInfoTmp01",DataFrameUtil.CACHETABLE_EAGER);
     }
 
     private DataFrame getTelInfoDF02(HiveContext sqlContext) {
         String hql = "select tel\n" +
                 "  from telInfoTmp01\n" +
-                " where entstatus = '1'\n" +
-                "   and tel is not null\n" +
+                "   where tel is not null\n" +
                 "   and tel <> ''\n" +
                 "   and length(tel) > 5\n" +
                 " group by tel\n" +
-                "having count(distinct pripid) > 1 and count(distinct pripid) < 5 ";
+                "having count(distinct pripid) > 1 and count(distinct pripid) <= 5 ";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "telInfoTmp02");
     }
 
@@ -205,20 +199,13 @@ public class DirectedAssociationETL implements Serializable {
      * @return
      */
     public DataFrame getTelRelaInfoDF(HiveContext sqlContext) {
-        getTelRelaInfoDF01(sqlContext);
         return getTelRelaInfoDF02(sqlContext);
-    }
-
-    private DataFrame getTelRelaInfoDF01(HiveContext sqlContext) {
-        String hql = "select distinct tel, pripid\n" +
-                " from enterprisebaseinfocollect_merge_20170427\n";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "telRelaInfoTmp01");
     }
 
     private DataFrame getTelRelaInfoDF02(HiveContext sqlContext) {
         String hql = " select me.pripid, ai.tel\n" +
                 "  from telInfoTmp02 ai\n" +
-                " inner join telRelaInfoTmp01 me\n" +
+                " inner join (select distinct tel, pripid from telInfoTmp01) me\n" +
                 "    on ai.tel = me.tel\n" +
                 " where ai.tel is not null\n" +
                 "   and ai.tel <> ''";
@@ -236,33 +223,23 @@ public class DirectedAssociationETL implements Serializable {
     }
 
     private DataFrame getEntDomInfoDF01(HiveContext sqlContext) {
-        String hql = "select *\n" +
-                "  from enterprisebaseinfocollect_merge_20170427 a\n" +
+        String hql = "select dom,pripid \n" +
+                "  from enterprisebaseinfocollect_hdfs_ext_20170508 a\n" +
                 " where (length(a.DOM) > 4 AND\n" +
                 "       (a.dom LIKE '%号%' OR a.dom LIKE '%村%组%' OR a.dom LIKE '%楼%'))\n" +
-                "   and ((a.entTYPE in ('10',\n" +
-                "                       '11',\n" +
-                "                       '12',\n" +
-                "                       '13',\n" +
-                "                       '14',\n" +
-                "                       '15',\n" +
-                "                       '31',\n" +
-                "                       '32',\n" +
-                "                       '33',\n" +
-                "                       '34') AND length(a.entname) > 3) OR\n" +
+                "   and ((length(a.entname) > 3) OR\n" +
                 "       a.entname LIKE '%公司%' OR a.entname LIKE '%室%' OR\n" +
-                "       a.entname LIKE '%企业%')";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "entDomTmp01");
+                "       a.entname LIKE '%企业%') and entstatus = '1'";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "entDomTmp01",DataFrameUtil.CACHETABLE_EAGER);
     }
 
     private DataFrame getEntDomInfoDF02(HiveContext sqlContext) {
         String hql = "select dom\n" +
                 "  from entDomTmp01\n" +
-                " where entstatus = '1'\n" +
-                "   and dom is not null\n" +
+                "   where dom is not null\n" +
                 "   and dom <> ''\n" +
                 " group by dom\n" +
-                "having count(distinct pripid) > 1 and count(distinct pripid) < 5 ";
+                "having count(distinct pripid) > 1 and count(distinct pripid) <= 5 ";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "entDomTmp02");
     }
 
@@ -272,20 +249,13 @@ public class DirectedAssociationETL implements Serializable {
      * @return
      */
     public DataFrame getEntDomInfoRelaDF(HiveContext sqlContext) {
-        getEntDomInfoRelaDF01(sqlContext);
         return getEntDomInfoRelaDF02(sqlContext);
-    }
-
-    private DataFrame getEntDomInfoRelaDF01(HiveContext sqlContext) {
-        String hql = "select distinct dom, pripid\n" +
-                " from enterprisebaseinfocollect_merge_20170427\n";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "entDomRelaTmp01");
     }
 
     private DataFrame getEntDomInfoRelaDF02(HiveContext sqlContext) {
         String hql = "select me.pripid, ai.dom\n" +
                 "  from entDomTmp02 ai\n" +
-                " inner join entDomRelaTmp01 me\n" +
+                " inner join (select distinct  dom, pripid from entDomTmp01) me\n" +
                 "    on ai.dom = me.dom\n" +
                 " where me.pripid is not null\n" +
                 "   and me.pripid <> ''";
@@ -299,10 +269,19 @@ public class DirectedAssociationETL implements Serializable {
      * @return
      */
     public DataFrame getLegalRelaDF(HiveContext sqlContext) {
-        String hql = "select distinct zspid as key,pripid\n" +
-                "  from e_pri_person_hdfs_ext_20170427\n" +
-                " where (name <> '' and zspid <> 'null')\n" +
-                "   and LEREPSIGN = '1'";
+        String hql = "select distinct case\n" +
+                "                  when (pri.zspid = 'null' and pri.pripid <> 'null' and pri.name <> '') then\n" +
+                "                   concat_ws('-', pri.pripid, pri.name)\n" +
+                "                  else\n" +
+                "                   pri.zspid\n" +
+                "                end key,pri.pripid\n" +
+                "  from e_pri_person_hdfs_ext_20170508 pri\n" +
+                "  inner join enterprisebaseinfocollect_hdfs_ext_20170508 ent\n" +
+                "  on pri.pripid = ent.pripid\n" +
+                " where pri.name <> ''\n" +
+                "   and pri.pripid <> 'null'\n" +
+                "   and pri.pripid <> ''\n" +
+                "   and pri.LEREPSIGN = '1'\n" ;
         return DataFrameUtil.getDataFrame(sqlContext, hql, "legalRelaTmp01");
     }
 
@@ -312,9 +291,20 @@ public class DirectedAssociationETL implements Serializable {
      * @return
      */
     public DataFrame getStaffRelaDF(HiveContext sqlContext) {
-        String hql = "select distinct zspid as startkey, position, pripid as endkey\n" +
-                "  from e_pri_person_hdfs_ext_20170427\n" +
-                " where (name <> '' and zspid <> 'null')";
+        String hql = "select distinct case\n" +
+                "                  when (pri.zspid = 'null' and pri.pripid <> 'null' and pri.name <> '') then\n" +
+                "                   concat_ws('-', pri.pripid, pri.name)\n" +
+                "                  else\n" +
+                "                   pri.zspid\n" +
+                "                end startkey,\n" +
+                "                pri.position,\n" +
+                "                pri.pripid as endkey" +
+                "  from e_pri_person_hdfs_ext_20170508 pri \n" +
+                "  inner join enterprisebaseinfocollect_hdfs_ext_20170508 ent \n" +
+                "  on pri.pripid = ent.pripid \n" +
+                " where pri.name <> ''\n" +
+                "   and pri.pripid <> 'null'\n" +
+                "   and pri.pripid <> ''";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "staffRelaTmp01");
     }
 
@@ -332,7 +322,7 @@ public class DirectedAssociationETL implements Serializable {
 
     private DataFrame getInvRelaDF01(HiveContext sqlContext) {
         String hql = "select pripid, regno, credit_code,entname\n" +
-                " from enterprisebaseinfocollect_hdfs_ext_20170427\n" +
+                " from enterprisebaseinfocollect_hdfs_ext_20170508\n" +
                 "where credit_code <> ''\n" +
                 "group by pripid, regno, credit_code,entname\n";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp01",DataFrameUtil.CACHETABLE_EAGER);
@@ -346,7 +336,7 @@ public class DirectedAssociationETL implements Serializable {
                 "              conprop,\n" +
                 "              blicno,\n" +
                 "              pripid\n" +
-                "from e_inv_investment_hdfs_ext_20170427\n" +
+                "from e_inv_investment_hdfs_ext_20170508\n" +
                 "where blicno <> ''";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp02",DataFrameUtil.CACHETABLE_EAGER);
     }
@@ -385,20 +375,33 @@ public class DirectedAssociationETL implements Serializable {
 
     private DataFrame getInvRelaDF04(HiveContext sqlContext) {
         String hql = "select distinct startKey, condate, subconam, currency, conprop, endKey\n" +
-                "  from invRelaTmp03\n" +
-                "union all\n" +
-                "select distinct zspid    as startKey,\n" +
-                "                condate,\n" +
-                "                subconam,\n" +
-                "                currency,\n" +
-                "                conprop,\n" +
-                "                pripid   as endKey\n" +
-                "  from e_inv_investment_hdfs_ext_20170427\n" +
-                " where zspid <> 'null'\n" +
-                "   and inv <> ''";
+                "  from invRelaTmp03 ";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp04");
     }
 
+
+    public DataFrame getPersonInv(HiveContext sqlContext){
+        String hql =
+                " select distinct case\n" +
+                "                  when (pri.zspid = 'null' and pri.pripid <> 'null' and pri.inv <> '') then\n" +
+                "                   concat_ws('-', pri.pripid, pri.inv)\n" +
+                "                  else\n" +
+                "                   pri.zspid\n" +
+                "                end startKey,\n" +
+                "                pri.condate,\n" +
+                "                pri.subconam,\n" +
+                "                pri.currency,\n" +
+                "                pri.conprop,\n" +
+                "                pri.pripid as endKey" +
+                "  from e_inv_investment_hdfs_ext_20170508 pri\n " +
+                "  inner join enterprisebaseinfocollect_hdfs_ext_20170508 ent \n" +
+                "   on pri.pripid=ent.pripid \n" +
+                " where pri.inv <> '' \n" +
+                "   and pri.invtype in('20','21','22','30','35','36')" +
+                "   and pri.pripid <> 'null' \n" +
+                "   and pri.pripid <> '' ";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "personInvTmp01");
+    }
 
 
 

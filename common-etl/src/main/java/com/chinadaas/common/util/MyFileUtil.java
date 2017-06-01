@@ -1,14 +1,10 @@
-package com.chinadaas.association.util;
+package com.chinadaas.common.util;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.IOUtils;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.Row;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 public class MyFileUtil {
 
