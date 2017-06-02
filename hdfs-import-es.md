@@ -2,7 +2,8 @@
 
 采用nested方式存储企业
 ```
-ent|--entname
+enterprise
+   |--entname
    |--regno
    |--entstatus
    |...
