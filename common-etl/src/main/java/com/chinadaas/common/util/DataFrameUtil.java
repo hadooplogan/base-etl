@@ -1,6 +1,9 @@
 package com.chinadaas.common.util;
 
 
+import com.chinadaas.common.common.Constants;
+import com.chinadaas.common.common.CommonConfig;
+import com.chinadaas.common.common.DatabaseValues;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
@@ -131,8 +134,6 @@ public class DataFrameUtil {
 		System.out.println(path);
 		System.out.println("delimiter"+ CommonConfig.getValue(Constants.ASSOCIATION_CSV_DELIMITER));
 		df.write().mode(SaveMode.Overwrite).format("com.databricks.spark.csv").options(saveOptions).save();
-//		df.save(path,"com.databricks.spark.csv");
-//		df.save("com.databricks.spark.csv", SaveMode.Overwrite, saveOptions);
 		return df;
 	}
 
@@ -140,13 +141,13 @@ public class DataFrameUtil {
 		return null;
 	}
 
-	public static DataFrame cacheTable(HiveContext sqlContext, String table, String cols, String conds) {
+	/*public static DataFrame cacheTable(HiveContext sqlContext, String table, String cols, String conds) {
 		String schema = DataFormatConvertUtil.getSchema();
 		String sql = "CACHE TABLE " + table + " AS SELECT " + cols + " FROM " + schema + table;
 		if (conds != null) {
 			sql += " WHERE " + conds;
 		}
 		return sqlContext.sql(sql);
-	}
+	}*/
 
 }

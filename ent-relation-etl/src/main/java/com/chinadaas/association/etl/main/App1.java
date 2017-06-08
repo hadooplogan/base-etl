@@ -1,14 +1,15 @@
 package com.chinadaas.association.etl.main;
 
-import com.chinadaas.association.common.CommonConfig;
-import com.chinadaas.association.common.DatabaseValues;
-import com.chinadaas.association.etl.sparksql.DirectedAssociationETL;
-import com.chinadaas.association.etl.sparksql.Hbase2EsETL;
+import com.chinadaas.association.etl.sparksql.Hdfs2EsETL;
+import com.chinadaas.association.etl.table.EntBaseInfoEO;
+import com.chinadaas.common.common.CommonConfig;
+import com.chinadaas.common.common.DatabaseValues;
+import com.chinadaas.common.udf.StringFormatUDF;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
-import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
-import org.elasticsearch.spark.sql.api.java.JavaEsSparkSQL;
+import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
+
 /**
  * Created by gongxs01 on 2017/5/15.
  */
@@ -20,17 +21,13 @@ public class App1 {
         conf.set(DatabaseValues.ES_PORT,CommonConfig.getValue(DatabaseValues.ES_PORT));
         conf.set(DatabaseValues.ES_BATCH_SIZE_BYTES,CommonConfig.getValue(DatabaseValues.ES_BATCH_SIZE_BYTES));
         conf.set(DatabaseValues.ES_BATCH_SIZE_ENTRIES,CommonConfig.getValue(DatabaseValues.ES_BATCH_SIZE_ENTRIES));
-        conf.set("es.http.timeout ","30m");
         SparkContext sc = new SparkContext(conf);
         HiveContext sqlContext = new HiveContext(sc);
-
-        Hbase2EsETL dfEtl = new Hbase2EsETL();
-        //person
-        //JavaEsSparkSQL.saveToEs(dfEtl.getPersonDataFrame(sqlContext).repartition(40),"person/Person");
-        JavaEsSparkSQL.saveToEs(dfEtl.getEntDataFrame(sqlContext),"entbaseinfo_test01/ENTBASEINFO_TEST01");
-       // JavaEsSparkSQL.saveToEs(dfEtl.getinvDataFrame(sqlContext).repartition(40),"inv/INV");
+        StringFormatUDF.stringHandle(sc,sqlContext);
+        JavaEsSpark.saveToEs(EntBaseInfoEO.convertData(sqlContext),"entbaseinfo_test/ENTBASEINFO_TEST");
         sqlContext.clearCache();
         sc.stop();
 
     }
+
 }

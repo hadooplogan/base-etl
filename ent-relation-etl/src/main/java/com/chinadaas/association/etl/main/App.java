@@ -1,8 +1,9 @@
 package com.chinadaas.association.etl.main;
 
-import com.chinadaas.association.common.CommonConfig;
-import com.chinadaas.association.common.DatabaseValues;
-import com.chinadaas.association.etl.sparksql.DirectedAssociationETL;
+import com.chinadaas.association.etl.sparksql.EntRelationETL;
+import com.chinadaas.common.common.CommonConfig;
+import com.chinadaas.common.common.DatabaseValues;
+import com.chinadaas.common.util.DataFormatConvertUtil;
 import com.chinadaas.common.util.DataFrameUtil;
 import com.chinadaas.common.util.MyFileUtil;
 import org.apache.hadoop.fs.Path;
@@ -16,13 +17,27 @@ import org.apache.spark.sql.hive.HiveContext;
  */
 public class App {
     public static void main(String[] args) {
+        if(args.length<1){
+            System.out.println("please input databatch date!  date format yyyymmdd  :20170508");
+
+            return ;
+        }
+        //验证date日期格式
+        if(!DataFormatConvertUtil.isValidDate(args[0])){
+            System.out.println("please input date format yyyymmdd  for example:20170508");
+            return ;
+        }
+
+        String date = args[0];
         SparkConf conf = new SparkConf().setAppName("Chinadaas Association ETL APP");
         SparkContext sc = new SparkContext(conf);
         HiveContext sqlContext = new HiveContext(sc);
         String srcPath = CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_SRCPATH_TMP);
         String dstPath = CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_DSTPATH_TMP);
-
-        saveDF(sqlContext, srcPath, dstPath);
+        EntRelationETL dfEtl = new EntRelationETL();
+        dfEtl.setDate(date);
+        System.out.println("date format "+date);
+        saveDF(sqlContext, srcPath, dstPath,dfEtl);
         sqlContext.clearCache();
         sc.stop();
     }
@@ -34,9 +49,9 @@ public class App {
      * @param srcPath
      * @param dstPath
      */
-    private static void saveDF(HiveContext sqlContext, String srcPath, String dstPath) {
+    private static void saveDF(HiveContext sqlContext, String srcPath, String dstPath,EntRelationETL dfEtl) {
         try {
-            DirectedAssociationETL dfEtl = new DirectedAssociationETL();
+
             //person
             DataFrame dfPerson = dfEtl.getPersonDataFrame(sqlContext);
             //      JavaEsSparkSQL.saveToEs(dfPerson.repartition(10),"person/Person");

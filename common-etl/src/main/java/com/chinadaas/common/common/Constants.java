@@ -1,4 +1,4 @@
-package com.chinadaas.association.common;
+package com.chinadaas.common.common;
 
 public class Constants {
 

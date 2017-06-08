@@ -7,6 +7,7 @@ import org.apache.hadoop.fs.Path;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -111,9 +112,23 @@ public class DataFormatConvertUtil {
 		}
 		return ret;
 	}
-	
-	public static String getSchema() {
-		return CommonConfig.getValue(DatabaseValues.CHINADAAS_HIVE_ASSOCIATION_SCHEMA);
+
+	public static boolean isValidDate(String sDate) {
+		if(sDate==null){
+			return false;
+		}
+		DateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+		try{
+			Date date = (Date)formatter.parse(sDate);
+			return sDate.equals(formatter.format(date));
+		}catch(Exception e){
+			return false;
+		}
+	}
+
+	public static void main(String[] args){
+		String date="20170801";
+		System.out.println(isValidDate(date));
 	}
 
 	

@@ -1,11 +1,12 @@
 /**
  * 
  */
-package com.chinadaas.association.common;
+package com.chinadaas.common.common;
 
 import java.util.Enumeration;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
 /**
  * 
  */
