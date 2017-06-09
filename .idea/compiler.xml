@@ -13,8 +13,8 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="association" target="1.7" />
-      <module name="base-etl" target="1.7" />
-      <module name="common-etl" target="1.7" />
+      <module name="base-etl" target="1.5" />
+      <module name="common-etl" target="1.5" />
       <module name="ent-relation-etl" target="1.7" />
       <module name="riskbell-etl" target="1.7" />
     </bytecodeTargetLevel>

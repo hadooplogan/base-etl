@@ -11,6 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="common-etl" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-core_2.10:1.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-mapred:hadoop2:1.7.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-ipc:1.7.7" level="project" />
@@ -196,5 +197,6 @@
     <orderEntry type="library" name="Maven: net.sf.opencsv:opencsv:2.0" level="project" />
     <orderEntry type="library" name="Maven: org.elasticsearch:elasticsearch-spark-13_2.10:5.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-streaming_2.10:1.6.2" level="project" />
+    <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.24" level="project" />
   </component>
 </module>
