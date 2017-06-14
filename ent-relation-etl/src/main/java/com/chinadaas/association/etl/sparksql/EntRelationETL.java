@@ -330,9 +330,7 @@ public class EntRelationETL implements Serializable {
 
     private DataFrame getInvRelaDF01(HiveContext sqlContext) {
         String hql = "select pripid, regno, credit_code,entname\n" +
-                " from enterprisebaseinfocollect_hdfs_ext_%s\n" +
-                "where credit_code <> ''\n" +
-                "group by pripid, regno, credit_code,entname\n";
+                " from enterprisebaseinfocollect_hdfs_ext_%s\n";
         return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "invRelaTmp01",DataFrameUtil.CACHETABLE_EAGER);
     }
 
@@ -344,8 +342,7 @@ public class EntRelationETL implements Serializable {
                 "              conprop,\n" +
                 "              blicno,\n" +
                 "              pripid\n" +
-                "from e_inv_investment_hdfs_ext_%s\n" +
-                "where blicno <> ''";
+                "from e_inv_investment_hdfs_ext_%s \n";
         return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "invRelaTmp02",DataFrameUtil.CACHETABLE_EAGER);
     }
 
@@ -356,7 +353,9 @@ public class EntRelationETL implements Serializable {
                 "       hd.currency,\n" +
                 "       hd.conprop,\n" +
                 "       hd.pripid   as endKey\n" +
-                "  from invRelaTmp01 en, invRelaTmp02 hd\n" +
+                "  from (select distinct pripid, credit_code\n" +
+                "                  from invRelaTmp01 \n" +
+                "                 where credit_code <> '' ) en, (select * from invRelaTmp02 where blicno<>'' and length(blicno)>17) hd\n" +
                 " where hd.blicno = en.credit_code\n" +
                 "   and en.pripid <> hd.pripid\n" +
                 "union all\n" +
@@ -366,19 +365,10 @@ public class EntRelationETL implements Serializable {
                 "       hd.currency,\n" +
                 "       hd.conprop,\n" +
                 "       hd.pripid   as endKey\n" +
-                "  from invRelaTmp01 en, invRelaTmp02 hd\n" +
-                " where hd.blicno = en.regno\n" +
-                "   and en.pripid <> hd.pripid\n" +
-                "union all\n" +
-                "select en.pripid   as startKey,\n" +
-                "       hd.condate,\n" +
-                "       hd.subconam,\n" +
-                "       hd.currency,\n" +
-                "       hd.conprop,\n" +
-                "       hd.pripid   as endKey\n" +
-                "  from invRelaTmp01 en, invRelaTmp02 hd\n" +
+                "  from (select distinct pripid, entname\n" +
+                "                          from invRelaTmp01) en, (select * from invRelaTmp02 where inv<>'') hd\n" +
                 " where hd.inv = en.entname";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp03");
+        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql), "invRelaTmp03");
     }
 
     private DataFrame getInvRelaDF04(HiveContext sqlContext) {

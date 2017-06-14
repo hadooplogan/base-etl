@@ -26,16 +26,7 @@
         <artifactId>common-etl</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
-    <dependency>
-        <groupId>com.chinadaas.etl</groupId>
-        <artifactId>common-etl</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-        <groupId>com.chinadaas.etl</groupId>
-        <artifactId>common-etl</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </dependency>
+
 
     <!--      <dependency>
               <groupId>org.elasticsearch</groupId>
@@ -46,7 +37,7 @@
 </dependencies>
     <build>
         <plugins>
-           <!-- <plugin>
+            <!--<plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptorRefs>

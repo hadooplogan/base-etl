@@ -42,6 +42,12 @@ public class App {
         sc.stop();
     }
 
+
+    public static DataFrame flushRadioData(HiveContext sqlContext, boolean isReCreate){
+
+
+        return null;
+    }
     /**
      * save 5node and 6relations to many csv
      *

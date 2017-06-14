@@ -67,6 +67,10 @@
         <artifactId>elasticsearch-spark-13_2.10</artifactId>
         <version>5.2.2</version>
     </dependency>
-
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>oracle-jdbc</artifactId>
+            <version>11.1.0.7</version>
+        </dependency>
     </dependencies>
 </project>
