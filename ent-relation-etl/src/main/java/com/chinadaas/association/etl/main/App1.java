@@ -27,7 +27,6 @@ public class App1 {
         JavaEsSpark.saveToEs(EntBaseInfoEO.convertData(sqlContext),"entbaseinfo_test/ENTBASEINFO_TEST");
         sqlContext.clearCache();
         sc.stop();
-
     }
 
 }

@@ -1,6 +1,8 @@
 package com.chinadaas.association.etl.main;
 
-import com.chinadaas.association.etl.sparksql.FlushRadioETL;
+import com.chinadaas.association.etl.sparksql.FlushConpropETL;
+import com.chinadaas.common.common.CommonConfig;
+import com.chinadaas.common.common.DatabaseValues;
 import com.chinadaas.common.udf.CollectionSameUDF;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
@@ -16,9 +18,9 @@ public class App3 {
         SparkConf conf = new SparkConf().setAppName("Chinadaas Association ETL APP3");
         SparkContext sc = new SparkContext(conf);
         HiveContext sqlContext = new HiveContext(sc);
-        FlushRadioETL dfEtl = new FlushRadioETL();
+        FlushConpropETL dfEtl = new FlushConpropETL();
         CollectionSameUDF.collectSame(sc,sqlContext);
-        dfEtl.getFlushBadData(sqlContext).write().mode(SaveMode.Overwrite).parquet("/tmp/hive_export_inv/e_inv_investment_parquet");
+        dfEtl.getFlushBadData(sqlContext).write().mode(SaveMode.Overwrite).parquet(CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_INV_RADIO_PATH));
         sqlContext.clearCache();
         sc.stop();
     }

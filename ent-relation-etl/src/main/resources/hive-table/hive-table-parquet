@@ -15,7 +15,7 @@ CREATE EXTERNAL TABLE e_inv_investment_parquet(
        acconam string,
        subconamusd string,
        acconamusd string,
-       conprop string,
+       conprop double,
        conform string,
        condate string,
        baldelper string,
