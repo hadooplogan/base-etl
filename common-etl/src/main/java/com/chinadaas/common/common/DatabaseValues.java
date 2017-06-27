@@ -32,10 +32,19 @@ public class DatabaseValues {
     public static final String CHINADAAS_ASSOCIATION_RELATION_PERSONINV="chinadaas.association.relation.personinv";
     public static final String CHINADAAS_ASSOCIATION_RELATION_PERSONHOLD="chinadaas.association.relation.personhold";
     public static final String CHINADAAS_ASSOCIATION_RELATION_PERSONJOIN="chinadaas.association.relation.personjoin";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_PERSONMERGE="chinadaas.association.relation.personmerge";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_INVMERGE="chinadaas.association.relation.invmerge";
 
     public static final String CHINADAAS_ASSOCIATION_RELATION_LEGAL="chinadaas.association.relation.legal";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_TEL = "chinadaas.association.relation.entandenttel";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_TEL_HEADER = "chinadaas.association.relation.entandenttel.header";
     public static final String CHINADAAS_ASSOCIATION_RELATION_ENTTEL = "chinadaas.association.relation.enttel";
     public static final String CHINADAAS_ASSOCIATION_RELATION_ENTADDR="chinadaas.association.relation.entaddr";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_ADDR="chinadaas.association.relation.entandentaddr";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_ADDR_HEADER="chinadaas.association.relation.entandentaddr.header";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_PERSONMERGE_HEADER="chinadaas.association.relation.personmerge.header";
+    public static final String CHINADAAS_ASSOCIATION_RELATION_INVMERGE_HEADER="chinadaas.association.relation.invmerge.header";
+
     public static final String CHINADAAS_ASSOCIATION_RELATION_STAFF="chinadaas.association.relation.staff";
     public static final String CHINADAAS_ASSOCIATION_RELATION_PERADDR="chinadaas.association.relation.peraddr";
     public static final String CHINADAAS_ASSOCIATION_RELATION_ENTINV_HEADER="chinadaas.association.relation.entinv.header";

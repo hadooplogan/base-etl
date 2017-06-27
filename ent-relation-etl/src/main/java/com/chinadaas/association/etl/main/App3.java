@@ -20,6 +20,7 @@ public class App3 {
         HiveContext sqlContext = new HiveContext(sc);
         FlushConpropETL dfEtl = new FlushConpropETL();
         CollectionSameUDF.collectSame(sc,sqlContext);
+        dfEtl.setDate(args[0]);
         dfEtl.getFlushBadData(sqlContext).write().mode(SaveMode.Overwrite).parquet(CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_INV_RADIO_PATH));
         sqlContext.clearCache();
         sc.stop();
