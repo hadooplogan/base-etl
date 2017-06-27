@@ -118,28 +118,6 @@ select startKey, condate, subconam, currency, conprop, endKey
                        hd.currency,
                        hd.conprop,
                        hd.pripid   as endKey
-                  from (select pripid, regno, credit_code
-                          from enterprisebaseinfocollect_hdfs_ext_20170508
-                         where regno <> ''
-                         group by pripid, regno, credit_code) en,
-                       (select distinct inv,
-                                        condate,
-                                        subconam,
-                                        currency,
-                                        conprop,
-                                        blicno,
-                                        pripid
-                          from e_inv_investment_hdfs_ext_20170508
-                         where blicno <> '') hd
-                 where hd.blicno = en.regno
-                 and en.pripid<>hd.pripid
-                union all
-                select en.pripid   as startKey,
-                       hd.condate,
-                       hd.subconam,
-                       hd.currency,
-                       hd.conprop,
-                       hd.pripid   as endKey
                   from (select distinct pripid, entname
                           from enterprisebaseinfocollect_hdfs_ext_20170508) en,
                        (select distinct inv,

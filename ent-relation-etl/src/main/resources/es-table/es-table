@@ -1,0 +1,364 @@
+curl -XPUT 'http://192.168.207.14:59200/entbaseinfo_test' -d '{
+"settings": {
+"index": {
+"number_of_shards": "10",
+"number_of_replicas": "0"
+}
+},
+"mappings": {
+"ENTBASEINFO_TEST": {
+"properties": {
+"s_ext_nodenum": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"pripid": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"entname": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"regno": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"enttype": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"industryphy": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"industryco": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"abuitem": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"opfrom": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"opto": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"postalcode": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"tel": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"email": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"esdate": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"apprdate": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"regorg": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"entstatus": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"regcap": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"opscope": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"opform": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"dom": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"reccap": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"regcapcur": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"forentname": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"country": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"entname_old": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"name": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"ancheyear": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"candate": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"revdate": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"licid": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"credit_code": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"tax_code": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"zspid": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"inv": {
+"type": "nested",
+"include_in_parent":true,
+"properties":{
+"s_ext_nodenum":    {"type":"text"    },
+"pripid": { "type": "text"  },
+"invid":     { "type": "text"   },
+"inv":   { "type": "text"   },
+"invtype":    {"type":"text"    },
+"certype": { "type": "text"  },
+"cerno":     { "type": "text"   },
+"blictype":   { "type": "text"   },
+"blicno":    {"type":"text"    },
+"country": { "type": "text"  },
+"currency":     { "type": "text"   },
+"subconam":   { "type": "text"   },
+"acconam":    {"type":"text"    },
+"conprop": { "type": "text"  },
+"conform":     { "type": "text"   },
+"condate":   { "type": "text"   },
+"conam":    { "type": "text"    },
+"cerno_old":    { "type": "text"    },
+"zspid":    { "type": "text"    }
+}
+},
+"person": {
+"type": "nested",
+"include_in_parent":true,
+"properties":{
+"s_ext_nodenum":    {"type":"text"    },
+"pripid": { "type": "text"  },
+"name":     { "type": "text"   },
+"certype":   { "type": "text"   },
+"cerno":    {"type":"text"    },
+"sex": { "type": "text"  },
+"natdate":     { "type": "text"   },
+"lerepsign":   { "type": "text"   },
+"country":    {"type":"text"    },
+"position": { "type": "text"  },
+"offhfrom":     { "type": "text"   },
+"offhto":   { "type": "text"   },
+"zspid":    {"type":"text"    }
+}
+}
+}
+}
+}
+}'

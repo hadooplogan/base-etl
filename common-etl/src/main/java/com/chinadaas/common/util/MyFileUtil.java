@@ -8,9 +8,12 @@ import java.io.IOException;
 
 public class MyFileUtil {
 
-    public static boolean copyMergeWithHeader(Path srcDir, Path dstFile, String header,boolean deleteSource) throws IOException {
+    public static boolean copyMergeWithHeader(String srcDirstr, String dstFilestr, String fileName,String header,boolean deleteSource) throws IOException {
 
-        System.out.println("srcDir getname"+dstFile.getName());
+        Path srcDir = new Path(srcDirstr);
+        Path dstFile = new Path(dstFilestr+fileName+"/"+fileName);
+
+        System.out.println("srcDir getname=="+dstFilestr+fileName+"/"+fileName);
         FileSystem hdfs = null;
         Configuration hadoopConfig = new Configuration();
         DataFormatConvertUtil.deletePath(dstFile.getName());

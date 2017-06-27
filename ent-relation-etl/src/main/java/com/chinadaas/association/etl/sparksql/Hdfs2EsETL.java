@@ -105,12 +105,6 @@ public class Hdfs2EsETL implements Serializable{
                 "   and en.pripid <> hd.pripid\n" +
                 "union all\n" +
                 "select hd.*\n" +
-                "  from (select * from entDataTmp where regno <> '') en,\n" +
-                "       (select * from invDataTmp01 where blicno <> '') hd\n" +
-                " where hd.blicno = en.regno\n" +
-                "   and en.pripid <> hd.pripid\n" +
-                "union all\n" +
-                "select hd.*\n" +
                 "  from (select * from entDataTmp) en,\n" +
                 "        (select * from invDataTmp01 where inv <> '') hd\n" +
                 "        where hd.inv = en.entname";
