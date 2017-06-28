@@ -85,10 +85,10 @@ public class EntRelationETL implements Serializable {
     private DataFrame getPersonInfo05(HiveContext sqlContext) {
        String hql = " select a.key,a.name, case when a.riskinfo1 is not null or a.riskinfo2 is not null  " +
                "                            then concat_ws(' ',a.riskinfo1,a.riskinfo2)  else '' " +
-               "                            end  riskinfo from personInfoTmp04 a join " +
+               "                            end  riskinfo,b.encode_v1 from personInfoTmp04 a left join " +
                "                            s_cif_indmap_hdfs_ext_%s b" +
                "                            on a.key=b.zspid";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "personInfoTmp05");
+        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "personInfoTmp05");
     }
 
     /**
@@ -798,6 +798,18 @@ public class EntRelationETL implements Serializable {
         return  DataFrameUtil.getDataFrame(sqlContext, hql, "invMergeRelationTm01");
     }
 
+
+    /*public DataFrame entDistinct(String temTable,HiveContext sqlContext){
+       //重复的数据
+        String sql = "select count(*), a.credit_code, a.entname\n" +
+               "  from entInfoTmp03 a inner join "+temTable+" b on a.pripid=b.pripid\n" +
+               " group by a.credit_code, a.entname\n" +
+               "having count(*) > 1";
+DataFrameUtil.getDataFrame(sqlContext)
+
+
+        return null;
+    }*/
 
 
     public void pairRDD2Parquet(HiveContext sqlContext, DataFrame df, String path) {
