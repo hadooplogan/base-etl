@@ -12,7 +12,7 @@
     <modules>
         <module>common-etl</module>
         <module>ent-relation-etl</module>
-        <module>riskbell-etl</module>
+        <!--<module>riskbell-etl</module>-->
     </modules>
 
     <repositories>
