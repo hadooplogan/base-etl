@@ -1,9 +1,9 @@
 --企业节点
 CREATE EXTERNAL TABLE entbaseinfo_gxs(
       pripid string,
-      name string,
+      entname string,
       regno string,
-      creditcode string,
+      credit_code string,
       esdate string,
       industryphy string,
       regcap string,

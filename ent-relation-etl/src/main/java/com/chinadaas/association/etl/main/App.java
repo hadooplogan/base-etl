@@ -1,19 +1,15 @@
 package com.chinadaas.association.etl.main;
 
 import com.chinadaas.association.etl.sparksql.EntRelationETL;
-import com.chinadaas.association.etl.sparksql.FlushConpropETL;
 import com.chinadaas.association.etl.udf.ScoreModelUDF;
 import com.chinadaas.common.common.CommonConfig;
 import com.chinadaas.common.common.DatabaseValues;
 import com.chinadaas.common.udf.CollectionSameUDF;
-import com.chinadaas.common.util.DataFormatConvertUtil;
 import com.chinadaas.common.util.DataFrameUtil;
 import com.chinadaas.common.util.MyFileUtil;
-import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.hive.HiveContext;
 /*import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;*/
@@ -67,12 +63,13 @@ public class App {
             DataFrame dfPerson = dfEtl.getPersonDataFrame(sqlContext);
             DataFrameUtil.saveAsCsv(dfPerson, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath , CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_PERSON), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_PERSON_HEADER), true);
+
             //ent
             DataFrame dfEnt = dfEtl.getEntDataFrame(sqlContext);
             DataFrameUtil.saveAsCsv(dfEnt, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_ENT), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_ENT_HEADER), true);
 
-            //ent same tel
+          /*  //ent same tel
             DataFrame dfTel = dfEtl.getTelInfoDF(sqlContext);
             DataFrameUtil.saveAsCsv(dfTel, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_ENTTEL), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_ENTTEL_HEADER), true);
@@ -88,7 +85,9 @@ public class App {
             DataFrameUtil.saveAsCsv(dfEntTel, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_TEL), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_TEL_HEADER), true);
             sqlContext.uncacheTable("telInfoTmp01");
-
+            sqlContext.uncacheTable("telRelaInfoTmp02tmp01");
+            sqlContext.uncacheTable("telRelaInfoTmp02tmp02");
+            sqlContext.uncacheTable("telRelaInfoTmp02tmp03");
 
             //person same addr
             DataFrame dfPersonAr = dfEtl.getPersonAddrDataFrame(sqlContext);
@@ -113,51 +112,63 @@ public class App {
             DataFrameUtil.saveAsCsv(dfentAndentDomRa, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_ADDR), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_ADDR_HEADER), true);
 
-            sqlContext.uncacheTable("entDomTmp01");
+            sqlContext.uncacheTable("entDomTmp01");*/
 
             //legal relation
             DataFrame dfLegal = dfEtl.getLegalRelaDF(sqlContext);
             DataFrameUtil.saveAsCsv(dfLegal, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_LEGAL), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_LEGAL_HEADER), true);
+            sqlContext.uncacheTable("legalRelaTmp01tmp01");
+            sqlContext.uncacheTable("legalRelaTmp01tmp02");
+            sqlContext.uncacheTable("legalRelaTmp01tmp03");
 
-            //staff relation
+
+
+    /*        //staff relation
             DataFrame dfStaff = dfEtl.getStaffRelaDF(sqlContext);
             DataFrameUtil.saveAsCsv(dfStaff, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_STAFF), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_STAFF_HEADER), true);
+            sqlContext.uncacheTable("staffRelaTmp012tmp01");
+            sqlContext.uncacheTable("staffRelaTmp012tmp02");
+            sqlContext.uncacheTable("staffRelaTmp012tmp03");
+*/
+/*
 
-            //entinv relation
+            //ent inv relation
             DataFrame dfInvRela = dfEtl.getInvRelaDF(sqlContext);
             DataFrameUtil.saveAsCsv(dfInvRela, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTINV), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTINV_HEADER), true);
+*/
+
+
+        /*    //entinv join relation
+            DataFrame dfInvJoinRela = dfEtl.getInvJoinRelaDF(sqlContext);
+            DataFrameUtil.saveAsCsv(dfInvJoinRela,srcPath);
+            MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_INVJOIN), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTINV_HEADER), true);
+            //sqlContext.uncacheTable("invRelaTmp04");
+*/
+            //personinv relation
+     /*       DataFrame personInvRela = dfEtl.getPersonInv(sqlContext);
+            DataFrameUtil.saveAsCsv(personInvRela, srcPath);
+            MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONINV), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONINV_HEADER), true);
+*/
+           /* //person join relation
+            DataFrame dfPersonJoinRela = dfEtl.getPersonJoinRelaDF(sqlContext);
+            DataFrameUtil.saveAsCsv(dfPersonJoinRela,srcPath);
+            MyFileUtil.copyMergeWithHeader(srcPath, dstPath,CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONJOIN), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONINV_HEADER), true);
+            //sqlContext.uncacheTable("personInvTmp01");
+*/
+            //person hold relation
+        /*    DataFrame dfPersonHoldRela = dfEtl.getPersonHoldRelaDF(sqlContext);
+            DataFrameUtil.saveAsCsv(dfPersonHoldRela,srcPath);
+            MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONHOLD), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONINV_HEADER), true);
 
             //entinv hold relation
             DataFrame dfholdRela = dfEtl.getInvHoldRelaDF(sqlContext);
             DataFrameUtil.saveAsCsv(dfholdRela,srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_INVHOLD), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTINV_HEADER), true);
-
-            //entinv join relation
-            DataFrame dfInvJoinRela = dfEtl.getInvJoinRelaDF(sqlContext);
-            DataFrameUtil.saveAsCsv(dfInvJoinRela,srcPath);
-            MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_INVJOIN), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTINV_HEADER), true);
-            //sqlContext.uncacheTable("invRelaTmp04");
-
-            //personinv relation
-            DataFrame personInvRela = dfEtl.getPersonInv(sqlContext);
-            DataFrameUtil.saveAsCsv(personInvRela, srcPath);
-            MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONINV), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONINV_HEADER), true);
-
-            //person hold relation
-            DataFrame dfPersonHoldRela = dfEtl.getPersonHoldRelaDF(sqlContext);
-            DataFrameUtil.saveAsCsv(dfPersonHoldRela,srcPath);
-            MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONHOLD), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONINV_HEADER), true);
-
-            //person join relation
-            DataFrame dfPersonJoinRela = dfEtl.getPersonJoinRelaDF(sqlContext);
-            DataFrameUtil.saveAsCsv(dfPersonJoinRela,srcPath);
-            MyFileUtil.copyMergeWithHeader(srcPath, dstPath,CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONJOIN), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONINV_HEADER), true);
-            //sqlContext.uncacheTable("personInvTmp01");
-
-            //合并多种关系为一种关系(人员关系)
+*/
+         /*   //合并多种关系为一种关系(人员关系)
             DataFrame dfPersonRelationMerge = dfEtl.getPersonMergeRelaDF(sqlContext);
             DataFrameUtil.saveAsCsv(dfPersonRelationMerge,srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONMERGE), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONMERGE_HEADER), true);
@@ -167,9 +178,7 @@ public class App {
             DataFrame dfInvMergeRrelation = dfEtl.getInvMergeRelationDF(sqlContext);
             DataFrameUtil.saveAsCsv(dfInvMergeRrelation,srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_INVMERGE), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_INVMERGE_HEADER), true);
-
-
-        } catch (Exception e) {
+*/        } catch (Exception e) {
             e.printStackTrace();
         }
     }

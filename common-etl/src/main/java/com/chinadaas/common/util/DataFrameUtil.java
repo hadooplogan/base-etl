@@ -73,7 +73,7 @@ public class DataFrameUtil {
 				df.saveAsParquetFile(path);
 				df = sqlContext.load(path);
 				df.registerTempTable(tmpTableName);
-				sqlContext.cacheTable(tmpTableName);
+				//sqlContext.cacheTable(tmpTableName);
 				break;
 			}
 			default:

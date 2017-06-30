@@ -21,12 +21,6 @@ public class CommonConfig {
 			return "";
 		}
 	}
-
-/*	public static boolean hasKey(String key) {
-		RESOURCE_BUNDLE.containsKey(key);
-	    return RESOURCE_BUNDLE.containsKey(key);
-	}*/
-	
 	public static Enumeration<String> getKeys() {
 	    return RESOURCE_BUNDLE.getKeys();
 	}
