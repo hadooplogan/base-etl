@@ -13,6 +13,7 @@ import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.hive.HiveContext;
 import scala.Tuple2;
 
 import com.google.common.base.Optional;
@@ -27,11 +28,14 @@ public class New_Ent_BaseLocation_finStr {
 
         //构建Spark运行时的环境参数
         SparkConf conf = new SparkConf().setAppName("New_Ent_BaseLocation").setMaster("local");
+        conf.set("spark.storage.memoryFraction", "0.5");
+        conf.set("spark.shuffle.file.buffer", "64");
         SparkContext sc = new SparkContext(conf);
-        SQLContext hc = new SQLContext(sc);
+        SQLContext hc = new HiveContext(sc);
 
         //1、加载 hive表 NEW_ENT_BASEINFO 数据到dataFrame ，将 basedf 转换为 baseRdd
-        DataFrame basedf = hc.sql("select PRIPID,DOM  from NEW_ENT_BASEINFO_MID where dom not in ('null','NULL') and dom is not null limit 10000 " );
+        DataFrame basedf = hc.sql("select PRIPID,DOM  from NEW_ENT_BASEINFO_MID " +
+                " where dom not in ('null','NULL') and dom is not null  " );
         JavaRDD<Row> baseRdd = basedf.toJavaRDD();
         JavaPairRDD<String, String> baseDetailRDD = getBaseDetailRDD(baseRdd);
         //2、locationRDD ，从Oracle数据库中查询出数据 pripid,dom
@@ -44,7 +48,9 @@ public class New_Ent_BaseLocation_finStr {
         JavaPairRDD<String, Tuple2<String, Optional<String>>> joinRDD = locationRDD.leftOuterJoin(baseDetailRDD);
 
         //4、filter，留下不符合的，pripid相同，dom不同的数据,删除 Oracle 表中这些值，值应该不多
-        JavaPairRDD<String, Tuple2<String, Optional<String>>> filtRdd = getFilterRdd(joinRDD);    
+        JavaPairRDD<String, Tuple2<String, Optional<String>>> filtRdd = getFilterRdd(joinRDD);
+
+        //filtRdd.coalesce(300);
 
         //5、oracle ，delete NEW_ENT_BASEINFO_LOCATION_1
         deletFilterPripid(filtRdd);
@@ -56,8 +62,6 @@ public class New_Ent_BaseLocation_finStr {
         
                     @Override
                     public Tuple2<String, String> call(Tuple2<String, Tuple2<String, Optional<String>>> tu) throws Exception {
-                        System.out.println("mapRdd"+tu._1+"----"+tu._2._1); 
-                        
                         Optional<String> op = tu._2._2;
                         if(op.isPresent()){
                             return new Tuple2<String, String>(tu._1,op.get());
@@ -80,14 +84,15 @@ public class New_Ent_BaseLocation_finStr {
 
                 while (rows.hasNext()) {
                     Tuple2<String, String> tu = rows.next();
-                    String pripid = tu._1;
-                    if(null ==pripid || "".equals(pripid)){
-                        
-                    }else{
-                        String dom  =  tu._2;
-                        System.out.println("unionRdd-======"+pripid+"---------"+dom);
-                        list.add(pripid+" "+dom) ;
+                    if(tu!=null){
+                        if(null !=tu._1 && !"".equals(tu._1)){
+
+                            String pripid = tu._1;
+                            String dom  =  tu._2;
+                            list.add(pripid+" "+dom) ;
+                        }
                     }
+
                 }
 
                 JDBCHelper jdbcHelper = JDBCHelper.getInstance();
@@ -100,26 +105,28 @@ public class New_Ent_BaseLocation_finStr {
                 List<Map<String, String>> subList = new ArrayList<Map<String, String>>();
                 int submitC = 6;
                 for (int i = 0; i < list.size(); i++) {
+                    String dom="";
                     String pripid = list.get(i).split(" ")[0];
-                    String dom = list.get(i).split(" ")[1];
-                    
-                    Map<String, String> map = new HashMap<String,String>();
-                    map.put("PRIPID",pripid);
-                    map.put("DOM",dom);
-                    subList.add(map);
+                    if(list.get(i).split(" ").length>1){
+                        dom = list.get(i).split(" ")[1];
 
-                    if((i==list.size()-1) && ((i+1)%submitC !=0)){//有剩余
-                        System.out.println("enter end");
-                        GaoDeUtils.getLocation(subList,params);
-                    }else{
-                        if((i+1)%submitC==0){
-                            System.out.println("enter 2");
+                        Map<String, String> map = new HashMap<String,String>();
+                        map.put("PRIPID",pripid);
+                        map.put("DOM",dom);
+                        subList.add(map);
+
+                        if((i==list.size()-1) && ((i+1)%submitC !=0)){//有剩余
+                            System.out.println("enter end");
                             GaoDeUtils.getLocation(subList,params);
-                            subList.clear();
+                        }else{
+                            if((i+1)%submitC==0){
+                                System.out.println("enter 2");
+                                GaoDeUtils.getLocation(subList,params);
+                                subList.clear();
+                            }
                         }
                     }
                 }
-
                 jdbcHelper.executeBatch(sql , params);
             }
         });
@@ -140,7 +147,6 @@ public class New_Ent_BaseLocation_finStr {
                 while (rows.hasNext()) {
                     Tuple2<String, Tuple2<String, Optional<String>>> t = rows.next();
                     String pripid= t._1;
-                    System.out.println("delete  pripid===="+pripid);
                     params.add(new Object[]{pripid});
                 }
                 jdbcHelper.executeBatch(sql, params);
@@ -163,7 +169,6 @@ public class New_Ent_BaseLocation_finStr {
                             String r2 = tu._2._2.get();
                             String dom1 = String.valueOf(r1);
                             String dom2 = String.valueOf(r2);
-                            System.out.println("dom1=:"+dom1+"-----dom2=:"+dom2);
                             if(dom1.equals(dom2)){
                                 return false;
                             }else{                       

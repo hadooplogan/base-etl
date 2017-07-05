@@ -2,10 +2,7 @@ package com.chinadaas.newEnt.etl.jdbc;
 
 import com.chinadaas.newEnt.etl.cfg.Constants;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -158,7 +155,40 @@ public class JDBCHelper {
 			}
 		}
 	}
-	
+
+	//创建表
+	public void createtable(String sql){
+		Connection conn = null;
+		Statement st=null;
+		try {
+			conn = DriverManager.getConnection(Constants.JDBC_URL, Constants.JDBC_USER, Constants.JDBC_PASSWORD);
+			st = conn.createStatement();
+
+			conn.setAutoCommit(false);
+			st.executeUpdate(sql);
+			conn.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(st!=null){
+				try {
+					st.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if(conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+
+
 	/**
 	 * 批量执行SQL语句
 	 */
@@ -216,5 +246,10 @@ public class JDBCHelper {
 		void process(ResultSet rs) throws Exception;
 		
 	}
+
+
+
+
+
 	
 }
