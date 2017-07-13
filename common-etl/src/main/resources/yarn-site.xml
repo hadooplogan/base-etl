@@ -126,7 +126,7 @@
     </property>
     <property>
         <name>yarn.log-aggregation-enable</name>
-        <value>false</value>
+        <value>true</value>
     </property>
     <property>
         <name>yarn.nodemanager.pmem-check-enabled</name>

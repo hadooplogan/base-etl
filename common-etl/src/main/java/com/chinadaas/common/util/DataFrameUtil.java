@@ -73,7 +73,6 @@ public class DataFrameUtil {
 				df.saveAsParquetFile(path);
 				df = sqlContext.load(path);
 				df.registerTempTable(tmpTableName);
-				//sqlContext.cacheTable(tmpTableName);
 				break;
 			}
 			default:
@@ -134,6 +133,24 @@ public class DataFrameUtil {
 		System.out.println(path);
 		System.out.println("delimiter"+ CommonConfig.getValue(Constants.ASSOCIATION_CSV_DELIMITER));
 		df.write().mode(SaveMode.Overwrite).format("com.databricks.spark.csv").options(saveOptions).save();
+		return df;
+	}
+
+
+	public static DataFrame saveAsCsvAppend(DataFrame df, String path) {
+		HashMap<String, String> saveOptions = new HashMap<String, String>();
+		saveOptions.put("path", path);
+		saveOptions.put("header", CommonConfig.getValue(Constants.ASSOCIATION_CSV_HEADER));
+		saveOptions.put("delimiter", CommonConfig.getValue(Constants.ASSOCIATION_CSV_DELIMITER));
+		saveOptions.put("nullValue", CommonConfig.getValue(Constants.ASSOCIATION_CSV_NULLVALUE));
+		System.out.println(path);
+		System.out.println("delimiter"+ CommonConfig.getValue(Constants.ASSOCIATION_CSV_DELIMITER));
+		df.write().mode(SaveMode.Append).format("com.databricks.spark.csv").options(saveOptions).save();
+		return df;
+	}
+
+	public static DataFrame saveAsParquetOverwrite(DataFrame df, String path) {
+		df.write().mode(SaveMode.Overwrite).parquet(path);
 		return df;
 	}
 

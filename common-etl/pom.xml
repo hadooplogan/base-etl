@@ -78,11 +78,10 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.22</version>
         </dependency>
- <!--       <dependency>
+        <dependency>
             <groupId>org.log4s</groupId>
-            <artifactId>log4s_${soft.scala.version}</artifactId>
-            <version>1.2.0</version>
-            <scope>compile</scope>
-        </dependency>-->
+            <artifactId>log4s_2.10</artifactId>
+            <version>1.3.0</version>
+        </dependency>
     </dependencies>
 </project>

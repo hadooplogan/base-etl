@@ -38,24 +38,24 @@ date: 2017-06-30 11:50:43
 
 目前是打包所有依赖jar，进行spark-submit，后期希望配置classpath环境变量，甚至自动打包部署
 
-#### 3、spark监控页面
-* spark on standalone监控
+#### 3、Spark监控页面
+* Spark on standalone监控
 
   UI页面：[http://192.168.100.101:4040/stages/](http://192.168.100.101:4040/stages/)
   
-* spark on yarn监控
+* Spark on yarn监控
 
   UI页面：[http://192.168.100.101:8088/cluster/apps/RUNNING](http://192.168.100.101:8088/cluster/apps/RUNNING)
 
-### 4、spark  job 提交
+### 4、Spark  job 提交
 
-* spark on yarn 方式
+* Spark on yarn 方式
 ````
 /usr/lib/spark/spark-1.5.2-bin-hadoop2.4/bin/spark-submit 
 --executor-memory 4G 
 --num-executors 20 
 --executor-cores 4  
---class com.chinadaas.association.etl.main.App 
+--class com.chinadaas.association.etl.main.EntRelationApp 
 --master yarn ent-relation-etl-1.0-SNAPSHOT1.jar
 s
 ````
