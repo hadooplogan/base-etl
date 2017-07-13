@@ -69,10 +69,10 @@ public class EntBaseInfoEO implements Serializable {
 
 
 
-    public static JavaRDD<EntBaseInfoEO> convertData(HiveContext sqlContext) {
+    public static JavaRDD<EntBaseInfoEO> convertData(HiveContext sqlContext,Hdfs2EsETL hdfs) {
 
-        Hdfs2EsETL hdfs = new Hdfs2EsETL();
-        //投资企业
+
+        //股东
         JavaPairRDD<String, Iterable<JSONObject>> inv = hdfs.getEntInvDf(sqlContext).toJavaRDD().mapToPair(new PairFunction<Row, String, JSONObject>() {
             @Override
             public Tuple2<String, JSONObject> call(Row row) throws Exception {
@@ -142,12 +142,14 @@ public class EntBaseInfoEO implements Serializable {
         invMap.put("currency",row.getString(10));
         invMap.put("subconam",row.getString(11));
         invMap.put("acconam",row.getString(12));
-        invMap.put("conprop",row.getString(13));
+        invMap.put("conprop",String.valueOf(row.getDouble(13)));
         invMap.put("conform",row.getString(14));
         invMap.put("condate",row.getString(15));
         invMap.put("conam",row.getString(16));
         invMap.put("cerno_old",row.getString(17));
         invMap.put("zspid",row.getString(18));
+        invMap.put("encode_v1",row.getString(19));
+
         return invMap;
     }
 
@@ -166,6 +168,7 @@ public class EntBaseInfoEO implements Serializable {
         personMap.put("offhfrom",row.getString(10));
         personMap.put("offhto",row.getString(11));
         personMap.put("zspid",row.getString(12));
+        personMap.put("encode_v1",row.getString(13));
         return personMap;
     }
 

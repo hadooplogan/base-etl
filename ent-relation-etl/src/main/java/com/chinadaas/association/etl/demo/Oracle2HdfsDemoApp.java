@@ -1,4 +1,4 @@
-package com.chinadaas.association.etl.main;
+package com.chinadaas.association.etl.demo;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
@@ -11,8 +11,16 @@ import java.util.Map;
 
 /**
  * Created by gongxs01 on 2017/6/12.
+ *
+ *
+ * ****************************
+ *
+ *  oracle to hdfs  demo
+ *
+ * *****************************
+ *
  */
-public class App2 {
+public class Oracle2HdfsDemoApp {
 
     public static void main(String[] args) {
 
@@ -24,12 +32,9 @@ public class App2 {
         options.put("dbtable", tableName);
         options.put("numPartitions", "4");
         options.put("fetchsize", "1000");
-
-
         SparkContext sc = new SparkContext(conf);
         HiveContext sqlContext = new HiveContext(sc);
         DataFrame jdbcDF = sqlContext.read().format("jdbc").options(options).load();
-        jdbcDF.limit(100).show();
 
         jdbcDF.write().mode(SaveMode.Overwrite).parquet("/tmp/hive_export_inv/tmp/"+tableName);
         sqlContext.clearCache();

@@ -9,13 +9,21 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.hive.HiveContext;
 import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
+import org.elasticsearch.spark.sql.EsSparkSQL;
 
 /**
  * Created by gongxs01 on 2017/5/15.
+ * ****************************************
+ *企业照面信息，股东信息，管理人员信息写入ES entbaseinfo
+ *企业变更数据写入ES ealterrecoder
+ * ****************************************
  */
-public class App1 {
+public class EntInfo2EsApp {
     public static void main(String[] args) {
-        SparkConf conf = new SparkConf().setAppName("Chinadaas Hbase2Es ETL APP");
+
+        String date = args[0];
+
+        SparkConf conf = new SparkConf().setAppName("Chinadaas Hdfs2Es ETL APP");
         conf.set(DatabaseValues.ES_INDEX_AUTO_CREATE, CommonConfig.getValue(DatabaseValues.ES_INDEX_AUTO_CREATE));
         conf.set(DatabaseValues.ES_NODES,CommonConfig.getValue(DatabaseValues.ES_NODES));
         conf.set(DatabaseValues.ES_PORT,CommonConfig.getValue(DatabaseValues.ES_PORT));
@@ -24,7 +32,14 @@ public class App1 {
         SparkContext sc = new SparkContext(conf);
         HiveContext sqlContext = new HiveContext(sc);
         StringFormatUDF.stringHandle(sc,sqlContext);
-        JavaEsSpark.saveToEs(EntBaseInfoEO.convertData(sqlContext),"entbaseinfo_test/ENTBASEINFO_TEST");
+        Hdfs2EsETL hdfs = new Hdfs2EsETL();
+        hdfs.setDate(date);
+        String parquetPath = CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_PARQUET_TMP);
+        //共同企业基本信息
+        sqlContext.load(parquetPath+"entInfoTmp03").registerTempTable("entInfoTmp03");
+        //企业投资
+        JavaEsSpark.saveToEs(EntBaseInfoEO.convertData(sqlContext,hdfs),"entbaseinfo_test/ENTBASEINFO_TEST");
+        EsSparkSQL.saveToEs(hdfs.getAlterDataDF(sqlContext),"ealterrecoder/EALTERRECODER");
         sqlContext.clearCache();
         sc.stop();
     }

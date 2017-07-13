@@ -1,42 +1,42 @@
---ÆóÒµÍ¬µØÖ·¹ØÁª
-create table rn_baseinfo_same_dom_20170508 as
+--ä¼ä¸šåŒåœ°å€å…³è”
+create table rn_baseinfo_same_dom_20170620 as
 select dom
   from (select dom, count(distinct pripid) dom_count
           from (select *
-                  from enterprisebaseinfocollect_hdfs_ext_20170508 a
+                  from enterprisebaseinfocollect_hdfs_ext_20170620 a
                  where (length(a.DOM) > 4 AND
-                       (a.dom LIKE '%ºÅ%' OR a.dom LIKE '%´å%×é%' OR
-                       a.dom LIKE '%Â¥%'))
-                   and ((length(a.entname) > 3) OR a.entname LIKE '%¹«Ë¾%' OR
-                       a.entname LIKE '%ÊÒ%' OR a.entname LIKE '%ÆóÒµ%'))
+                       (a.dom LIKE '%å·%' OR a.dom LIKE '%æ‘%ç»„%' OR
+                       a.dom LIKE '%æ¥¼%'))
+                   and ((length(a.entname) > 3) OR a.entname LIKE '%å…¬å¸%' OR
+                       a.entname LIKE '%å®¤%' OR a.entname LIKE '%ä¼ä¸š%'))
          where entstatus = '1'
            and dom is not null
            and dom <> ''
          group by dom
-        having count(distinct pripid) > 1 and count(distinct pripid) < 5);
---ÆóÒµÍ¬µØÖ·¹ØÁª
-create table rn_baseinfo_same_dom_rela_20170508 as
+        having count(distinct pripid) > 1 and count(distinct pripid) <= 5);
+--ä¼ä¸šåŒåœ°å€å…³è”
+create table rn_baseinfo_same_dom_rela_20170620 as
 select me.pripid, ai.dom
   from (select dom, count(distinct pripid) dom_count
           from (select *
-                  from enterprisebaseinfocollect_hdfs_ext_20170508 a
+                  from enterprisebaseinfocollect_hdfs_ext_20170620 a
                  where (length(a.DOM) > 4 AND
-                       (a.dom LIKE '%ºÅ%' OR a.dom LIKE '%´å%×é%' OR
-                       a.dom LIKE '%Â¥%'))
-                   and ((length(a.entname) > 3) OR a.entname LIKE '%¹«Ë¾%' OR
-                       a.entname LIKE '%ÊÒ%' OR a.entname LIKE '%ÆóÒµ%')
+                       (a.dom LIKE '%å·%' OR a.dom LIKE '%æ‘%ç»„%' OR
+                       a.dom LIKE '%æ¥¼%'))
+                   and ((length(a.entname) > 3) OR a.entname LIKE '%å…¬å¸%' OR
+                       a.entname LIKE '%å®¤%' OR a.entname LIKE '%ä¼ä¸š%')
                    and a.entstatus = '1')
          where dom is not null
            and dom <> ''
          group by dom
         having count(distinct pripid) > 1 and count(distinct pripid) <= 5) ai
  inner join (select distinct dom, pripid
-               from enterprisebaseinfocollect_hdfs_ext_20170508 a
+               from enterprisebaseinfocollect_hdfs_ext_20170620 a
               where (length(a.DOM) > 4 AND
-                    (a.dom LIKE '%ºÅ%' OR a.dom LIKE '%´å%×é%' OR
-                    a.dom LIKE '%Â¥%'))
-                and ((length(a.entname) > 3) OR a.entname LIKE '%¹«Ë¾%' OR
-                    a.entname LIKE '%ÊÒ%' OR a.entname LIKE '%ÆóÒµ%')
+                    (a.dom LIKE '%å·%' OR a.dom LIKE '%æ‘%ç»„%' OR
+                    a.dom LIKE '%æ¥¼%'))
+                and ((length(a.entname) > 3) OR a.entname LIKE '%å…¬å¸%' OR
+                    a.entname LIKE '%å®¤%' OR a.entname LIKE '%ä¼ä¸š%')
                 and a.entstatus = '1') me
     on ai.dom = me.dom
  where me.pripid is not null

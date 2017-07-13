@@ -25,7 +25,7 @@ public class FlushConpropETL {
         getFlushBadData05(sqlContext);
         getFlushBadData06(sqlContext);
         getFlushBadData061(sqlContext);
-        getFlushBadData062(sqlContext);
+        //getFlushBadData062(sqlContext);
         DataFrame df = getFlushBadData07(sqlContext);
 //        df.limit(100000).show();
         return df;
@@ -40,7 +40,7 @@ public class FlushConpropETL {
                 "                 group by pripid) a\n" +
                 "          join (select pripid, REGCAP, regno, entname\n" +
                 "                 from enterprisebaseinfocollect_hdfs_ext_%s\n" +
-                "                where entstatus = '1') b\n" +
+                "                ) b\n" +
                 "            on a.pripid = b.pripid\n" +
                 "         where b.REGCAP <> '0'\n" +
                 "           and b.REGCAP <> '') f\n" +
@@ -145,7 +145,7 @@ public class FlushConpropETL {
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp061",DataFrameUtil.CACHETABLE_EAGER);
     }
 
-    private void getFlushBadData062(HiveContext sqlContext){
+    /*private void getFlushBadData062(HiveContext sqlContext){
         String hql = "select a.s_ext_nodenum,\n" +
                 "       a.pripid,\n" +
                 "       a.s_ext_sequence,\n" +
@@ -188,7 +188,7 @@ public class FlushConpropETL {
                 "   and a.inv = c.inv\n" ;
         DataFrameUtil.getDataFrame(sqlContext,String.format(hql,date),"probleDataTmp062").write().mode(SaveMode.Overwrite).parquet("/tmp/hive_export_inv/e_inv_investment_parquet_verify/");
         //return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp062");
-    }
+    }*/
 
     private DataFrame getFlushBadData07(HiveContext sqlContext){
         String hql = "select a.s_ext_nodenum,\n" +
@@ -271,7 +271,7 @@ public class FlushConpropETL {
                 "     on a.pripid = b.pripid\n" +
                 "  inner join (select pripid, REGCAP\n" +
                 "                from enterprisebaseinfocollect_hdfs_ext_%s\n" +
-                "               where entstatus = '1') c on a.pripid = c.pripid\n" +
+                "               ) c on a.pripid = c.pripid\n" +
                 "  where b.pripid is null ";
 
         return  DataFrameUtil.getDataFrame(sqlContext,String.format(hql,date,date,date),"probleDataTmp07");

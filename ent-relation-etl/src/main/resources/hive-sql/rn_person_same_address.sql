@@ -1,5 +1,5 @@
---node ÈËÔ±µØÖ·
-create table rn_person_same_address_new_20170508 as 
+--node äººå‘˜åœ°å€
+create table rn_person_same_address_new_20170529 as
 select dom
   from (select dom, count(distinct zspid) dom_count
           from (select pre.dom,
@@ -11,20 +11,20 @@ select dom
                           pre.zspid
                        end zspid
                   from (select *
-                          from e_pri_person_hdfs_ext_20170508 a
+                          from e_pri_person_hdfs_ext_20170529 a
                          where (length(a.DOM) > 4 AND
-                               (a.dom LIKE '%ºÅ%' OR a.dom LIKE '%´å%×é%' OR
-                               a.dom LIKE '%Â¥%') and a.dom not like '%¼¯Ìå%')) pre
-                 inner join enterprisebaseinfocollect_hdfs_ext_20170508 ent
+                               (a.dom LIKE '%å·%' OR a.dom LIKE '%æ‘%ç»„%' OR
+                               a.dom LIKE '%æ¥¼%') and a.dom not like '%é›†ä½“%')) pre
+                 inner join enterprisebaseinfocollect_hdfs_ext_20170529 ent
                     on pre.pripid = ent.pripid
                  where ent.entstatus = '1') pri
          where pri.dom is not null
            and pri.dom <> ''
          group by dom
-        having count(distinct zspid) > 1 and count(distinct zspid) < 5);
+        having count(distinct zspid) > 1 and count(distinct zspid) <= 5);
 
-----ÏàÍ¬µØÖ·²»Í¬ÈË¹ØÏµ(relation)
-create table rn_person_same_address_rel_new_20170508 as 
+----ç›¸åŒåœ°å€ä¸åŒäººå…³ç³»(relation)
+create table rn_person_same_address_rel_new_20170529 as
 select pr.zspid, ai.dom
   from (select dom, count(distinct zspid) dom_count
           from (select pre.dom,
@@ -36,11 +36,11 @@ select pr.zspid, ai.dom
                           pre.zspid
                        end zspid
                   from (select *
-                          from e_pri_person_hdfs_ext_20170508 a
+                          from e_pri_person_hdfs_ext_20170529 a
                          where (length(a.DOM) > 4 AND
-                               (a.dom LIKE '%ºÅ%' OR a.dom LIKE '%´å%×é%' OR
-                               a.dom LIKE '%Â¥%') and a.dom not like '%¼¯Ìå%')) pre
-                 inner join enterprisebaseinfocollect_hdfs_ext_20170508 ent
+                               (a.dom LIKE '%å·%' OR a.dom LIKE '%æ‘%ç»„%' OR
+                               a.dom LIKE '%æ¥¼%') and a.dom not like '%é›†ä½“%')) pre
+                 inner join enterprisebaseinfocollect_hdfs_ext_20170529 ent
                     on pre.pripid = ent.pripid
                  where ent.entstatus = '1') pri
          where pri.dom is not null
@@ -56,11 +56,11 @@ select pr.zspid, ai.dom
                                 pre.zspid
                              end zspid
                from (select *
-                       from e_pri_person_hdfs_ext_20170508 a
+                       from e_pri_person_hdfs_ext_20170529 a
                       where (length(a.DOM) > 4 AND
-                            (a.dom LIKE '%ºÅ%' OR a.dom LIKE '%´å%×é%' OR
-                            a.dom LIKE '%Â¥%') and a.dom not like '%¼¯Ìå%')) pre
-              inner join enterprisebaseinfocollect_hdfs_ext_20170508 ent
+                            (a.dom LIKE '%å·%' OR a.dom LIKE '%æ‘%ç»„%' OR
+                            a.dom LIKE '%æ¥¼%') and a.dom not like '%é›†ä½“%')) pre
+              inner join enterprisebaseinfocollect_hdfs_ext_20170529 ent
                  on pre.pripid = ent.pripid
               where ent.entstatus = '1') pr
     on pr.dom = ai.dom;

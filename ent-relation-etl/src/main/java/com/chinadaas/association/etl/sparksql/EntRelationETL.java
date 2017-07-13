@@ -39,24 +39,17 @@ public class EntRelationETL implements Serializable {
         sql.append(" SELECT case when (zspid='null' and  pripid<>'null' and name<>'') then concat_ws('-',pripid,name) else zspid end  key, name                         ");
         sql.append(" FROM e_pri_person_hdfs_ext_%s       ");
         sql.append(" WHERE name <> ''                                  ");
+        sql.append(" UNION ");
+        sql.append(" select distinct ");
+        sql.append(" concat_ws('-', pri.pripid, pri.inv) ");
+        sql.append("  as key,pri.inv ");
+        sql.append(" from entOrgRelatgionTmp01 pri where length(inv) < 4");
         return DataFrameUtil.getDataFrame(sqlContext, String.format(sql.toString(),date), "personInfoTmp01");
     }
 
-    private DataFrame getPersonInfo02(HiveContext sqlContext) {
-        StringBuffer sql = new StringBuffer();
-        sql.append(" SELECT *, row_number() over(partition by key) rk  ");
-        sql.append("   FROM personInfoTmp01                           ");
-        return DataFrameUtil.getDataFrame(sqlContext, sql.toString(), "personInfoTmp02");
-    }
-
-    private DataFrame getPersonInfo03(HiveContext sqlContext) {
-        StringBuffer sql = new StringBuffer();
-        sql.append(" SELECT key,name FROM  personInfoTmp02 b WHERE b.rk=1 ");
-        return DataFrameUtil.getDataFrame(sqlContext, sql.toString(), "personInfoTmp03");
-    }
 
     //人员风险信息提示
-    private DataFrame getPersonInfo04(HiveContext sqlContext) {
+    private DataFrame getPersonInfo02(HiveContext sqlContext) {
         String hql = " select a.*,\n" +
                 "       case\n" +
                 "         when b.fsx_name is not null then\n" +
@@ -70,7 +63,7 @@ public class EntRelationETL implements Serializable {
                 "         else\n" +
                 "          null\n" +
                 "       end riskinfo2\n" +
-                "  from personInfoTmp03 a\n" +
+                "  from personInfoTmp01 a\n" +
                 "  left join (select max(fsx_fbdate) as fsx_fbdate, zspid,fsx_name\n" +
                 "               from dis_sxbzxr_new_hdfs_ext_%s\n" +
                 "              group by zspid,fsx_name) b\n" +
@@ -81,31 +74,43 @@ public class EntRelationETL implements Serializable {
                 "              group by zspid,fss_name) c\n" +
                 "    on a.key = c.zspid" +
                 "    and a.name=c.fss_name ";
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date,date), "personInfoTmp04");
+        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date,date), "personInfoTmp02");
+    }
+
+    private DataFrame getPersonInfo03(HiveContext sqlContext) {
+       String hql = " select a.key,a.name, case when a.riskinfo1 is not null or a.riskinfo2 is not null  " +
+               "                            then concat_ws(' ',a.riskinfo1,a.riskinfo2)  else '' " +
+               "                            end  riskinfo,b.encode_v1 from personInfoTmp02 a left join " +
+               "                            s_cif_indmap_hdfs_ext_%s b" +
+               "                            on a.key=b.zspid";
+        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "personInfoTmp03");
+    }
+
+    private DataFrame getPersonInfo04(HiveContext sqlContext) {
+        StringBuffer sql = new StringBuffer();
+        sql.append(" SELECT *, row_number() over(partition by key) rk  ");
+        sql.append("   FROM personInfoTmp03                           ");
+        return DataFrameUtil.getDataFrame(sqlContext, sql.toString(), "personInfoTmp04");
     }
 
     private DataFrame getPersonInfo05(HiveContext sqlContext) {
-       String hql = " select a.key,a.name, case when a.riskinfo1 is not null or a.riskinfo2 is not null  " +
-               "                            then concat_ws(' ',a.riskinfo1,a.riskinfo2)  else '' " +
-               "                            end  riskinfo,b.encode_v1 from personInfoTmp04 a left join " +
-               "                            s_cif_indmap_hdfs_ext_%s b" +
-               "                            on a.key=b.zspid";
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "personInfoTmp05");
+        StringBuffer sql = new StringBuffer();
+        sql.append(" SELECT key,name,riskinfo,encode_v1 FROM  personInfoTmp04 b WHERE b.rk=1 ");
+        return DataFrameUtil.getDataFrame(sqlContext, sql.toString(), "personInfoTmp05");
     }
-
     /**
      * 企业节点数据
      * @param sqlContext
      * @return
      */
     public DataFrame getEntDataFrame(HiveContext sqlContext) {
-        getEntInfo01(sqlContext);
+        //getEntInfo01(sqlContext);
         getEntInfo04(sqlContext);
         return getEntInfo05(sqlContext);
     }
 
-    private DataFrame getEntInfo01(HiveContext sqlContext) {
-        String hql = "SELECT                    pripid,\n" +
+    public DataFrame getEntInfo01(HiveContext sqlContext) {
+      /*  String hql = "SELECT                    pripid,\n" +
                 "                               entname,\n" +
                 "                               regno,\n" +
                 "                               credit_code,\n" +
@@ -116,10 +121,48 @@ public class EntRelationETL implements Serializable {
                 "                               regcapcur,\n" +
                 "                               enttype," +
                 "                               tel," +
-                "                               dom \n" +
+                "                               dom," +
+                "                              entname_old \n" +
                 "                          FROM enterprisebaseinfocollect_hdfs_ext_%s\n" +
-                "                         WHERE pripid <> '' ";
-        return DataFrameUtil.getDataFrame(sqlContext,String.format(hql,date) , "entInfoTmp03",DataFrameUtil.CACHETABLE_PARQUET);
+                "                         WHERE pripid <> '' ";*/
+
+        String hql =" select s_ext_nodenum,\n" +
+                "       pripid,\n" +
+                "       entname,\n" +
+                "       regno,\n" +
+                "       enttype,\n" +
+                "       industryphy,\n" +
+                "       industryco,\n" +
+                "       abuitem,\n" +
+                "       opfrom,\n" +
+                "       opto,\n" +
+                "       postalcode,\n" +
+                "       tel,\n" +
+                "       email,\n" +
+                "       esdate,\n" +
+                "       apprdate,\n" +
+                "       regorg,\n" +
+                "       entstatus,\n" +
+                "       regcap,\n" +
+                "       opscope,\n" +
+                "       opform,\n" +
+                "       dom,\n" +
+                "       reccap,\n" +
+                "       regcapcur,\n" +
+                "       forentname,\n" +
+                "       country,\n" +
+                "       entname_old,\n" +
+                "       name,\n" +
+                "       ancheyear,\n" +
+                "       candate,\n" +
+                "       revdate,\n" +
+                "       case when (licid='' or licid='null' or licid is null) and length(credit_code)>17 then substr(credit_code,9,9) else licid end licid ,\n" +
+                "       credit_code,\n" +
+                "       case when (tax_code='' or tax_code='null' or tax_code is null) and length(credit_code)>17 then substr(credit_code,3,13) else tax_code end tax_code,\n" +
+                "       zspid\n" +
+                "  from enterprisebaseinfocollect_hdfs_ext_%s WHERE pripid <> ''";
+
+        return DataFrameUtil.getDataFrame(sqlContext,String.format(hql,date) , "entInfoTmp03");
     }
 
     //企业风险提示
@@ -246,7 +289,7 @@ public class EntRelationETL implements Serializable {
     private DataFrame getPseronAddrRela(HiveContext sqlContext) {
         String hql = "select pr.zspid, ai.dom\n" +
                 "  from personAddrInfoTmp03 ai\n" +
-                " inner join (select distinct dom,zspid from personAddrInfoTmp02) pr\n" +
+                " inner join (select distinct dom,zspid from personAddrInfoTmp02 where zspid <>'null') pr\n" +
                 "    on pr.dom = ai.dom " ;
         return DataFrameUtil.getDataFrame(sqlContext, hql, "personAddrRelaTmp01");
     }
@@ -338,7 +381,7 @@ public class EntRelationETL implements Serializable {
                 "              on dom.pripid = ent.pripid) b\n" +
                 "      on a.tel = b.tel\n" +
                 "     and a.pripid <> b.pripid ";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "telRelaInfoTmp111",DataFrameUtil.CACHETABLE_PARQUET);
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "telRelaInfoTmp111");
     }
 
 
@@ -426,7 +469,7 @@ public class EntRelationETL implements Serializable {
                 "              on dom.pripid = ent.pripid) b\n" +
                 "      on a.dom = b.dom\n" +
                 "     and a.pripid <> b.pripid ";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "entDomRelaTmp11",DataFrameUtil.CACHETABLE_PARQUET);
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "entDomRelaTmp11");
     }
 
     /**
@@ -471,7 +514,7 @@ public class EntRelationETL implements Serializable {
                 "  from legalRelaTmp01tmp08 pri\n" +
                 " inner join entInfoTmp03 ent\n" +
                 "    on pri.pripid = ent.pripid" ;
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "legalRelaTmp02",DataFrameUtil.CACHETABLE_PARQUET);
+        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "legalRelaTmp02");
     }
 
     /**
@@ -522,7 +565,7 @@ public class EntRelationETL implements Serializable {
                 "    and concat_ws('-',a.startkey,a.position)=b.dtcpara \n" +
                 "  join entInfoTmp03 ent\n" +
                 "    on a.pripid = ent.pripid";
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "staffRelaTmp01",DataFrameUtil.CACHETABLE_EAGER);
+        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "staffRelaTmp01");
     }
 
     /**
@@ -564,7 +607,7 @@ public class EntRelationETL implements Serializable {
                 "                  from entInfoTmp03 \n" +
                 "                 where credit_code <> '' ) en, (select * from invRelaTmp02 where blicno<>'' and length(blicno)>17) hd\n" +
                 " where hd.blicno = en.credit_code\n" +
-                "   and en.pripid <> hd.pripid\n" +
+                "   and en.pripid <> hd.pripid \n" +
                 "union all\n" +
                 "select en.pripid   as startKey,\n" +
                 "       hd.condate,\n" +
@@ -574,8 +617,18 @@ public class EntRelationETL implements Serializable {
                 "       hd.pripid   as endKey\n" +
                 "  from (select distinct pripid, entname\n" +
                 "                          from entInfoTmp03) en, (select * from invRelaTmp02 where inv<>'') hd\n" +
-                " where hd.inv = en.entname";
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql), "invRelaTmp03",DataFrameUtil.CACHETABLE_PARQUET);
+                " where hd.inv = en.entname " +
+                "union all " +
+                "select en.pripid   as startKey,\n" +
+                "       hd.condate,\n" +
+                "       hd.subconam,\n" +
+                "       hd.currency,\n" +
+                "       hd.conprop,\n" +
+                "       hd.pripid   as endKey\n" +
+                "  from (select distinct pripid, entname_old\n" +
+                "                          from entInfoTmp03) en, (select * from invRelaTmp02 where inv<>'') hd\n" +
+                " where hd.inv = en.entname_old ";
+        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql), "invRelaTmp03",DataFrameUtil.CACHETABLE_LAZY);
     }
 
     private DataFrame getInvRelaDF04(HiveContext sqlContext) {
@@ -600,20 +653,7 @@ public class EntRelationETL implements Serializable {
     }
 
 
-     /* private DataFrame getInvRelaDF05(HiveContext sqlContext) {
-        String hql = "select distinct a.startKey, a.condate, a.subconam, a.currency, a.conprop, a.endKey,riskscore(1,concat_ws('|',b.entstatus,b.enttype,a.conprop)) as riskscore\n" +
-                "  from invRelaTmp03 a join entInfoTmp03 b on a.endKey=b.pripid " +
-                "  join invRelaTmp031tmp08 c " +
-                "  on a.endKey=c.pripid " +
-                "  and concat_ws('-',\n" +
-                "               a.startKey,\n" +
-                "               a.condate,\n" +
-                "               a.subconam,\n" +
-                "               a.currency,\n" +
-                "               a.conprop) = c.dtcpara\n";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp04");
-    }
-*/
+   //TODO 改成配置表的方式挡板功能
     private DataFrame getInvRelaDF05(HiveContext sqlContext) {
         String hql = "select distinct a.startKey, a.condate, a.subconam, a.currency, a.conprop, a.endKey,riskscore(1,concat_ws('|',b.entstatus,b.enttype,a.conprop)) as riskscore\n" +
                 "  from invRelaTmp03 a join entInfoTmp03 b on a.endKey=b.pripid " +
@@ -624,8 +664,9 @@ public class EntRelationETL implements Serializable {
                 "               a.condate,\n" +
                 "               a.subconam,\n" +
                 "               a.currency,\n" +
-                "               a.conprop) = c.dtcpara\n";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp04",DataFrameUtil.CACHETABLE_PARQUET);
+                "               a.conprop) = c.dtcpara" +
+                " where a.startKey <> 'A-1f6bdca0-35f3-4ce7-b4f0-1ccf1e4b2539'\n";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp04");
     }
 
 
@@ -670,7 +711,7 @@ public class EntRelationETL implements Serializable {
      return   getInvJoinRelaDF05(sqlContext);
     }
 
-    private DataFrame getPersonJoinRelaDF01(HiveContext sqlContext) {
+    public DataFrame getPersonJoinRelaDF01(HiveContext sqlContext) {
         String hql = "select startKey, position, endkey\n" +
                 "          from staffRelaTmp01\n" +
                 "         where position in ('410A',\n" +
@@ -699,7 +740,7 @@ public class EntRelationETL implements Serializable {
                 "                           '451D',\n" +
                 "                           '490A',\n" +
                 "                           '491A')";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "personJoinRelaTmp01",DataFrameUtil.CACHETABLE_EAGER);
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "personJoinRelaTmp01");
     }
 
     private DataFrame getInvJoinRelaDF01(HiveContext sqlContext) {
@@ -715,7 +756,7 @@ public class EntRelationETL implements Serializable {
                 "  from invJoinRelaTmp01 a\n" +
                 "  join personJoinRelaTmp01  b\n" +
                 "    on a.startkey = b.endkey";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "invJoinRelaTmp02",DataFrameUtil.CACHETABLE_EAGER);
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "invJoinRelaTmp02",DataFrameUtil.CACHETABLE_LAZY);
     }
 
     private DataFrame getInvJoinRelaDF03(HiveContext sqlContext) {
@@ -797,72 +838,9 @@ public class EntRelationETL implements Serializable {
                         "               a.conprop) = b.dtcpara\n" +
                         "join entInfoTmp03 ent\n" +
                         "  on a.endKey = ent.pripid ";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "personInvTmp01",DataFrameUtil.CACHETABLE_PARQUET);
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "personInvTmp01");
     }
 
-
-    public DataFrame getHoldRelation(HiveContext sqlContext){
-        getHoldRelation01(sqlContext);
-        getHoldRelation02(sqlContext);
-        return   getHoldRelation03(sqlContext);
-
-    }
-
-    private DataFrame getHoldRelation01(HiveContext sqlContext){
-        String hql = "select a.*,'person' as flag from personInvTmp01 a" +
-                "  union all " +
-                "    select b.* ,'ent' as flag from invRelaTmp04 b            ";
-
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "holdRelationTmp01");
-    }
-
-    private DataFrame getHoldRelation02(HiveContext sqlContext){
-        String hql = "select max(conprop) as conprop, endkey\n" +
-                "          from holdRelationTmp01\n" +
-                "         group by endkey";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "holdRelationTmp02");
-    }
-
-    private DataFrame getHoldRelation03(HiveContext sqlContext){
-        String hql = "select b.startKey, b.condate, b.subconam, b.currency, b.conprop, b.endKey,b.flag \n" +
-                "  from holdRelationTmp02 a" +
-                " inner join holdRelationTmp01 b\n" +
-                "    on a.conprop = b.conprop\n" +
-                "   and a.endkey = b.endkey";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "holdRelationTmp01",DataFrameUtil.CACHETABLE_EAGER);
-    }
-
-
-
-    /**
-     * 自然人控股股东
-     * @param sqlContext
-     * @return
-     */
-    public DataFrame getPersonHoldRelaDF(HiveContext sqlContext) {
-        getHoldRelation(sqlContext);
-        return   getPersonHoldRelaDF01(sqlContext);
-    }
-
-    private DataFrame getPersonHoldRelaDF01(HiveContext sqlContext) {
-        String hql = " select b.startKey, b.condate, b.subconam, b.currency, b.conprop, b.endKey from holdRelationTmp01 b where b.flag='person' ";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "personHoldRelaTmp01");
-    }
-
-
-    /**
-     * 企业控股股东
-     * @param sqlContext
-     * @return
-     */
-    public DataFrame getInvHoldRelaDF(HiveContext sqlContext) {
-        return   getInvHoldRelaDF01(sqlContext);
-    }
-
-    private DataFrame getInvHoldRelaDF01(HiveContext sqlContext) {
-        String hql = " select b.startKey, b.condate, b.subconam, b.currency, b.conprop, b.endKey from holdRelationTmp01 b where b.flag='ent' ";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "invHoldRelaTmp01");
-    }
 
 
     /**
@@ -976,7 +954,7 @@ public class EntRelationETL implements Serializable {
     }
 
 
-    private DataFrame distinctEntRelationDF01(String tableName,HiveContext sqlContext){
+        private DataFrame distinctEntRelationDF01(String tableName,HiveContext sqlContext){
         String hql = "select a.pripid, a.entstatus, a.entname, a.credit_code, a.regno, b.dtcpara\n" +
                 "  from entInfoTmp03 a\n" +
                 "  join "+tableName+" b\n" +
@@ -989,7 +967,7 @@ public class EntRelationETL implements Serializable {
         String hql = "select count(*), entname, credit_code, regno, dtcpara\n" +
                 "  from "+tableName+"tmp01\n" +
                 " group by entname, credit_code, regno, dtcpara\n" +
-                "having count(*) > 1";
+                " having count(*) > 1";
         System.out.println(hql);
 
         return DataFrameUtil.getDataFrame(sqlContext,hql,tableName+"tmp02",DataFrameUtil.CACHETABLE_LAZY);
@@ -1087,6 +1065,173 @@ public class EntRelationETL implements Serializable {
         System.out.println(hql);
 
         return DataFrameUtil.getDataFrame(sqlContext,hql,tableName+"tmp08");
+    }
+
+
+    /**
+     * 分支机构关系
+     * @param sqlContext
+     * @return
+     */
+    public DataFrame getBranchRelation(HiveContext sqlContext){
+        String hql = "select pripid,brn_rpripid from  s_en_brn_org_hdfs_ext_20170703 where brn_rpripid <> 'null' " +
+                "     union " +
+                "     select a.pripid,b.pripid as brn_rpripid from s_en_brn_org_hdfs_ext_20170703 a join entInfoTmp03 b" +
+                "     on a.brn_entname=b.entname and a.brn_regno=b.regno" +
+                "     where a.brn_rpripid<>'null'" +
+                "     and  a.brn_entname <>'null'";
+        return DataFrameUtil.getDataFrame(sqlContext,hql,"branchRelationTmp01");
+    }
+
+
+    public DataFrame getEntOrgRelatgion(HiveContext sqlContext){
+        getEntOrgRelatgion01(sqlContext);
+        return getEntOrgRelatgion02(sqlContext);
+    }
+
+
+    private DataFrame getEntOrgRelatgion01(HiveContext sqlContext){
+        String hql = "" +
+                "select c.condate, c.inv, c.subconam, c.currency, c.conprop, c.pripid,c.zspid \n" +
+                "  from (select a.condate, a.inv, a.subconam, a.currency, a.conprop, a.pripid,b.entname,a.zspid\n" +
+                "          from e_inv_investment_parquet a\n" +
+                "          left join (select a.startKey, a.endKey, b.entname,b.entname_old\n" +
+                "                      from invRelaTmp04 a\n" +
+                "                      join entInfoTmp03 b\n" +
+                "                        on a.startKey = b.pripid) b\n" +
+                "           on a.pripid = b.endKey " +
+                "           and (a.inv = b.entname or a.inv = b.entname_old)\n" +
+                "         where a.invtype in ('10',\n" +
+                "                             '11',\n" +
+                "                             '12',\n" +
+                "                             '13',\n" +
+                "                             '14',\n" +
+                "                             '15',\n" +
+                "                             '31',\n" +
+                "                             '32',\n" +
+                "                             '33',\n" +
+                "                             '34',\n" +
+                "                             '40',\n" +
+                "                             '50',\n" +
+                "                             '90')) c\n" +
+                " where c.entname is null ";
+
+        return DataFrameUtil.getDataFrame(sqlContext,hql,"entOrgRelatgionTmp01",DataFrameUtil.CACHETABLE_EAGER);
+    }
+
+    private DataFrame getEntOrgRelatgion02(HiveContext sqlContext){
+        String hql = " select distinct concat_ws('-', org.pripid, org.inv) as startKey,\n" +
+                "       org.condate,\n" +
+                "       org.subconam,\n" +
+                "       org.currency,\n" +
+                "       org.conprop,\n" +
+                "       org.pripid as endKey," +
+                "        riskscore(1,concat_ws('|', ent.entstatus, ent.enttype, org.conprop)) as riskscore\n" +
+                "  from entOrgRelatgionTmp01 org " +
+                "  join  entInfoTmp03 ent " +
+                "  on  org.pripid = ent.pripid \n" +
+                " where length(org.inv) >= 4  ";
+        return DataFrameUtil.getDataFrame(sqlContext,hql,"entOrgRelatgionTmp02");
+    }
+
+    public DataFrame getpersonOrgRelation(HiveContext sqlContext){
+        String hql = " select distinct \n" +
+                "                   concat_ws('-', pri.pripid, pri.inv) \n" +
+                "                as startKey,\n" +
+                "                pri.condate,\n" +
+                "                pri.subconam,\n" +
+                "                pri.currency,\n" +
+                "                pri.conprop,\n" +
+                "                pri.pripid as endKey," +
+                "                riskscore(1,concat_ws('|', ent.entstatus, ent.enttype, pri.conprop)) as riskscore\n" +
+                "  from entOrgRelatgionTmp01 pri " +
+                "  join entInfoTmp03 ent " +
+                "  on  pri.pripid = ent.pripid\n" +
+                " where length(inv) < 4 " +
+                " union" +
+                " select * from personInvTmp01 ";
+        return DataFrameUtil.getDataFrame(sqlContext,hql,"entOrgRelatgionTmp03");
+    }
+
+    public DataFrame getOrgNode(HiveContext sqlContext){
+        String hql = "select distinct concat_ws('-', pripid, inv) as key, inv as name,'org' as type\n" +
+                "   from entOrgRelatgionTmp01\n" +
+                "  where length(inv) >= 4";
+        return DataFrameUtil.getDataFrame(sqlContext,hql,"orgNodeTmpe01");
+    }
+
+    private DataFrame getHoldRelation01(HiveContext sqlContext){
+        String hql = "select a.*,'person' as flag from entOrgRelatgionTmp03 a" +
+                "  union all " +
+                "    select b.* ,'ent' as flag from invRelaTmp04 b    " +
+                "   union all " +
+                "    select c.*,'entorg' as flag from  entOrgRelatgionTmp02 c" ;
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "holdRelationTmp01",DataFrameUtil.CACHETABLE_LAZY);
+    }
+
+    private DataFrame getHoldRelation02(HiveContext sqlContext){
+        String hql = "select max(conprop) as conprop, endkey\n" +
+                "          from holdRelationTmp01\n" +
+                "         group by endkey";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "holdRelationTmp02");
+    }
+
+    private DataFrame getHoldRelation03(HiveContext sqlContext){
+        String hql = "select b.startKey, b.condate, b.subconam, b.currency, b.conprop, b.endKey,b.flag \n" +
+                "  from holdRelationTmp02 a" +
+                " inner join holdRelationTmp01 b\n" +
+                "    on a.conprop = b.conprop\n" +
+                "   and a.endkey = b.endkey";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "holdRelationTmp011");
+    }
+
+
+    /**
+     * 自然人控股股东
+     * @param sqlContext
+     * @return
+     */
+    public DataFrame getPersonHoldRelaDF(HiveContext sqlContext) {
+        getHoldRelation(sqlContext);
+        return   getPersonHoldRelaDF01(sqlContext);
+    }
+
+    private DataFrame getPersonHoldRelaDF01(HiveContext sqlContext) {
+        String hql = " select distinct b.startKey, b.condate, b.subconam, b.currency, b.conprop, b.endKey from holdRelationTmp011 b where b.flag='person' and  b.conprop<>0.0";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "personHoldRelaTmp01");
+    }
+
+    public DataFrame getHoldRelation(HiveContext sqlContext){
+        getHoldRelation01(sqlContext);
+        getHoldRelation02(sqlContext);
+        return   getHoldRelation03(sqlContext);
+
+    }
+
+
+    /**
+     * 企业控股股东
+     * @param sqlContext
+     * @return
+     */
+    public DataFrame getInvHoldRelaDF(HiveContext sqlContext) {
+        return   getInvHoldRelaDF01(sqlContext);
+    }
+
+    private DataFrame getInvHoldRelaDF01(HiveContext sqlContext) {
+        String hql = " select distinct b.startKey, b.condate, b.subconam, b.currency, b.conprop, b.endKey from holdRelationTmp011 b where b.flag='ent' and b.conprop<>0.0";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "invHoldRelaTmp01");
+    }
+
+
+    /**
+     * 组织机构控股股东
+     * @param sqlContext
+     * @return
+     */
+    public DataFrame getOrgHoldRelaDF(HiveContext sqlContext) {
+        String hql =" select distinct b.startKey, b.condate, b.subconam, b.currency, b.conprop, b.endKey from holdRelationTmp011 b where b.flag='entorg' and  b.conprop<>0.0";
+        return   DataFrameUtil.getDataFrame(sqlContext, hql, "orgHoldRelaTmp01");
     }
 
 }

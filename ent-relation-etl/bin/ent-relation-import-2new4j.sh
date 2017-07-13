@@ -3,7 +3,7 @@ HDFS_PATH=/tmp/hive_export_inv/tmp/dstpath/
 HOST=192.168.207.14
 LOG_SUFFIX=`date +%Y%m%d-%H%M`
 # step 1: spark pre-proess
-/usr/lib/spark/spark-1.5.2-bin-hadoop2.4/bin/spark-submit --executor-memory 2G --num-executors 20 --executor-cores 3  --class com.chinadaas.association.etl.main.App --master yarn ent-relation-etl-1.0-SNAPSHOT1.jar > ./logs/association-$LOG_SUFFIX.log 2 >&1
+/usr/lib/spark/spark-1.5.2-bin-hadoop2.4/bin/spark-submit --executor-memory 2G --num-executors 20 --executor-cores 3  --class com.chinadaas.association.etl.main.EntRelationApp --master yarn ent-relation-etl-1.0-SNAPSHOT1.jar > ./logs/association-$LOG_SUFFIX.log 2 >&1
 # step 2:get csv data from hdfs
 echo `date +%F" "%H:%M:%S`
 if [ ! -d './import_data' ]; then

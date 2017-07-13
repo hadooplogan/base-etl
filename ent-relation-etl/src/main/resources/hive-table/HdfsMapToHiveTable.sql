@@ -17,7 +17,8 @@ LOCATION '/tmp/hive_export_inv/tmp/dstpath/ent';
 CREATE EXTERNAL TABLE person_gxs(
       zsid string,
       name string,     
-      riskinfo string)
+      riskinfo string,
+      encode_v1 string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
 LOCATION '/tmp/hive_export_inv/tmp/dstpath/person';
@@ -181,4 +182,22 @@ CREATE EXTERNAL TABLE ent_invmerge_relation_gxs(
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
 LOCATION '/tmp/hive_export_inv/tmp/dstpath/invmerge';
-
+--组织机构
+CREATE EXTERNAL TABLE entorg_gxs(
+     key string,
+      name string)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+LOCATION '/tmp/hive_export_inv/tmp/dstpath/org';
+--组织结构投资
+CREATE EXTERNAL TABLE ent_orginv_relation_gxs(
+      pripid string,
+      condate string,
+      subconam string,
+      currency string,
+      conprop string,
+      topripid string,
+      riskscore string)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+LOCATION '/tmp/hive_export_inv/tmp/dstpath/orginv';

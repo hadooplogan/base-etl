@@ -11,9 +11,14 @@ import org.apache.spark.sql.hive.HiveContext;
 
 /**
  * Created by gongxs01 on 2017/6/13.
- * 刷股东占比数据
+ *
+ * ***********************************
+ * 采用年报数据刷新股东占比信息
+ * 并重新计算占比信息=认缴出资额/企业注册资本
+ * ***********************************
+ *
  */
-public class App3 {
+public class FlushConpropApp {
     public static void main(String[] args) {
         SparkConf conf = new SparkConf().setAppName("Chinadaas Association ETL APP3");
         SparkContext sc = new SparkContext(conf);

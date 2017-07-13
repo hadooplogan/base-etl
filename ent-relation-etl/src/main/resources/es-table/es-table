@@ -336,7 +336,8 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo_test' -d '{
 "condate":   { "type": "text"   },
 "conam":    { "type": "text"    },
 "cerno_old":    { "type": "text"    },
-"zspid":    { "type": "text"    }
+"zspid":    { "type": "text"    },
+"encode_v1":    { "type": "text"    }
 }
 },
 "person": {
@@ -355,7 +356,133 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo_test' -d '{
 "position": { "type": "text"  },
 "offhfrom":     { "type": "text"   },
 "offhto":   { "type": "text"   },
-"zspid":    {"type":"text"    }
+"zspid":    {"type":"text"    },
+"encode_v1":    { "type": "text"    }
+}
+}
+}
+}
+}
+}'
+
+
+
+curl -XPUT 'http://192.168.207.14:59200/ealterrecoder' -d '{
+"settings": {
+"index": {
+"number_of_shards": "10",
+"number_of_replicas": "0"
+}
+},
+"mappings": {
+"EALTERRECODER": {
+"properties": {
+"s_ext_nodenum": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"pripid": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"s_ext_sequence": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"alt_id": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"altitem": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"altbe": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"altaf": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"altdate": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"alttime": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"s_ext_timestamp": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"s_ext_batch": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
+}
+},
+"s_ext_validflag": {
+"type": "text",
+"fields": {
+"keyword": {
+"ignore_above": 256,
+"type": "keyword"
+}
 }
 }
 }
