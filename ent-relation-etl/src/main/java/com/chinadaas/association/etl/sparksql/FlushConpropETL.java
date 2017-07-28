@@ -1,8 +1,8 @@
 package com.chinadaas.association.etl.sparksql;
 
+import com.chinadaas.association.etl.common.CommonApp;
 import com.chinadaas.common.util.DataFrameUtil;
 import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.hive.HiveContext;
 
 /**
@@ -14,6 +14,7 @@ public class FlushConpropETL {
         this.date = date;
     }
     public DataFrame getFlushBadData(HiveContext sqlContext) {
+        CommonApp.loadAndRegiserTable(sqlContext,new String[]{CommonApp.ENT_INFO,CommonApp.ENT_INV_INFO});
         getFlushBadData01(sqlContext);
         getFlushBadData011(sqlContext);
         getFlushBadData02(sqlContext);
@@ -25,9 +26,7 @@ public class FlushConpropETL {
         getFlushBadData05(sqlContext);
         getFlushBadData06(sqlContext);
         getFlushBadData061(sqlContext);
-        //getFlushBadData062(sqlContext);
         DataFrame df = getFlushBadData07(sqlContext);
-//        df.limit(100000).show();
         return df;
     }
 
@@ -36,17 +35,17 @@ public class FlushConpropETL {
         String hql = "select *\n" +
                 "  from (select a.pripid, b.regno, b.entname,b.regcap, a.conam / b.REGCAP as bili\n" +
                 "          from (select pripid, sum(SUBCONAM) as conam\n" +
-                "                  from e_inv_investment_hdfs_ext_%s\n" +
+                "                  from entInvTmp\n" +
                 "                 group by pripid) a\n" +
-                "          join (select pripid, REGCAP, regno, entname\n" +
-                "                 from enterprisebaseinfocollect_hdfs_ext_%s\n" +
+                "          join (select pripid, regcap, regno, entname\n" +
+                "                 from entInfoTmp03\n" +
                 "                ) b\n" +
                 "            on a.pripid = b.pripid\n" +
                 "         where b.REGCAP <> '0'\n" +
                 "           and b.REGCAP <> '') f\n" +
                 " where f.bili > 1.05\n" +
                 "    or f.bili < 0.95";
-        return DataFrameUtil.getDataFrame(sqlContext,String.format(hql,date,date),"probleDataTmp01",DataFrameUtil.CACHETABLE_EAGER);
+        return DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp01",DataFrameUtil.CACHETABLE_EAGER);
     }
 
     private DataFrame getFlushBadData011(HiveContext sqlContext){
@@ -57,7 +56,6 @@ public class FlushConpropETL {
                 "  join C_GS_AN_BASEINFO b\n" +
                 "    on a.pripid = b.pripid\n" +
                 "   and a.ancheyear = b.ancheyear\n";
-
         return DataFrameUtil.getDataFrame(sqlContext,hql,"CGSANBASEINFOTMP011");
     }
 
@@ -95,10 +93,10 @@ public class FlushConpropETL {
     private DataFrame getFlushBadData042(HiveContext sqlContext){
         String hql = "select a.pripid, b.inv\n" +
                 "                     from probleDataTmp01 a\n" +
-                "                     join e_inv_investment_hdfs_ext_%s b\n" +
+                "                     join entInvTmp b\n" +
                 "                       on a.pripid = b.pripid";
 
-        return  DataFrameUtil.getDataFrame(sqlContext,String.format(hql,date),"probleDataTmp042");
+        return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp042");
     }
 
     private DataFrame getFlushBadData041(HiveContext sqlContext){
@@ -109,9 +107,10 @@ public class FlushConpropETL {
     }
 
     private DataFrame getFlushBadData04(HiveContext sqlContext){
-        String hql = "select pripid as pripidpro, collect_set(inv) as invpro\n" +
-                "     from probleDataTmp041 \n" +
-                "    group by pripid";
+        String hql = "select pripid as pripidpro, " +
+                "            collect_set(inv) as invpro\n" +
+                "            from probleDataTmp041 \n" +
+                "            group by pripid";
 
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp04");
     }
@@ -225,7 +224,7 @@ public class FlushConpropETL {
                 "       a.record_desc,\n" +
                 "       a.match,\n" +
                 "       a.zspid\n" +
-                "  from e_inv_investment_hdfs_ext_%s a\n" +
+                "  from entInvTmp a\n" +
                 "  join probleDataTmp061 b\n" +
                 "    on a.pripid = b.pripid\n" +
                 "  join probleDataTmp02 c\n" +
@@ -266,15 +265,15 @@ public class FlushConpropETL {
                 "        a.record_desc,\n" +
                 "        a.match,\n" +
                 "        a.zspid\n" +
-                "   from e_inv_investment_hdfs_ext_%s a\n" +
+                "   from entInvTmp a\n" +
                 "   left join probleDataTmp061 b\n" +
                 "     on a.pripid = b.pripid\n" +
                 "  inner join (select pripid, REGCAP\n" +
-                "                from enterprisebaseinfocollect_hdfs_ext_%s\n" +
+                "                from entInfoTmp03 \n" +
                 "               ) c on a.pripid = c.pripid\n" +
                 "  where b.pripid is null ";
 
-        return  DataFrameUtil.getDataFrame(sqlContext,String.format(hql,date,date,date),"probleDataTmp07");
+        return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp07");
     }
 
 }

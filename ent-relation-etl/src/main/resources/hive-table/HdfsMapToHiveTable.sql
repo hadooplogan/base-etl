@@ -201,3 +201,16 @@ CREATE EXTERNAL TABLE ent_orginv_relation_gxs(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '|'
 LOCATION '/tmp/hive_export_inv/tmp/dstpath/orginv';
+
+--组织结构控股关系
+CREATE EXTERNAL TABLE org_hold_relation_gxs(
+      zspid string,
+      condate string,
+      subconam string,
+      currency string,
+      conprop string,
+      pripid string,
+      riskscore string)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+LOCATION '/tmp/hive_export_inv/tmp/dstpath/orghold';

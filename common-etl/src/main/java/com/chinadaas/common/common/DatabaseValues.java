@@ -16,9 +16,13 @@ public class DatabaseValues {
     /**
      * CSV path
      */
-     public static final String CHINADAAS_ASSOCIATION_SRCPATH_TMP="chinadaas.association.srcpath.tmp";
-     public static final String CHINADAAS_ASSOCIATION_PARQUET_TMP="chinadaas.association.parquet.tmp";
-     public static final String CHINADAAS_ASSOCIATION_DSTPATH_TMP="chinadaas.association.dstpath.tmp";
+    public static final String CHINADAAS_ASSOCIATION_SRCPATH_TMP="chinadaas.association.srcpath.tmp";
+    public static final String CHINADAAS_ASSOCIATION_PARQUET_TMP="chinadaas.association.parquet.tmp";
+    public static final String CHINADAAS_ASSOCIATION_DSTPATH_TMP="chinadaas.association.dstpath.tmp";
+
+    public static final String CHINADAAS_ASSOCIATION_SHORT_NAME_PATH="chinadaas.association.shortname.csvpath";
+
+
     /**
      * node name
      */

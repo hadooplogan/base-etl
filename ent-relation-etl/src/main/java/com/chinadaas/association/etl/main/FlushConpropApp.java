@@ -12,10 +12,12 @@ import org.apache.spark.sql.hive.HiveContext;
 /**
  * Created by gongxs01 on 2017/6/13.
  *
- * ***********************************
+ * ***************************************
+ *
  * 采用年报数据刷新股东占比信息
  * 并重新计算占比信息=认缴出资额/企业注册资本
- * ***********************************
+ *
+ * ****************************************
  *
  */
 public class FlushConpropApp {
@@ -26,8 +28,18 @@ public class FlushConpropApp {
         FlushConpropETL dfEtl = new FlushConpropETL();
         CollectionSameUDF.collectSame(sc,sqlContext);
         dfEtl.setDate(args[0]);
-        dfEtl.getFlushBadData(sqlContext).write().mode(SaveMode.Overwrite).parquet(CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_INV_RADIO_PATH));
+        dfEtl.getFlushBadData(sqlContext).write().mode(SaveMode.Overwrite).parquet(
+                CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_INV_RADIO_PATH));
         sqlContext.clearCache();
         sc.stop();
     }
+
+    public static void flushConprop(HiveContext sqlContext,String date){
+        FlushConpropETL dfEtl = new FlushConpropETL();
+        CollectionSameUDF.collectSame(sqlContext.sparkContext(),sqlContext);
+        dfEtl.setDate(date);
+        dfEtl.getFlushBadData(sqlContext).write().mode(SaveMode.Overwrite).parquet(
+                CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_INV_RADIO_PATH));
+    }
+
 }

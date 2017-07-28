@@ -3,18 +3,83 @@
 采用nested方式存储企业
 ```
 enterprise
+   |--s_ext_nodenum
+   |--pripid
    |--entname
+   |--exactentname
+   |--pinyinname
    |--regno
+   |--enttype
+   |--industryphy
+   |--industryco
+   |--abuitem
+   |--opfrom
+   |--opto
+   |--postalcode
+   |--tel
+   |--email
+   |--esdate
+   |--apprdate
+   |--regorg
    |--entstatus
-   |...
+   |--regcap
+   |--opscope
+   |--opform
+   |--dom
+   |--reccap
+   |--regcapcur
+   |--forentname
+   |--country
+   |--entname_old
+   |--name
+   |--ancheyear
+   |--candate
+   |--revdate
+   |--licid
+   |--credit_code
+   |--tax_code
+   |--zspid
+   |--empnum
+   |--cerno
+   |--oriregno
+   |--entitytype
+   |--shortname
    |--inv
-        |-- invId
+        |-- s_ext_nodenum
+        |--pripid
+        |--invid
+        |--inv
         |--invtype
-        |...
+        |--certype
+        |--cerno
+        |--blictype
+        |--blicno
+        |--country
+        |--currency
+        |--subconam
+        |--acconam
+        |--conprop
+        |--conform
+        |--condate
+        |--conam
+        |--cerno_old
+        |--zspid
+        |--encode_v1
    |--person
-        |-- name
-        |-- posistion
-        |...
+        |-- s_ext_nodenum
+        |-- pripid
+        |--name
+        |--certype
+        |--cerno
+        |--sex
+        |--natdate
+        |--lerepsign
+        |--country
+        |--position
+        |--offhfrom
+        |--offhto
+        |--zspid
+        |--encode_v1
 ```   
 
 # es中保留的字段
@@ -56,6 +121,11 @@ licid               	string -- 当hdfs中licid字段为空时，取credit_code�
 credit_code         	string              	                    	 	 
 tax_code            	string              	                    	 	 
 zspid               	string 
+empnum                  string
+cerno                   string
+oriregno                string
+entityType              string
+shortname               string
 ```
 
 ## e_pri_person_hdfs_ext_20170529
