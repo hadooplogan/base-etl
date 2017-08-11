@@ -15,13 +15,10 @@ public class LogUtil {
     private Logger logger;
 
     public static LogUtil getLogger (Logger logger) {
-        PropertyConfigurator.configure(Thread.currentThread().getContextClassLoader().getResourceAsStream("log4j.properties"));
-        System.out.println("--------path--------"+Thread.currentThread().getContextClassLoader().getResourceAsStream("log4j.properties"));
         return  new LogUtil(logger);
     }
 
     public static LogUtil getLogger (Class<?> clazz) {
-        //PropertyConfigurator.configure("log4j.properties");
         return  new LogUtil(clazz);
     }
 

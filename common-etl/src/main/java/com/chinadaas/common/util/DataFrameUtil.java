@@ -4,6 +4,9 @@ package com.chinadaas.common.util;
 import com.chinadaas.common.common.Constants;
 import com.chinadaas.common.common.CommonConfig;
 import com.chinadaas.common.common.DatabaseValues;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
@@ -12,6 +15,7 @@ import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.hive.HiveContext;
 import org.apache.spark.sql.types.DataTypes;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 public class DataFrameUtil {
@@ -19,7 +23,7 @@ public class DataFrameUtil {
 	 * Init Hive external table from hbase
 	 */
 	public static void InitTable(HiveContext sqlContext, String descTableName, String destFieldString,
-			String srcTableName, String srcFieldString) {
+								 String srcTableName, String srcFieldString) {
 		sqlContext.sql("CREATE EXTERNAL TABLE IF NOT EXISTS " + descTableName + " (key string, " + destFieldString
 				+ ") " + "STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'   WITH SERDEPROPERTIES "
 				+ "(\"hbase.columns.mapping\" = \":key," + srcFieldString
@@ -71,7 +75,7 @@ public class DataFrameUtil {
 				String path = CommonConfig.getValue(DatabaseValues.CHINADAAS_CACHETABLE_PARQUET_PATH) + "/" + tmpTableName;
 				DataFormatConvertUtil.deletePath(path);
 				df.saveAsParquetFile(path);
-				df = sqlContext.load(path);
+				df = sqlContext.read().load(path);
 				df.registerTempTable(tmpTableName);
 				break;
 			}
@@ -158,6 +162,8 @@ public class DataFrameUtil {
 		return null;
 	}
 
+
+
 	/*public static DataFrame cacheTable(HiveContext sqlContext, String table, String cols, String conds) {
 		String schema = DataFormatConvertUtil.getSchema();
 		String sql = "CACHE TABLE " + table + " AS SELECT " + cols + " FROM " + schema + table;
@@ -166,5 +172,52 @@ public class DataFrameUtil {
 		}
 		return sqlContext.sql(sql);
 	}*/
+
+	/**
+	 * 熔断文件判断程序是否执行成功
+	 *
+	 * @return
+	 */
+	public static boolean saveAsFlag(String path){
+		try {
+
+			return	FileSystem.newInstance(new Configuration()).createNewFile(new Path(path));
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * 删除熔断文件
+	 *
+	 * @return
+	 */
+	public static boolean deleteFlag(String path){
+		try {
+
+			return	FileSystem.newInstance(new Configuration()).delete(new Path(path),true);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * 检查熔断文件
+	 *
+	 * @return
+	 */
+	public static boolean checkFlag(String path){
+		try {
+			return	FileSystem.newInstance(new Configuration()).isFile(new Path(path));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 
 }

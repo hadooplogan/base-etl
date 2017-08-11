@@ -35,4 +35,4 @@ CREATE EXTERNAL TABLE e_inv_investment_parquet(
        zspid string)
 ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS  PARQUET
-LOCATION '/tmp/hive_export_inv/e_inv_investment_parquet';
+LOCATION '/tmp/ent-relation/e_inv_investment_parquet';

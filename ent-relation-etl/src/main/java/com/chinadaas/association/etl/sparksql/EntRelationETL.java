@@ -20,7 +20,7 @@ public class EntRelationETL implements Serializable {
      * 个人节点数据
      * ***********************************************************************************************
      *  规则：
-     *  1、个人节点包含自然人股东（invtype为判别'20','21','22','30','35','36'为个人）、高管、组织结构人员
+     *  1、个人节点包含自然人股东（invtype为判别'20','21','22','30','35','36','77' 为个人）、高管、组织结构人员
      *  2、当zspid为空时，使用该人员的所在的公司pripir-name作为人员标志
      *  3、组织人员表当name长度小于4时标记为个人节点
      *  4、关联人员风险提示信息判别人员风险
@@ -43,7 +43,7 @@ public class EntRelationETL implements Serializable {
         StringBuffer sql = new StringBuffer();
         sql.append(" SELECT case when (zspid='null' and pripid<>'null'  and inv<>'') then concat_ws('-',pripid,inv) else zspid end key, inv AS name                  ");
         sql.append("   FROM e_inv_investment_parquet ");
-        sql.append(" WHERE  invtype in('20','21','22','30','35','36')  ");
+        sql.append(" WHERE  invtype in('20','21','22','30','35','36','77')  ");
         sql.append("   AND inv <> ''                                   ");
         sql.append(" UNION                                             ");
         sql.append(" SELECT case when (zspid='null' and  pripid<>'null' and name<>'') then concat_ws('-',pripid,name) else zspid end  key, name                         ");
@@ -512,7 +512,7 @@ public class EntRelationETL implements Serializable {
                 "  from legalRelaTmp01tmp08 pri\n" +
                 " inner join entInfoTmp03 ent\n" +
                 "    on pri.pripid = ent.pripid" ;
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "legalRelaTmp02");
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "legalRelaTmp02");
     }
 
     /**
@@ -564,7 +564,7 @@ public class EntRelationETL implements Serializable {
                 "    and concat_ws('-',a.startkey,a.position)=b.dtcpara \n" +
                 "  join entInfoTmp03 ent\n" +
                 "    on a.pripid = ent.pripid";
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "staffRelaTmp01");
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "staffRelaTmp01");
     }
 
     /**
@@ -820,7 +820,7 @@ public class EntRelationETL implements Serializable {
                         "  from e_inv_investment_parquet pri\n" +
                         " where pri.inv <> '' " +
                         "   and pri.inv <> 'null'\n" +
-                        "   and pri.invtype in ('20', '21', '22', '30', '35', '36')\n" +
+                        "   and pri.invtype in ('20', '21', '22', '30', '35', '36','77')\n" +
                         "   and pri.pripid <> 'null'\n" +
                         "   and pri.pripid <> ''";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "personInvTmp011",DataFrameUtil.CACHETABLE_PARQUET);
@@ -910,9 +910,17 @@ public class EntRelationETL implements Serializable {
 
 
     private DataFrame getPersonMergeRelaDF02(HiveContext sqlContext){
-        String hql = " select startKey, sum(riskscore), endKey\n" +
-                "from personMergeRelationTm01\n" +
-                "group by startKey, endKey";
+        String hql = " select a.startKey,\n" +
+                "       case\n" +
+                "         when a.riskscore > 1 then\n" +
+                "          1\n" +
+                "         else\n" +
+                "          a.riskscore\n" +
+                "       end riskscore,\n" +
+                "       a.endKey\n" +
+                "  from (select startKey, sum(riskscore) as riskscore, endKey\n" +
+                "          from personMergeRelationTm01\n" +
+                "         group by startKey, endKey) a";
         return  DataFrameUtil.getDataFrame(sqlContext, hql, "personMergeRelationTm02");
     }
 
@@ -940,8 +948,20 @@ public class EntRelationETL implements Serializable {
     }
 
     private DataFrame getInvMergeRelationDF02(HiveContext sqlContext){
-        String hql = "select startKey,sum(riskscore),endKey from invMergeRelationTm01 group by startKey,endKey";
-        return  DataFrameUtil.getDataFrame(sqlContext, hql, "invMergeRelationTm01");
+
+        String hql = " select a.startKey,\n" +
+                "       case\n" +
+                "         when a.riskscore > 1 then\n" +
+                "          1\n" +
+                "         else\n" +
+                "          a.riskscore\n" +
+                "       end riskscore,\n" +
+                "       a.endKey\n" +
+                "  from (select startKey, sum(riskscore) as riskscore, endKey\n" +
+                "          from invMergeRelationTm01\n" +
+                "         group by startKey, endKey) a";
+
+        return  DataFrameUtil.getDataFrame(sqlContext, hql, "invMergeRelationTm");
     }
 
 
@@ -1075,13 +1095,13 @@ public class EntRelationETL implements Serializable {
      * @return
      */
     public DataFrame getBranchRelation(HiveContext sqlContext){
-        String hql = "select pripid,brn_rpripid from  s_en_brn_org_hdfs_ext_20170703 where brn_rpripid <> 'null' " +
+        String hql = "select pripid,brn_rpripid from  s_en_brn_org_hdfs_ext_%s where brn_rpripid <> 'null' " +
                 "     union " +
-                "     select a.pripid,b.pripid as brn_rpripid from s_en_brn_org_hdfs_ext_20170703 a join entInfoTmp03 b" +
+                "     select a.pripid,b.pripid as brn_rpripid from s_en_brn_org_hdfs_ext_%s a join entInfoTmp03 b" +
                 "     on a.brn_entname=b.entname and a.brn_regno=b.regno" +
                 "     where a.brn_rpripid<>'null'" +
                 "     and  a.brn_entname <>'null'";
-        return DataFrameUtil.getDataFrame(sqlContext,hql,"branchRelationTmp01");
+        return DataFrameUtil.getDataFrame(sqlContext,String.format(hql,date,date),"branchRelationTmp01");
     }
 
 
@@ -1114,7 +1134,7 @@ public class EntRelationETL implements Serializable {
                 "                             '34',\n" +
                 "                             '40',\n" +
                 "                             '50',\n" +
-                "                             '90')) c\n" +
+                "                             '90','88')) c\n" +
                 " where c.entname is null ";
 
         return DataFrameUtil.getDataFrame(sqlContext,hql,"entOrgRelatgionTmp01",DataFrameUtil.CACHETABLE_EAGER);
@@ -1233,6 +1253,116 @@ public class EntRelationETL implements Serializable {
     public DataFrame getOrgHoldRelaDF(HiveContext sqlContext) {
         String hql =" select distinct b.startKey, b.condate, b.subconam, b.currency, b.conprop, b.endKey from holdRelationTmp011 b where b.flag='entorg' and  b.conprop<>0.0";
         return   DataFrameUtil.getDataFrame(sqlContext, hql, "orgHoldRelaTmp01");
+    }
+
+    /**
+     * 获取主要管理职位
+     */
+    public DataFrame mainStaff(HiveContext sqlContext){
+        String hql="select *\n" +
+                "  from staffRelationTmp\n" +
+                " where position in ('410A',\n" +
+                "                    '410B',\n" +
+                "                    '410C',\n" +
+                "                    '410D',\n" +
+                "                    '410E',\n" +
+                "                    '410F',\n" +
+                "                    '410G',\n" +
+                "                    '410Z',\n" +
+                "                    '430A',\n" +
+                "                    '431A',\n" +
+                "                    '431B',\n" +
+                "                    '432A',\n" +
+                "                    '432K',\n" +
+                "                    '433A',\n" +
+                "                    '433B',\n" +
+                "                    '434Q',\n" +
+                "                    '441A',\n" +
+                "                    '441B',\n" +
+                "                    '441C',\n" +
+                "                    '441D',\n" +
+                "                    '441E',\n" +
+                "                    '441F',\n" +
+                "                    '441G',\n" +
+                "                    '442G',\n" +
+                "                    '451C',\n" +
+                "                    '451D',\n" +
+                "                    '451E',\n" +
+                "                    '490A',\n" +
+                "                    '491A',\n" +
+                "                    '493A',\n" +
+                "                    'A004',\n" +
+                "                    'A005',\n" +
+                "                    'A015',\n" +
+                "                    'A016',\n" +
+                "                    'A017',\n" +
+                "                    'A019',\n" +
+                "                    'A022',\n" +
+                "                    'A023',\n" +
+                "                    'A025',\n" +
+                "                    'A027',\n" +
+                "                    'A029',\n" +
+                "                    'A030',\n" +
+                "                    'A033',\n" +
+                "                    'A034',\n" +
+                "                    'A041',\n" +
+                "                    'A042',\n" +
+                "                    'A043',\n" +
+                "                    'A044',\n" +
+                "                    'A045',\n" +
+                "                    'A046',\n" +
+                "                    'A047',\n" +
+                "                    'A048',\n" +
+                "                    'A049',\n" +
+                "                    'A050',\n" +
+                "                    'A051',\n" +
+                "                    'A052',\n" +
+                "                    'A053',\n" +
+                "                    'A057',\n" +
+                "                    'A139',\n" +
+                "                    'A140',\n" +
+                "                    'A141',\n" +
+                "                    'A143',\n" +
+                "                    'A147',\n" +
+                "                    'A149',\n" +
+                "                    'A150',\n" +
+                "                    'A152',\n" +
+                "                    'A153',\n" +
+                "                    'A154',\n" +
+                "                    'A155',\n" +
+                "                    'A156',\n" +
+                "                    'A157',\n" +
+                "                    'A158',\n" +
+                "                    'A160',\n" +
+                "                    'A161',\n" +
+                "                    'A162',\n" +
+                "                    'A163',\n" +
+                "                    'A165',\n" +
+                "                    'A169',\n" +
+                "                    'A170',\n" +
+                "                    'A175',\n" +
+                "                    'A176',\n" +
+                "                    'A186',\n" +
+                "                    'A187',\n" +
+                "                    'A188',\n" +
+                "                    'A189',\n" +
+                "                    'A190',\n" +
+                "                    'A191',\n" +
+                "                    'A192',\n" +
+                "                    'A193',\n" +
+                "                    'A197',\n" +
+                "                    'A198',\n" +
+                "                    'A199',\n" +
+                "                    'A200',\n" +
+                "                    'A201',\n" +
+                "                    'A204',\n" +
+                "                    'A210',\n" +
+                "                    'A222',\n" +
+                "                    'A236',\n" +
+                "                    'A237',\n" +
+                "                    'A242')";
+
+        return   DataFrameUtil.getDataFrame(sqlContext, hql, "mainRelaTmp01");
     }
 
 }

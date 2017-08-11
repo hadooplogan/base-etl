@@ -1,6 +1,8 @@
 package com.chinadaas.association.etl.sparksql;
 
 import com.chinadaas.association.etl.common.CommonApp;
+import com.chinadaas.common.common.CommonConfig;
+import com.chinadaas.common.common.DatabaseValues;
 import com.chinadaas.common.util.DataFrameUtil;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
@@ -157,6 +159,7 @@ public class Hdfs2EsETL implements Serializable{
     //企业的投资企业
     public  DataFrame getEntInvDf(HiveContext sqlContext){
         CommonApp.loadAndRegiserTable(sqlContext,new String[]{CommonApp.ENT_INFO});
+        sqlContext.load(CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_INV_RADIO_PATH)).registerTempTable("e_inv_investment_parquet");
         getcifindmap(sqlContext);
         return getEntInfoDf02(sqlContext);
     }
@@ -301,8 +304,10 @@ public class Hdfs2EsETL implements Serializable{
                 "          b.zspid\n" +
                 "       end zspid,\n" +
                 "       b.encode_v1\n" +
-                "  from invDataTmp04 b";
-        return DataFrameUtil.getDataFrame(sqlContext, hql, "gtPersonManagerTmp01");
+                "  from invDataTmp04 b " +
+                " inner join e_gt_baseinfo_hdfs_ext_%s c" +
+                " on b.name=c.name  and b.pripid= c.pripid";
+        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "gtPersonManagerTmp01");
     }
 
 

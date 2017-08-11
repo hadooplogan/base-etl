@@ -1,32 +1,11 @@
 curl -XPUT 'http://192.168.207.14:59200/entbaseinfo' -d '{
   "settings": {
   "index": {
-  "number_of_shards": "10",
-  "number_of_replicas": "0",
+  "number_of_shards": "5",
+  "number_of_replicas": "1",
   "refresh_interval": "30s",
   "codec": "best_compression",
-  "translog.sync_interval": "5s",
-  "analysis" : {
-            "analyzer" : {
-              "default" : {
-                "tokenizer" : "ik_max_word"
-              },
-              "pinyin_analyzer" : {
-                "tokenizer" : "my_pinyin"
-              }
-            },
-            "tokenizer" : {
-              "my_pinyin" : {
-                "type" : "pinyin",
-                 "keep_separate_first_letter" : false,
-                 "keep_full_pinyin" : true,
-                 "keep_original" : true,
-                 "limit_first_letter_length" : 16,
-                 "lowercase" : true,
-                 "remove_duplicated_term" : true
-              }
-            }
-          }
+  "translog.sync_interval": "5s"
   }
   },
   "mappings": {
@@ -44,16 +23,16 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo' -d '{
   "type": "keyword"
   },
   "entname": {
-  "analyzer": "ik_max_word",
-  "type": "text"
+  "index": true,
+  "type": "keyword"
   },
   "exactentname": {
   "index": true,
   "type": "keyword"
   },
   "pinyinname": {
-  "analyzer": "pinyin_analyzer",
-  "type": "text"
+  "index": true,
+  "type": "keyword"
   },
   "regno": {
   "index": true,
@@ -259,8 +238,8 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo' -d '{
 curl -XPUT 'http://192.168.207.14:59200/ealterrecoder' -d '{
 "settings": {
 "index": {
-"number_of_shards": "10",
-"number_of_replicas": "0",
+"number_of_shards": "5",
+"number_of_replicas": "1",
 "refresh_interval": "30s",
 "codec": "best_compression",
 "translog.sync_interval": "5s"
@@ -270,15 +249,13 @@ curl -XPUT 'http://192.168.207.14:59200/ealterrecoder' -d '{
 "EALTERRECODER": {
 "properties": {
 "s_ext_nodenum": {
-"type": "keyword",
+"type": "text",
 "index": true
 }
-}
-},
+,
 "pripid": {
-"type": "keyword",
+"type": "text",
 "index": true
-}
 },
 "s_ext_sequence": {
 "type": "text",
@@ -294,11 +271,11 @@ curl -XPUT 'http://192.168.207.14:59200/ealterrecoder' -d '{
 },
 "altbe": {
 "type": "text",
-"index": false
+"index": true
 },
 "altaf": {
 "type": "text",
-"index": false
+"index": true
 },
 "altdate": {
 "type": "text",
@@ -334,4 +311,4 @@ code string,
 type string,
 typedesc string)
 STORED BY 'org.elasticsearch.hadoop.hive.EsStorageHandler'
-TBLPROPERTIES('es.resource' = 'code/code','es.nodes'='192.168.207.14','es.port'='59200');
+TBLPROPERTIES('es.resource' = 'code/code','es.nodes'='192.168.207.14','es.port'='58200');

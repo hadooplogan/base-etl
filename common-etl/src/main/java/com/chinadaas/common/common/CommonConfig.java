@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 public class CommonConfig {
 	private static final String BUNDLE_NAME = "common-config";
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
 	public static String getValue(String key) {
 		try {
 			return RESOURCE_BUNDLE.getString(key).trim();

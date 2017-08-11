@@ -17,7 +17,7 @@ import org.elasticsearch.spark.sql.EsSparkSQL;
  */
 public class Es2HdfsDemoApp {
     public static void main(String[] args) {
-        SparkConf conf = new SparkConf().setAppName("Chinadaas Es2Hdfs ETL APP");
+      /*  SparkConf conf = new SparkConf().setAppName("Chinadaas Es2Hdfs ETL APP");
         conf.set(DatabaseValues.ES_INDEX_AUTO_CREATE, CommonConfig.getValue(DatabaseValues.ES_INDEX_AUTO_CREATE));
         conf.set(DatabaseValues.ES_NODES,"192.168.206.12");
         conf.set(DatabaseValues.ES_PORT,"9300");
@@ -27,6 +27,6 @@ public class Es2HdfsDemoApp {
         HiveContext sqlContext = new HiveContext(sc);
         EsSparkSQL.esDF(sqlContext,"code/code").saveAsParquetFile("/tmp/hive_export_inv/code_parquet");
         sqlContext.clearCache();
-        sc.stop();
+        sc.stop();*/
     }
 }

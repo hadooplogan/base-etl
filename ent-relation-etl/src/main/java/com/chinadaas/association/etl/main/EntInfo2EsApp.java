@@ -5,6 +5,7 @@ import com.chinadaas.association.etl.table.EntBaseInfoEO;
 import com.chinadaas.association.etl.table.EntShortNameEo;
 import com.chinadaas.association.etl.udf.RandomUDF;
 import com.chinadaas.common.common.CommonConfig;
+import com.chinadaas.common.common.Constants;
 import com.chinadaas.common.common.DatabaseValues;
 import com.chinadaas.common.udf.StringFormatUDF;
 import com.chinadaas.common.util.DataFrameUtil;
@@ -30,9 +31,12 @@ import java.util.List;
  */
 public class EntInfo2EsApp {
     public static void main(String[] args) {
-
+    /*    if(!DataFrameUtil.checkFlag(Constants.ASSOCIATION_FLAG_PATh)){
+            return ;
+        }
+        DataFrameUtil.deleteFlag(Constants.ASSOCIATION_FLAG_PATh);
+*/
         String date = args[0];
-
         SparkConf conf = new SparkConf().setAppName("Chinadaas Hdfs2Es ETL APP");
         String parquetPath = CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_PARQUET_TMP);
         conf.set(DatabaseValues.ES_INDEX_AUTO_CREATE, CommonConfig.getValue(DatabaseValues.ES_INDEX_AUTO_CREATE));
@@ -48,16 +52,17 @@ public class EntInfo2EsApp {
         Hdfs2EsETL hdfs = new Hdfs2EsETL();
         hdfs.setDate(date);
 
-//      JavaEsSpark.saveToEs(EntBaseInfoEO.convertEntData(sqlContext,hdfs),"entbaseinfo/ENTBASEINFO");
-//      JavaEsSpark.saveToEs(EntBaseInfoEO.convertGtEntData(sqlContext,hdfs),"entbaseinfo/ENTBASEINFO");
-//      EsSparkSQL.saveToEs(hdfs.getAlterDataDF(sqlContext),"ealterrecoder/EALTERRECODER");
+       JavaEsSpark.saveToEs(EntBaseInfoEO.convertEntData(sqlContext,hdfs),"entbaseinfo/ENTBASEINFO");
+       JavaEsSpark.saveToEs(EntBaseInfoEO.convertGtEntData(sqlContext,hdfs),"entbaseinfo/ENTBASEINFO");
+       EsSparkSQL.saveToEs(hdfs.getAlterDataDF(sqlContext),"ealterrecoder/EALTERRECODER");
 
+//        DataFrameUtil.saveAsFlag(Constants.ASSOCIATION_FLAG_PATh);
         sqlContext.clearCache();
         sc.stop();
     }
 
     private static void  loadEntShortName(SparkContext sc,HiveContext sqlContext){
-        JavaRDD<EntShortNameEo> entShortName =  sc.textFile("/tmp/hive_export_inv/ent_shortname/shortname.csv",10).toJavaRDD().
+        JavaRDD<EntShortNameEo> entShortName =  sc.textFile("/tmp/ent-relation/ent_shortname/shortname.csv",10).toJavaRDD().
                 map(new Function<String, EntShortNameEo>() {
                     @Override
                     public EntShortNameEo call(String line) throws Exception {

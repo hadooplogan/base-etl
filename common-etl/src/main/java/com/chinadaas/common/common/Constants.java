@@ -8,4 +8,8 @@ public class Constants {
     public static final String ASSOCIATION_CSV_HEADER = "chinadaas.csv.header";
     public static final String ASSOCIATION_CSV_DELIMITER = "chinadaas.csv.delimiter";
     public static final String ASSOCIATION_CSV_NULLVALUE = "chinadaas.csv.nullvalue";
+    public static final String ASSOCIATION_FLAG_PATh = "/tmp/ent-relation/flag";
+
+
+
 }

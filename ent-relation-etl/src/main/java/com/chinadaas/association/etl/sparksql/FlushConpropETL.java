@@ -26,7 +26,8 @@ public class FlushConpropETL {
         getFlushBadData05(sqlContext);
         getFlushBadData06(sqlContext);
         getFlushBadData061(sqlContext);
-        DataFrame df = getFlushBadData07(sqlContext);
+        getFlushBadData07(sqlContext);
+        DataFrame df = getFlushBadData08(sqlContext);
         return df;
     }
 
@@ -196,7 +197,7 @@ public class FlushConpropETL {
                 "       a.invid,\n" +
                 "       a.inv,\n" +
                 "       a.invtype,\n" +
-                "       a.certype,\n" +
+                "       regexp_replace(a.certype,'!','') as certype,\n" +
                 "       a.cerno,\n" +
                 "       a.blictype,\n" +
                 "       a.blicno,\n" +
@@ -236,8 +237,8 @@ public class FlushConpropETL {
                 "        a.s_ext_sequence,\n" +
                 "        a.invid,\n" +
                 "        a.inv,\n" +
-                "        a.invtype,\n" +
-                "        a.certype,\n" +
+                "        regexp_replace(a.invtype, '!', '') as invtype,\n" +
+                "        regexp_replace(a.certype,'!','') as certype ,\n" +
                 "        a.cerno,\n" +
                 "        a.blictype,\n" +
                 "        a.blicno,\n" +
@@ -276,4 +277,62 @@ public class FlushConpropETL {
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp07");
     }
 
+    private DataFrame getFlushBadData08(HiveContext sqlContext){
+        String hql = "select a.s_ext_nodenum,\n" +
+                "       a.pripid,\n" +
+                "       a.s_ext_sequence,\n" +
+                "       a.invid,\n" +
+                "       a.inv,\n" +
+                "       case\n" +
+                "         when (a.invtype = '' or a.invtype = 'null' or a.invtype is null) and\n" +
+                "              (a.certype <> '' and a.certype <> 'null' and\n" +
+                "              a.certype is not null) and substr(a.certype, 1, 1) = 'P' then\n" +
+                "          '77'\n" +
+                "         when (a.invtype = '' or a.invtype = 'null' or a.invtype is null) and\n" +
+                "              (a.certype <> '' and a.certype <> 'null' and\n" +
+                "              a.certype is not null) and substr(a.certype, 1, 1) = 'C' then\n" +
+                "          '88'\n" +
+                "         when (a.invtype = '' or a.invtype = 'null' or a.invtype is null) and\n" +
+                "              (a.certype = '' or a.certype = 'null' or a.certype is null) and\n" +
+                "              length(a.inv) < 4 then\n" +
+                "          '77'\n" +
+                "         when (a.invtype = '' or a.invtype = 'null' or a.invtype is null) and\n" +
+                "              (a.certype = '' or a.certype = 'null' or a.certype is null) and\n" +
+                "              length(a.inv) >= 4 then\n" +
+                "          '88'\n" +
+                "         else\n" +
+                "          a.invtype\n" +
+                "       end invtype,\n" +
+                "       a.certype,\n" +
+                "       a.cerno,\n" +
+                "       a.blictype,\n" +
+                "       a.blicno,\n" +
+                "       a.country,\n" +
+                "       a.currency,\n" +
+                "       a.subconam,\n" +
+                "       a.acconam,\n" +
+                "       a.subconamusd,\n" +
+                "       a.acconamusd,\n" +
+                "       a.conprop,\n" +
+                "       a.conform,\n" +
+                "       a.condate,\n" +
+                "       a.baldelper,\n" +
+                "       a.conam ,\n" +
+                "       a.exeaffsign,\n" +
+                "       a.s_ext_timestamp,\n" +
+                "       a.s_ext_batch,\n" +
+                "       a.s_ext_validflag,\n" +
+                "       a.linkman,\n" +
+                "       a.cerno_old,\n" +
+                "       a.subconam_new,\n" +
+                "       a.conprop_new,\n" +
+                "       a.status,\n" +
+                "       a.record_stat,\n" +
+                "       a.record_desc,\n" +
+                "       a.match,\n" +
+                "       a.zspid\n" +
+                "  from probleDataTmp07 a\n";
+
+        return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp08");
+    }
 }

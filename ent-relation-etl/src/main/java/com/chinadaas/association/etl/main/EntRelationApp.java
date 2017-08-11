@@ -4,17 +4,26 @@ import com.chinadaas.association.etl.common.CommonApp;
 import com.chinadaas.association.etl.sparksql.EntRelationETL;
 import com.chinadaas.association.etl.udf.ScoreModelUDF;
 import com.chinadaas.common.common.CommonConfig;
+import com.chinadaas.common.common.Constants;
 import com.chinadaas.common.common.DatabaseValues;
 import com.chinadaas.common.udf.CollectionSameUDF;
 import com.chinadaas.common.util.DataFrameUtil;
 import com.chinadaas.common.util.LogUtil;
 import com.chinadaas.common.util.MyFileUtil;
+import jodd.io.FileUtil;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.hive.HiveContext;
+
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Created by gongxs01 on 2017/5/2.
@@ -28,15 +37,21 @@ import org.slf4j.LoggerFactory;
  * ************************************************************
  */
 public class EntRelationApp {
-    protected static LogUtil logUtil = LogUtil.getLogger(LoggerFactory.getLogger("common"));
+
+    protected static LogUtil logger = LogUtil.getLogger(EntRelationApp.class);
 
     public static void main(String[] args) {
-//        logUtil.info("","");
+        if(!DataFrameUtil.checkFlag(Constants.ASSOCIATION_FLAG_PATh)){
+            System.out.println("flag  file is not found!");
+            return ;
+        }
+        DataFrameUtil.deleteFlag(Constants.ASSOCIATION_FLAG_PATh);
         if (args.length < 1) {
             System.out.println("please input databatch date!  date format yyyymmdd  :20170508");
-
             return;
         }
+
+
 
        /* //验证date日期格式
         if(!DataFormatConvertUtil.isValidDate(args[0])){
@@ -49,6 +64,7 @@ public class EntRelationApp {
         SparkContext sc = new SparkContext(conf);
         HiveContext sqlContext = new HiveContext(sc);
         sqlContext.setConf("spark.sql.tungsten.enabled", "false");
+
         CollectionSameUDF.collectSame(sc, sqlContext);
         ScoreModelUDF.riskScore(sc, sqlContext);
         String srcPath = CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_SRCPATH_TMP);
@@ -59,8 +75,9 @@ public class EntRelationApp {
 
         EntRelationETL dfEtl = new EntRelationETL();
         dfEtl.setDate(date);
-        System.out.println("date format " + date);
         saveDF(sqlContext, srcPath, dstPath, dfEtl);
+
+        DataFrameUtil.saveAsFlag(Constants.ASSOCIATION_FLAG_PATh);
         sqlContext.clearCache();
         sc.stop();
     }
@@ -80,12 +97,12 @@ public class EntRelationApp {
             CommonApp.loadAndRegiserTable(sqlContext,new String[]{CommonApp.ENT_INFO,CommonApp.ENT_PERSON_INFO});
 
 
+
             //企业节点 alone 1.7min
             DataFrameUtil.saveAsCsv(dfEtl.getEntDataFrame(sqlContext), srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_ENT), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_ENT_HEADER), true);
-
-            //企业相同电话节点    4.8min
-            DataFrameUtil.saveAsParquetOverwrite(dfEtl.getTelInfoDF(sqlContext),CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_ENTTEL));
+           //企业相同电话节点    4.8min
+            DataFrameUtil.saveAsParquetOverwrite(dfEtl.getTelInfoDF(sqlContext),parquetPath+CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_ENTTEL));
             DataFrame dfTel = sqlContext.load(parquetPath+CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_NODE_ENTTEL));
             dfTel.registerTempTable("telInfoTmp02");
             DataFrameUtil.saveAsCsv(dfTel, srcPath);
@@ -95,6 +112,7 @@ public class EntRelationApp {
             DataFrame dfTelRa = dfEtl.getTelRelaInfoDF(sqlContext);
             DataFrameUtil.saveAsCsv(dfTelRa, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTTEL), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTTEL_HEADER), true);
+
             //企业与企业相同电话关系（直接相连）    5.7min
             DataFrameUtil.saveAsParquetOverwrite(dfEtl.getEntAndEntTelInfoDF(sqlContext),parquetPath+CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_TEL));
             DataFrame dfEntTel = sqlContext.load(parquetPath+CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_TEL));
@@ -124,8 +142,7 @@ public class EntRelationApp {
             DataFrame dfentDomRa = dfEtl.getEntDomInfoRelaDF(sqlContext);
             DataFrameUtil.saveAsCsv(dfentDomRa, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTADDR), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTADDR_HEADER), true);
-
-            //企业与企业相同地址关系（直接相连）    13min
+//            企业与企业相同地址关系（直接相连）    13min
             DataFrameUtil.saveAsParquetOverwrite(dfEtl.getEntAndEntDomInfoRelaDF(sqlContext),parquetPath+ CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_ADDR));
             DataFrame dfentAndentDomRa = sqlContext.load(parquetPath+ CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTANDENT_ADDR));
             dfentAndentDomRa.registerTempTable("entDomRelaTmp11");
@@ -139,7 +156,6 @@ public class EntRelationApp {
             dfLegal.registerTempTable("legalRelaTmp02");
             DataFrameUtil.saveAsCsv(dfLegal, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_LEGAL), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_LEGAL_HEADER), true);
-            sqlContext.clearCache();
 
             //任职关系 14min
             DataFrameUtil.saveAsParquetOverwrite( dfEtl.getStaffRelaDF(sqlContext),parquetPath+CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_STAFF));
@@ -147,7 +163,6 @@ public class EntRelationApp {
             dfStaff.registerTempTable("staffRelaTmp01");
             DataFrameUtil.saveAsCsv(dfStaff, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_STAFF), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_STAFF_HEADER), true);
-            sqlContext.clearCache();
 
             //企业股东投资关系  21min
             dfEtl.getInvRelaDF(sqlContext).write().mode(SaveMode.Overwrite).parquet(parquetPath+CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTINV));
@@ -155,8 +170,6 @@ public class EntRelationApp {
             dfInvRela.registerTempTable("invRelaTmp04");
             DataFrameUtil.saveAsCsv(dfInvRela, srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTINV), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTINV_HEADER), true);
-            sqlContext.clearCache();
-
             //人员职位信息
             DataFrameUtil.saveAsParquetOverwrite(dfEtl.getPersonJoinRelaDF01(sqlContext),parquetPath+"personJoinRelaTmp01");
             sqlContext.load(parquetPath+"personJoinRelaTmp01").registerTempTable("personJoinRelaTmp01");
@@ -165,6 +178,7 @@ public class EntRelationApp {
             DataFrameUtil.saveAsCsv(dfEtl.getInvJoinRelaDF(sqlContext),srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_INVJOIN), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ENTINV_HEADER), true);
             sqlContext.clearCache();
+
 
             //人员股东投资关系
             DataFrameUtil.saveAsParquetOverwrite( dfEtl.getPersonInv(sqlContext),parquetPath+CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONINV));
@@ -175,6 +189,7 @@ public class EntRelationApp {
             DataFrameUtil.saveAsCsv(dfEtl.getPersonJoinRelaDF(sqlContext),srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath,CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONJOIN), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONINV_HEADER), true);
 
+
             //合并多种关系为一种关系(人员关系)  1.4min
             DataFrameUtil.saveAsCsv(dfEtl.getPersonMergeRelaDF(sqlContext),srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONMERGE), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_PERSONMERGE_HEADER), true);
@@ -183,9 +198,9 @@ public class EntRelationApp {
             DataFrameUtil.saveAsCsv(dfInvMergeRrelation,srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_INVMERGE), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_INVMERGE_HEADER), true);
             //分支机构关系 17s
-            DataFrame dfbrach = dfEtl.getBranchRelation(sqlContext);
-            DataFrameUtil.saveAsCsv(dfbrach,srcPath);
-            MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_BRANCH), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_BRANCH_HEADER), true);
+//            DataFrame dfbrach = dfEtl.getBranchRelation(sqlContext);
+//            DataFrameUtil.saveAsCsv(dfbrach,srcPath);
+//            MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_BRANCH), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_BRANCH_HEADER), true);
 
             //组织机构投资关系 20s
             DataFrameUtil.saveAsCsv(dfEtl.getEntOrgRelatgion(sqlContext),srcPath);
@@ -216,6 +231,12 @@ public class EntRelationApp {
             //组织机构控股关系  37s
             DataFrameUtil.saveAsCsv(dfEtl.getOrgHoldRelaDF(sqlContext),srcPath);
             MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ORGHOLD), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_ORGHOLD_HEADER), true);
+            //关键人员关系
+            DataFrame mainStaff =sqlContext.load(parquetPath+CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_STAFF));
+            mainStaff.registerTempTable("staffRelationTmp");
+            DataFrameUtil.saveAsCsv(dfEtl.mainStaff(sqlContext),srcPath);
+            MyFileUtil.copyMergeWithHeader(srcPath, dstPath, CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_MAIN_STAFF), CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_RELATION_MAIN_STAFF_HEADER), true);
+
 
             sqlContext.clearCache();
         } catch (Exception e) {

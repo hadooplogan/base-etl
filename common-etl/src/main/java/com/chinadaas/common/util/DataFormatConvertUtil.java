@@ -4,9 +4,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -128,7 +126,7 @@ public class DataFormatConvertUtil {
 
 	public static void main(String[] args){
 		String date="20170801";
-		System.out.println(isValidDate(date));
+
 	}
 
 	
