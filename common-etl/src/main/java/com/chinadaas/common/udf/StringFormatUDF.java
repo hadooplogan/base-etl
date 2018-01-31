@@ -2,6 +2,7 @@ package com.chinadaas.common.udf;
 
 import com.chinadaas.common.util.IDUtil;
 import org.apache.spark.SparkContext;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.hive.HiveContext;
 import org.apache.spark.sql.types.DataTypes;
@@ -10,13 +11,14 @@ import org.apache.spark.sql.types.DataTypes;
  * Created by gongxs01 on 2017/6/2.
  */
 public class StringFormatUDF {
-    public static void stringHandle(SparkContext sc, HiveContext sqlContext) {
-        sqlContext.udf().register("stringhandle", new UDF1<String, String>() {
+    public static void stringHandle(SparkSession spark) {
+        spark.udf().register("stringhandle", new UDF1<String, String>() {
             /**
              *
              */
             private static final long serialVersionUID = -6709911270475566751L;
 
+            @Override
             public String call(String str) {
                 return formatEsString(str);
             }

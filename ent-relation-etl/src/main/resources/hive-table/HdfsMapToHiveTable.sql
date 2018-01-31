@@ -1,5 +1,5 @@
---企业节点
-CREATE EXTERNAL TABLE entbaseinfo_gxs(
+--锟斤拷业锟节碉拷
+CREATE EXTERNAL TABLE dev1_relation_entbaseinfo_gxs(
       pripid string,
       entname string,
       regno string,
@@ -10,10 +10,12 @@ CREATE EXTERNAL TABLE entbaseinfo_gxs(
       entstatus string,
       regcapcur string,
       riskinfo string)
-ROW FORMAT DELIMITED 
-FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/ent';
---人员节点
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|';
+LOCATION '/relation/dstpath/relation_data20170831/ent';
+
+load data inpath '/relation/dstpath/relation_data20171211/ent' into table dev1_relation_entbaseinfo_gxs;
+--锟斤拷员锟节碉拷
 CREATE EXTERNAL TABLE person_gxs(
       zsid string,
       name string,     
@@ -21,21 +23,22 @@ CREATE EXTERNAL TABLE person_gxs(
       encode_v1 string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/person';
---企业同一地址节点
+LOCATION '/relation/dstpath/relation/person';
+
+--锟斤拷业同一锟斤拷址锟节碉拷
 CREATE EXTERNAL TABLE pri_ent_addr_gxs(
       addr string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|'
-LOCATION '/tmp/ent-relation/tmp/dstpath/eaddr';
+LOCATION '/relation/dstpath/relation/eaddr';
 
---企业同一电话节点
+--锟斤拷业同一锟界话锟节碉拷
 CREATE EXTERNAL TABLE pri_ent_tel_gxs(
       tel string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/etel';
---人员投资关系
+LOCATION '/relation/dstpath/relation/etel';
+--锟斤拷员投锟绞癸拷系
 CREATE EXTERNAL TABLE person_inv_relation_gxs(
       zspid string,
       condate string,
@@ -46,8 +49,8 @@ CREATE EXTERNAL TABLE person_inv_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/personinv';
---企业投资关系
+LOCATION '/relation/dstpath/relation/personinv';
+--锟斤拷业投锟绞癸拷系
 CREATE EXTERNAL TABLE ent_inv_relation_gxs(
       pripid string,
       condate string,
@@ -58,17 +61,19 @@ CREATE EXTERNAL TABLE ent_inv_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/entinv';
---法人关系
+LOCATION '/relation/dstpath/relation_data20170913/entinv';
+
+
+--锟斤拷锟剿癸拷系
 CREATE EXTERNAL TABLE lerepsign_relation_gxs(
       personid string,
       pripid string,
       riskscore string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/legal';
+LOCATION '/relation/dstpath/relation/legal';
 
---职位关系
+--职位锟斤拷系
 CREATE EXTERNAL TABLE position_relation_gxs(
       personid string,
       position string,
@@ -76,29 +81,29 @@ CREATE EXTERNAL TABLE position_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/staff';
---企业同一地址关联
+LOCATION '/relation/dstpath/relation/staff';
+--锟斤拷业同一锟斤拷址锟斤拷锟斤拷
 CREATE EXTERNAL TABLE pri_ent_addr_relation_gxs(
       pripid string,
       dom string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/entaddr';
---企业同一电话关联
+LOCATION '/relation/dstpath/relation/entaddr';
+--锟斤拷业同一锟界话锟斤拷锟斤拷
 CREATE EXTERNAL TABLE pri_ent_tel_relation_gxs(
       pripid string,
       tel string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/enttel';
---人员同一地址关联
+LOCATION '/relation/dstpath/relation/enttel';
+--锟斤拷员同一锟斤拷址锟斤拷锟斤拷
 CREATE EXTERNAL TABLE pri_person_addr_relation_gxs(
       personid string,
       addr string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/peraddr';
---企业控股关系
+LOCATION '/relation/dstpath/relation/peraddr';
+--锟斤拷业锟截股癸拷系
 CREATE EXTERNAL TABLE ent_invhold_relation_gxs(
       zspid string,
       condate string,
@@ -109,8 +114,8 @@ CREATE EXTERNAL TABLE ent_invhold_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/invhold';
---企业参股关系
+LOCATION '/relation/dstpath/relation/invhold';
+--锟斤拷业锟轿股癸拷系
 CREATE EXTERNAL TABLE ent_invjoin_relation_gxs(
       zspid string,
       condate string,
@@ -121,8 +126,8 @@ CREATE EXTERNAL TABLE ent_invjoin_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/invjoin';
---人员参股关系
+LOCATION '/relation/dstpath/relation/invjoin';
+--锟斤拷员锟轿股癸拷系
 CREATE EXTERNAL TABLE person_join_relation_gxs(
       zspid string,
       condate string,
@@ -133,9 +138,9 @@ CREATE EXTERNAL TABLE person_join_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/personjoin';
+LOCATION '/relation/dstpath/relation/personjoin';
 
---人员控股关系
+--锟斤拷员锟截股癸拷系
 CREATE EXTERNAL TABLE person_hold_relation_gxs(
       zspid string,
       condate string,
@@ -146,9 +151,9 @@ CREATE EXTERNAL TABLE person_hold_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/personhold';
+LOCATION '/relation/dstpath/relation/personhold';
 
---企业同一电话关系风险评分
+--锟斤拷业同一锟界话锟斤拷系锟斤拷锟斤拷锟斤拷锟斤拷
 CREATE EXTERNAL TABLE ent_andenttel_relation_gxs(
       pripid string,
       tel string,
@@ -156,8 +161,8 @@ CREATE EXTERNAL TABLE ent_andenttel_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/entandenttel';
---企业同一地址风险评分
+LOCATION '/relation/dstpath/relation/entandenttel';
+--锟斤拷业同一锟斤拷址锟斤拷锟斤拷锟斤拷锟斤拷
 CREATE EXTERNAL TABLE ent_andentaddr_relation_gxs(
       pripid string,
       dom string,
@@ -165,31 +170,31 @@ CREATE EXTERNAL TABLE ent_andentaddr_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/entandentaddr';
---人员关系合并
+LOCATION '/relation/dstpath/relation/entandentaddr';
+--锟斤拷员锟斤拷系锟较诧拷
 CREATE EXTERNAL TABLE person_personmerge_relation_gxs(
       pripid string,
       riskscore string,
       topripid string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/personmerge';
---企业关系合并
+LOCATION '/relation/dstpath/relation/personmerge';
+--锟斤拷业锟斤拷系锟较诧拷
 CREATE EXTERNAL TABLE ent_invmerge_relation_gxs(
      pripid string,
       riskscore string,
       topripid string)
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '|' 
-LOCATION '/tmp/ent-relation/tmp/dstpath/invmerge';
---组织机构
+LOCATION '/relation/dstpath/relation/invmerge';
+--锟斤拷织锟斤拷锟斤拷
 CREATE EXTERNAL TABLE entorg_gxs(
      key string,
       name string)
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '|'
-LOCATION '/tmp/ent-relation/tmp/dstpath/org';
---组织结构投资
+LOCATION '/relation/dstpath/relation/org';
+--锟斤拷织锟结构投锟斤拷
 CREATE EXTERNAL TABLE ent_orginv_relation_gxs(
       pripid string,
       condate string,
@@ -200,9 +205,9 @@ CREATE EXTERNAL TABLE ent_orginv_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '|'
-LOCATION '/tmp/ent-relation/tmp/dstpath/orginv';
+LOCATION '/relation/dstpath/relation/orginv';
 
---组织结构控股关系
+--锟斤拷织锟结构锟截股癸拷系
 CREATE EXTERNAL TABLE org_hold_relation_gxs(
       zspid string,
       condate string,
@@ -213,52 +218,96 @@ CREATE EXTERNAL TABLE org_hold_relation_gxs(
       riskscore string)
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '|'
-LOCATION '/tmp/ent-relation/tmp/dstpath/orghold';
+LOCATION '/relation/dstpath/relation/orghold/';
 
+sudo -u hdfs hdfs dfs  -mkdir -p /relation/dstpath/relation/orghold/
 
---企业节点
+sudo -u hdfs hdfs -cp /relation/dstpath/relation_data20170831/orghold /relation/dstpath/relation/orghold/
+
+load data inpath '/relation/dstpath/relation_data20170831/orghold' into table org_hold_relation_gxs;
+load data inpath '/relation/dstpath/relation_data20170831/ent' into table entbaseinfo_gxs;
+
+/relation/dstpath/relation_data20170831/orghold
+--锟斤拷业锟节碉拷
 DROP TABLE entbaseinfo_gxs;
---人员节点
+--锟斤拷员锟节碉拷
 DROP TABLE person_gxs;
---企业同一地址节点
+--锟斤拷业同一锟斤拷址锟节碉拷
 DROP TABLE pri_ent_addr_gxs;
---企业同一电话节点
+--锟斤拷业同一锟界话锟节碉拷
 DROP TABLE pri_ent_tel_gxs;
---人员投资关系
+--锟斤拷员投锟绞癸拷系
 DROP TABLE person_inv_relation_gxs;
---企业投资关系
+--锟斤拷业投锟绞癸拷系
 DROP TABLE ent_inv_relation_gxs;
---法人关系
+--锟斤拷锟剿癸拷系
 DROP TABLE lerepsign_relation_gxs;
---职位关系
+--职位锟斤拷系
 DROP TABLE position_relation_gxs;
---企业同一地址关联
+--锟斤拷业同一锟斤拷址锟斤拷锟斤拷
 DROP TABLE pri_ent_addr_relation_gxs;
---企业同一电话关联
+--锟斤拷业同一锟界话锟斤拷锟斤拷
 DROP TABLE pri_ent_tel_relation_gxs;
---人员同一地址关联
+--锟斤拷员同一锟斤拷址锟斤拷锟斤拷
 DROP TABLE pri_person_addr_relation_gxs;
---企业控股关系
+--锟斤拷业锟截股癸拷系
 DROP TABLE ent_invhold_relation_gxs;
---企业参股关系
+--锟斤拷业锟轿股癸拷系
 DROP TABLE ent_invjoin_relation_gxs;
---人员参股关系
+--锟斤拷员锟轿股癸拷系
 DROP TABLE person_join_relation_gxs;
 
---人员控股关系
+--锟斤拷员锟截股癸拷系
 DROP TABLE person_hold_relation_gxs;
 
---企业同一电话关系风险评分
+--锟斤拷业同一锟界话锟斤拷系锟斤拷锟斤拷锟斤拷锟斤拷
 DROP TABLE ent_andenttel_relation_gxs;
---企业同一地址风险评分
+--锟斤拷业同一锟斤拷址锟斤拷锟斤拷锟斤拷锟斤拷
 DROP TABLE ent_andentaddr_relation_gxs;
---人员关系合并
+--锟斤拷员锟斤拷系锟较诧拷
 DROP TABLE person_personmerge_relation_gxs;
---企业关系合并
+--锟斤拷业锟斤拷系锟较诧拷
 DROP TABLE ent_invmerge_relation_gxs;
---组织机构
+--锟斤拷织锟斤拷锟斤拷
 DROP TABLE entorg_gxs;
---组织结构投资
+--锟斤拷织锟结构投锟斤拷
 DROP TABLE ent_orginv_relation_gxs;
---组织结构控股关系
+--锟斤拷织锟结构锟截股癸拷系
 DROP TABLE org_hold_relation_gxs;
+
+:START_ID(Org-ID)|holderrto|sharestype|holderamt|:END_ID(TenInv-ID)
+
+--锟斤拷织锟结构锟截股癸拷系
+CREATE EXTERNAL TABLE dev1_listedorg_gxs(
+      orgid string,
+      holderrto string,
+      sharestype string,
+      holderamt string,
+      pripid string)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+LOCATION '/tmp/spark_test/listedorg/';
+
+CREATE EXTERNAL TABLE dev1_listedorg_gxs(
+      orgid string,
+      holderrto string,
+      sharestype string,
+      holderamt string,
+      pripid string)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+LOCATION '/tmp/spark_test/listedorg/';
+
+b.entname, b.pripid, a.compcode
+
+comp_info_tmp
+
+CREATE EXTERNAL TABLE dev1_teninv_gxs(
+              entname string,
+              pripid string,
+              compcode string)
+ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+STORED AS  PARQUET
+LOCATION '/relation/cachetable/comp_info_tmp';
+
+

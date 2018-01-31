@@ -55,7 +55,7 @@ rm -rf ./import_data/*
 echo "check dir end"
 # step 1: spark pre-proess
 echo "step 1 start"
-/usr/lib/spark/spark-1.5.2-bin-hadoop2.4/bin/spark-submit --executor-memory 10G --num-executors 20 --executor-cores 4  --class com.chinadaas.association.etl.common.CommonApp --master yarn ent-relation-etl.jar $1 > ./logs/association-$LOG_SUFFIX.log 2 >&1
+$SPARK_HOME/bin/spark-submit --executor-memory 10G --num-executors 10 --executor-cores 4  --class com.chinadaas.association.etl.common.CommonApp --master yarn ent-relation-etl.jar $1 > ./logs/association-$LOG_SUFFIX.log 2 >&1
 
 if [ $? -ne 0 ] ;then
     echo "common error"

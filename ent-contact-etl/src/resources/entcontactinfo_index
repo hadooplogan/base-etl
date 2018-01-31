@@ -1,0 +1,1 @@
+{"mappings":{"ENTCONTACTINFO_INDEX":{"properties":{"pripid":{"type":"keyword"},"credit_code":{"type":"keyword","index":true},"entname":{"type":"keyword","index":true},"tel":{"type":"text","index":true},"email":{"type":"text","index":true},"position":{"type":"text","index":true},"source":{"type":"text","index":true}}}}}

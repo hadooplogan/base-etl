@@ -8,11 +8,11 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkContext;
-import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.api.java.UDF1;
-import org.apache.spark.sql.hive.HiveContext;
 import org.apache.spark.sql.types.DataTypes;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class DataFrameUtil {
 	/*
 	 * Init Hive external table from hbase
 	 */
-	public static void InitTable(HiveContext sqlContext, String descTableName, String destFieldString,
+	public static void InitTable(SparkSession sqlContext, String descTableName, String destFieldString,
 								 String srcTableName, String srcFieldString) {
 		sqlContext.sql("CREATE EXTERNAL TABLE IF NOT EXISTS " + descTableName + " (key string, " + destFieldString
 				+ ") " + "STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'   WITH SERDEPROPERTIES "
@@ -30,7 +30,7 @@ public class DataFrameUtil {
 				+ "\" ) TBLPROPERTIES (\"hbase.table.name\" = \"" + srcTableName + "\")");
 	}
 
-	public static DataFrame getDataFrame(HiveContext sqlContext, String hql, String tmpTableName) {
+	public static Dataset getDataFrame(SparkSession sqlContext, String hql, String tmpTableName) {
 		return getDataFrame(sqlContext, hql, tmpTableName, UNCACHE_TABLE);
 	}
 
@@ -40,8 +40,8 @@ public class DataFrameUtil {
 	public static final int CACHETABLE_MAGIC = 2;
 	public static final int CACHETABLE_PARQUET = 3;
 
-	public static DataFrame getDataFrame(HiveContext sqlContext, String hql, String tmpTableName, int cacheMode) {
-		DataFrame df = null;
+	public static Dataset getDataFrame(SparkSession sqlContext, String hql, String tmpTableName, int cacheMode) {
+		Dataset df = null;
 		if (cacheMode != CACHETABLE_MAGIC) {
 			df = sqlContext.sql(hql);
 		}
@@ -54,8 +54,7 @@ public class DataFrameUtil {
 			}
 			case CACHETABLE_LAZY: // memory async cache
 			{
-				df.registerTempTable(tmpTableName);
-				sqlContext.cacheTable(tmpTableName);
+				df.cache().registerTempTable(tmpTableName);
 				break;
 			}
 			case CACHETABLE_EAGER: // memory sync cache
@@ -72,11 +71,10 @@ public class DataFrameUtil {
 			}
 			case CACHETABLE_PARQUET: // parquet cache
 			{
-				String path = CommonConfig.getValue(DatabaseValues.CHINADAAS_CACHETABLE_PARQUET_PATH) + "/" + tmpTableName;
+				String path = CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_PARQUET_TMP)  + tmpTableName;
 				DataFormatConvertUtil.deletePath(path);
-				df.saveAsParquetFile(path);
-				df = sqlContext.read().load(path);
-				df.registerTempTable(tmpTableName);
+				df.write().mode(SaveMode.Overwrite).parquet(path);
+				sqlContext.read().load(path).registerTempTable(tmpTableName);
 				break;
 			}
 			default:
@@ -89,18 +87,15 @@ public class DataFrameUtil {
 		return df;
 	}
 
-	public static void uncacheTable(HiveContext sqlContext, String tableName) {
-		sqlContext.uncacheTable(tableName);
-	}
 
-	public static DataFrame distinct2TemplateTable(HiveContext sqlContext, String sourceTablename,
+	public static Dataset distinct2TemplateTable(SparkSession sqlContext, String sourceTablename,
 			String templateTableName, String columnName) {
-		String hql = "SELECT * " + "FROM " + sourceTablename + " " + "WHERE " + columnName + " IS NOT NULL AND "
+			String hql = "SELECT * " + "FROM " + sourceTablename + " " + "WHERE " + columnName + " IS NOT NULL AND "
 				+ columnName + " <> ''";
 		return DataFrameUtil.getDataFrame(sqlContext, hql, templateTableName);
 	}
 
-	public static DataFrame distinct2TemplateTable(HiveContext sqlContext, String sql, String templateTableName) {
+	public static Dataset distinct2TemplateTable(SparkSession sqlContext, String sql, String templateTableName) {
 		return DataFrameUtil.getDataFrame(sqlContext, sql, templateTableName);
 	}
 
@@ -112,7 +107,7 @@ public class DataFrameUtil {
 	/*
 	 * UDF Test
 	 */
-	public static void UDFTest(SparkContext sc, HiveContext sqlContext) {
+	public static void UDFTest(SparkContext sc, SparkSession sqlContext) {
 		SQLContext sqlCtx = new SQLContext(sc);
 		sqlCtx.udf().register("stringLengthTest", new UDF1<String, Integer>() {
 			/**
@@ -120,15 +115,16 @@ public class DataFrameUtil {
 			 */
 			private static final long serialVersionUID = -6709911270475566751L;
 
+			@Override
 			public Integer call(String str) {
 				return str.length();
 			}
 		}, DataTypes.IntegerType);
-		DataFrame dd = sqlContext.sql("SELECT stringLengthTest('test')");
+		Dataset dd = sqlContext.sql("SELECT stringLengthTest('test')");
 		dd.show();
 	}
 	
-	public static DataFrame saveAsCsv(DataFrame df, String path) {
+	public static Dataset saveAsCsv(Dataset df, String path) {
 		HashMap<String, String> saveOptions = new HashMap<String, String>();
 		saveOptions.put("path", path);
 		saveOptions.put("header", CommonConfig.getValue(Constants.ASSOCIATION_CSV_HEADER));
@@ -141,7 +137,7 @@ public class DataFrameUtil {
 	}
 
 
-	public static DataFrame saveAsCsvAppend(DataFrame df, String path) {
+	public static Dataset saveAsCsvAppend(Dataset df, String path) {
 		HashMap<String, String> saveOptions = new HashMap<String, String>();
 		saveOptions.put("path", path);
 		saveOptions.put("header", CommonConfig.getValue(Constants.ASSOCIATION_CSV_HEADER));
@@ -153,25 +149,31 @@ public class DataFrameUtil {
 		return df;
 	}
 
-	public static DataFrame saveAsParquetOverwrite(DataFrame df, String path) {
+	public static Dataset saveAsParquetOverwrite(Dataset df, String path) {
+
+		DataFormatConvertUtil.deletePath(path);
+
+		if(!DataFormatConvertUtil.isExistsPath(path)){
+			DataFormatConvertUtil.mkdir(path);
+		}
+
 		df.write().mode(SaveMode.Overwrite).parquet(path);
 		return df;
 	}
 
-	public static DataFrame saveASEs(DataFrame df,String path){
-		return null;
+	public static Dataset saveAsTextFileOverwrite(Dataset df,String path){
+
+		DataFormatConvertUtil.deletePath(path);
+
+		if(!DataFormatConvertUtil.isExistsPath(path)){
+			DataFormatConvertUtil.mkdir(path);
+		}
+        //临时设置文件输出分区为1分区。
+		df.repartition(1).write().mode(SaveMode.Overwrite).text(path);
+		return df;
+
 	}
 
-
-
-	/*public static DataFrame cacheTable(HiveContext sqlContext, String table, String cols, String conds) {
-		String schema = DataFormatConvertUtil.getSchema();
-		String sql = "CACHE TABLE " + table + " AS SELECT " + cols + " FROM " + schema + table;
-		if (conds != null) {
-			sql += " WHERE " + conds;
-		}
-		return sqlContext.sql(sql);
-	}*/
 
 	/**
 	 * 熔断文件判断程序是否执行成功

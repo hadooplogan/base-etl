@@ -1,17 +1,18 @@
 package com.chinadaas.association.etl.table;
 
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.chinadaas.association.etl.sparksql.Hdfs2EsETL;
-import com.google.common.base.Optional;
+import com.chinadaas.common.util.TimeUtil;
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.*;
+import org.apache.spark.api.java.Optional;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.hive.HiveContext;
+import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
 
 import java.io.Serializable;
@@ -30,7 +31,7 @@ public class EntBaseInfoEO implements Serializable {
                          String entstatus, String regcap, String opscope, String opform, String dom, String reccap, String regcapcur,
                          String forentname, String country, String entname_old, String name, String ancheyear, String candate, String revdate,
                          String licid, String credit_code, String tax_code, String zspid,String empnum,String cerno,String oriregno,String entitytype,
-                         String encode_v1,String shortname) {
+                         String encode_v1,String shortname,String s_ext_sequence,String data_date,String docid,String cbuitem) {
         this.s_ext_nodenum = s_ext_nodenum;
         this.pripid = pripid;
         this.entname = entname;
@@ -71,11 +72,20 @@ public class EntBaseInfoEO implements Serializable {
         this.entitytype=entitytype;
         this.pinyinname=entname;
         this.exactentname=entname;
+
+//        this.entname_smart=entname;
+
         this.encode_v1=encode_v1;
         this.shortname=shortname;
+        this.docid = docid;
+        this.s_ext_sequence=s_ext_sequence;
+        this.data_date = data_date;
+        this.write_date = TimeUtil.getNowStr();
+        this.cbuitem =  cbuitem;
+
     }
 
-    public static JavaRDD<EntBaseInfoEO> convertEntData(HiveContext sqlContext,Hdfs2EsETL hdfs) {
+    public static JavaRDD<EntBaseInfoEO>  convertEntData(SparkSession sqlContext, Hdfs2EsETL hdfs) {
         //股东
         JavaPairRDD<String, Iterable<JSONObject>> inv = getJavaRddEntInv(hdfs.getEntInvDf(sqlContext));
         //管理人员
@@ -83,11 +93,12 @@ public class EntBaseInfoEO implements Serializable {
         //主体企业
         JavaPairRDD<String, EntBaseInfoEO> entda = getJavaRddEnt(hdfs.getEntDataFrame(sqlContext));
 
+
         JavaPairRDD<String,EntBaseInfoEO> entInv = entda.leftOuterJoin(inv).mapToPair(new PairFunction<Tuple2<String,
-                Tuple2<EntBaseInfoEO, Optional<Iterable<JSONObject>>>>, String, EntBaseInfoEO>() {
+                        Tuple2<EntBaseInfoEO, Optional<Iterable<JSONObject>>>>, String, EntBaseInfoEO>() {
             @Override
             public Tuple2<String, EntBaseInfoEO> call(Tuple2<String, Tuple2<EntBaseInfoEO,
-                    Optional<Iterable<JSONObject>>>> stringTuple2Tuple2) throws Exception {
+                                Optional<Iterable<JSONObject>>>> stringTuple2Tuple2) throws Exception {
                 EntBaseInfoEO entEO = stringTuple2Tuple2._2()._1();
 
                 if(stringTuple2Tuple2._2()._2().isPresent()){
@@ -97,25 +108,6 @@ public class EntBaseInfoEO implements Serializable {
             }
         });
 
-       /* JavaRDD<EntBaseInfoEO> entEsData = entda.leftOuterJoin(inv).leftOuterJoin(person).map(
-                new Function<Tuple2<String, Tuple2<Tuple2<EntBaseInfoEO, Optional<Iterable<JSONObject>>>,
-                        Optional<Iterable<JSONObject>>>>, EntBaseInfoEO>() {
-                    @Override
-                    public EntBaseInfoEO call(Tuple2<String, Tuple2<Tuple2<EntBaseInfoEO,
-                            Optional<Iterable<JSONObject>>>, Optional<Iterable<JSONObject>>>>
-                                                      tupleEs) throws Exception {
-
-                        EntBaseInfoEO entEO = tupleEs._2()._1()._1();
-
-                        if (tupleEs._2()._1()._2().isPresent()) {
-                            entEO.setInv(IteratorUtils.toList(tupleEs._2()._1()._2().get().iterator()));
-                        }
-                        if (tupleEs._2()._2().isPresent()) {
-                            entEO.setPerson(IteratorUtils.toList(tupleEs._2()._2().get().iterator()));
-                        }
-                        return entEO;
-                    }
-                });*/
         return convertPersonData(entInv,person);
     }
 
@@ -134,24 +126,19 @@ public class EntBaseInfoEO implements Serializable {
                 });
         return entEsData;
     }
-    public static JavaRDD<EntBaseInfoEO> convertGtEntData(HiveContext sqlContext,Hdfs2EsETL hdfs) {
+
+    public static JavaRDD<EntBaseInfoEO> convertGtEntData(SparkSession sqlContext, Hdfs2EsETL hdfs) {
         //管理人员
         JavaPairRDD<String, Iterable<JSONObject>> person = getJavaRddPerson(hdfs.getGtPersonManagerDf(sqlContext));
         //主体企业
         JavaPairRDD<String, EntBaseInfoEO> entda = getJavaRddEnt(hdfs.getGtEntBaseInfo(sqlContext));
 
-      /*return  entda.map(new Function<Tuple2<String, EntBaseInfoEO>, EntBaseInfoEO>() {
-          @Override
-          public EntBaseInfoEO call(Tuple2<String, EntBaseInfoEO> stringEntBaseInfoEOTuple2) throws Exception {
-              return stringEntBaseInfoEOTuple2._2();
-          }
-      });*/
         return convertPersonData(entda,person);
     }
 
 
 
-    private static JavaPairRDD<String, Iterable<JSONObject>> getJavaRddEntInv(DataFrame df){
+    private static JavaPairRDD<String, Iterable<JSONObject>> getJavaRddEntInv(Dataset df){
        return df.toJavaRDD().mapToPair(new PairFunction<Row, String, JSONObject>() {
             @Override
             public Tuple2<String, JSONObject> call(Row row) throws Exception {
@@ -162,7 +149,7 @@ public class EntBaseInfoEO implements Serializable {
     }
 
 
-    private static JavaPairRDD<String, Iterable<JSONObject>> getJavaRddPerson(DataFrame df){
+    private static JavaPairRDD<String, Iterable<JSONObject>> getJavaRddPerson(Dataset df){
         return df.toJavaRDD().mapToPair(new PairFunction<Row, String, JSONObject>() {
             @Override
             public Tuple2<String, JSONObject> call(Row row) throws Exception {
@@ -172,7 +159,7 @@ public class EntBaseInfoEO implements Serializable {
         }).groupByKey();
     }
 
-    public static JavaPairRDD<String, EntBaseInfoEO> getJavaRddEnt(DataFrame df){
+    public static JavaPairRDD<String, EntBaseInfoEO> getJavaRddEnt(Dataset df){
         return df.toJavaRDD().mapToPair(new PairFunction<Row, String, EntBaseInfoEO>() {
             @Override
             public Tuple2<String, EntBaseInfoEO> call(Row row) throws Exception {
@@ -186,13 +173,15 @@ public class EntBaseInfoEO implements Serializable {
                         row.getString(25), row.getString(26), row.getString(27), row.getString(28),
                         row.getString(29), row.getString(30), row.getString(31), row.getString(32),
                         row.getString(33), row.getString(34), row.getString(35), row.getString(36),
-                        row.getString(37),row.getString(38),row.getString(39)));
+                        row.getString(37),row.getString(38),row.getString(39),row.getString(40),row.getString(41),
+                        row.getString(42),row.getString(43)));
             }
         });
     }
 
 
     public static Map<String,String> converInvMap(Row row){
+
         Map<String,String> invMap = new HashMap<String,String>(20);
         invMap.put("s_ext_nodenum",row.getString(0));
         invMap.put("pripid",row.getString(1));
@@ -207,16 +196,18 @@ public class EntBaseInfoEO implements Serializable {
         invMap.put("currency",row.getString(10));
         invMap.put("subconam",row.getString(11));
         invMap.put("acconam",row.getString(12));
-        invMap.put("conprop",String.valueOf(row.getDouble(13)));
+        invMap.put("conprop",row.getAs("conprop")==null?"0.0":row.getAs("conprop").toString());
         invMap.put("conform",row.getString(14));
         invMap.put("condate",row.getString(15));
         invMap.put("conam",row.getString(16));
         invMap.put("cerno_old",row.getString(17));
         invMap.put("zspid",row.getString(18));
         invMap.put("encode_v1",row.getString(19));
+        invMap.put("s_ext_sequence",row.getString(20));
 
         return invMap;
     }
+
 
     public static Map<String,String> converPersonMap(Row row){
         Map<String,String> personMap = new HashMap<String,String>(20);
@@ -234,6 +225,7 @@ public class EntBaseInfoEO implements Serializable {
         personMap.put("offhto",row.getString(11));
         personMap.put("zspid",row.getString(12));
         personMap.put("encode_v1",row.getString(13));
+        personMap.put("s_ext_sequence",row.getString(14));
         return personMap;
     }
 
@@ -331,6 +323,77 @@ public class EntBaseInfoEO implements Serializable {
 //    private String engname;
 //    private String exactdom;
     private String shortname;
+    private String docid;
+
+    private String data_date;
+
+    private String write_date;
+
+//    private String entname_smart;
+
+    private List<JSONObject> inv;
+
+    private List<JSONObject> person;
+
+    private String  cbuitem;
+
+    public String getCbuitem() {
+        return cbuitem;
+    }
+
+    public void setCbuitem(String cbuitem) {
+        this.cbuitem = cbuitem;
+    }
+
+    private String s_ext_sequence;
+
+    public String getS_ext_sequence() {
+        return s_ext_sequence;
+    }
+
+    public void setS_ext_sequence(String s_ext_sequence) {
+        this.s_ext_sequence = s_ext_sequence;
+    }
+
+    public String getPinyinname() {
+        return pinyinname;
+    }
+
+    public void setPinyinname(String pinyinname) {
+        this.pinyinname = pinyinname;
+    }
+
+    public String getData_date() {
+        return data_date;
+    }
+
+    public void setData_date(String data_date) {
+        this.data_date = data_date;
+    }
+
+    public String getWrite_date() {
+        return write_date;
+    }
+
+    public void setWrite_date(String write_date) {
+        this.write_date = write_date;
+    }
+
+/*    public String getEntname_smart() {
+        return entname_smart;
+    }
+
+    public void setEntname_smart(String entname_smart) {
+        this.entname_smart = entname_smart;
+    }*/
+
+    public String getDocid() {
+        return docid;
+    }
+
+    public void setDocid(String docid) {
+        this.docid = docid;
+    }
 
     public String getShortname() {
         return shortname;
@@ -354,18 +417,18 @@ public class EntBaseInfoEO implements Serializable {
         return encode_v1;
     }
 
+
     public void setEncode_v1(String encode_v1) {
         this.encode_v1 = encode_v1;
     }
 
-
-    public String getPinyinname() {
+/*    public String getPinyinname() {
         return pinyinname;
     }
 
     public void setPinyinname(String pinyinname) {
         this.pinyinname = pinyinname;
-    }
+    }*/
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -402,10 +465,6 @@ public class EntBaseInfoEO implements Serializable {
     public void setEntitytype(String entitytype) {
         this.entitytype = entitytype;
     }
-
-    private List<JSONObject> inv;
-
-    private List<JSONObject> person;
 
     public List<JSONObject> getInv() {
         return inv;

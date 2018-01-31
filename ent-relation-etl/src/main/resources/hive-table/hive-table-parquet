@@ -15,7 +15,7 @@ CREATE EXTERNAL TABLE e_inv_investment_parquet(
        acconam string,
        subconamusd string,
        acconamusd string,
-       conprop double,
+       conprop string,
        conform string,
        condate string,
        baldelper string,
@@ -35,4 +35,50 @@ CREATE EXTERNAL TABLE e_inv_investment_parquet(
        zspid string)
 ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS  PARQUET
-LOCATION '/tmp/ent-relation/e_inv_investment_parquet';
+LOCATION '/relation/cachetable/e_inv_investment_parquet';
+
+
+CREATE EXTERNAL TABLE ent_index_parquet(
+              pripid string,
+              EB0026 bigint,
+              EB0027 bigint,
+              EB0028 bigint,
+              EB0029 bigint,
+              EB0030 bigint,
+              EB0031 bigint,
+              EB0032 bigint,
+              EB0033 bigint,
+              EB0034 bigint,
+              EB0035 double,
+              EB0036 double,
+              EB0037 double,
+              EB0038 double,
+              EB0039 double,
+              EB0040 double,
+              EB0042 bigint,
+              EB0043 bigint,
+              EB0044 bigint,
+              EB0045 bigint,
+              EB0106 integer)
+ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+STORED AS  PARQUET
+LOCATION '/next/ent_indx/relation/';
+
+
+CREATE EXTERNAL TABLE dev1_relation_leaf_gxs(
+orgid string,
+conprop string,
+pripid   string
+             )
+ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+STORED AS  PARQUET
+LOCATION '/relation/cachetable/aml_leaf';
+
+CREATE EXTERNAL TABLE dev1_relation_entinv_gxs(
+pripid string,
+conprop string,
+invid string
+             )
+ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+STORED AS  PARQUET
+LOCATION '/relation/cachetable/aml_entinv';

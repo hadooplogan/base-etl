@@ -1,0 +1,32 @@
+联系方式的hive建立外表语句
+hive 用parquet 文件建立外表语句
+
+CREATE EXTERNAL TABLE ent_contact_infomation(
+id string,
+pripid string,
+entname string,
+credit_code string,
+tel string,
+email string,
+address string,
+position string,
+source string,
+date int)
+ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+STORED AS  PARQUET
+LOCATION '/next/entcontact/contactinfomation';
+
+
+
+
+CREATE EXTERNAL TABLE ent_extract_contact(
+pripid string,
+entname string,
+credit_code string,
+tel string,
+email string,
+address string,
+date int)
+ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+STORED AS  PARQUET
+LOCATION '/next/uniquecontact/merged/20180112';

@@ -1,13 +1,29 @@
 #!/bin/bash
-NEO4J_HOME=/u01/neo4j-community-3.1.3-two/bin/
-rm -rf /u01/neo4j-community-3.1.3-two/data/databases/graph.db
-/u01/neo4j-community-3.1.3-two/bin/neo4j-import --into  /u01/neo4j-community-3.1.3-two/data/databases/graph.db --nodes:person "/u01/importn4j_data/person.csv" --nodes:ent "/u01/importn4j_data/entbaseinfo.csv" --nodes:paddr "/u01/importn4j_data/pri_person_addr.csv" --nodes:etel "/u01/importn4j_data/pri_ent_tel.csv" --nodes:eaddr "/u01/importn4j_data/pri_ent_addr.csv"  --relationships:staff "/u01/importn4j_data/position_relation.csv"  --relationships:legal "/u01/importn4j_data/lerepsign_relation.csv" --relationships:peraddr "/u01/importn4j_data/pri_person_addr_relation.csv" --relationships:enttel "/u01/importn4j_data/pri_ent_tel_relation.csv"  --relationships:entaddr "/u01/importn4j_data/pri_ent_addr_relation.csv" --relationships:inv "/u01/importn4j_data/ent_inv_relation.csv" --relationships:inv "/u01/importn4j_data/person_inv_relation.csv"  --delimiter '|' --bad-tolerance 10000000 --skip-duplicate-nodes > log.log
-# create  neo4j index 
-/u01/neo4j-community-3.1.3-two/bin/neo4j restart
+NEO4J_HOME=/u01/neo4j-k8s
+#data_dir=/u01/importn4j_data/import_data_dev
+data_dir=/u01/pro_data_nfs/20180102
+$NEO4J_HOME/bin/neo4j stop
+#back up data
+rm -rf $NEO4J_HOME/data/databases/graph.db
+echo $NEO4J_HOME/bin/neo4j-import --into  $NEO4J_HOME/data/databases/graph.db --nodes:person "$data_dir/person.csv" --nodes:ent "$data_dir/entbaseinfo.csv" --nodes:paddr "$data_dir/pri_person_addr.csv" --nodes:etel "$data_dir/pri_ent_tel.csv" --nodes:eaddr "$data_dir/pri_ent_addr.csv"  --relationships:staff "$data_dir/position_relation.csv" --relationships:inv "$data_dir/ent_inv_relation.csv" --relationships:inv "$data_dir/person_inv_relation.csv"  --relationships:legal "$data_dir/lerepsign_relation.csv" --relationships:peraddr "$data_dir/pri_person_addr_relation.csv" --relationships:enttel "$data_dir/pri_ent_tel_relation.csv"  --relationships:entaddr "$data_dir/pri_ent_addr_relation.csv"  --relationships:hold "$data_dir/ent_invhold_relation.csv"  --relationships:hold "$data_dir/person_hold_relation.csv"--relationships:join "$data_dir/ent_invjoin_relation.csv"  --relationships:join "$data_dir/person_join_relation.csv"   --delimiter '|' --bad-tolerance 10000000 --skip-duplicate-nodes
+
+#$NEO4J_HOME/bin/neo4j-import --into  $NEO4J_HOME/data/databases/graph.db --nodes:person "$data_dir/person.csv" --nodes:ent "$data_dir/entorg.csv" --nodes:ent "$data_dir/entbaseinfo.csv" --nodes:paddr "$data_dir/pri_person_addr.csv" --nodes:etel "$data_dir/pri_ent_tel.csv" --nodes:eaddr "$data_dir/pri_ent_addr.csv"  --relationships:inv "$data_dir/entorg_orginv_relation.csv"   --relationships:staff "$data_dir/position_relation.csv" --relationships:inv "$data_dir/ent_inv_relation.csv" --relationships:inv "$data_dir/person_inv_relation.csv"  --relationships:legal "$data_dir/lerepsign_relation.csv" --relationships:peraddr "$data_dir/pri_person_addr_relation.csv" --relationships:enttel "$data_dir/pri_ent_tel_relation.csv"  --relationships:entaddr "$data_dir/pri_ent_addr_relation.csv"  --relationships:hold "$data_dir/ent_invhold_relation.csv" --relationships:hold "$data_dir/entorg_orghold_relation.csv"  --relationships:hold "$data_dir/person_hold_relation.csv" --relationships:join "$data_dir/ent_invjoin_relation.csv"  --relationships:join "$data_dir/person_join_relation.csv"  --relationships:suspectaddr "$data_dir/ent_andentaddr_relation.csv" --relationships:suspecttel "$data_dir/ent_andenttel_relation.csv"  --relationships:merge "$data_dir/ent_invmerge_relation.csv" --relationships:merge "$data_dir/person_personmerge_relation.csv"  --delimiter '|' --bad-tolerance 10000000 --skip-duplicate-nodes  > log.log
+
+$NEO4J_HOME/bin/neo4j-import --into  $NEO4J_HOME/data/databases/graph.db --nodes:teninv "$data_dir/teninv.csv" --nodes:person "$data_dir/personorg.csv"  --nodes:person "$data_dir/person.csv" --nodes:ent "$data_dir/entorg.csv" --nodes:ent "$data_dir/entbaseinfo.csv" --nodes:paddr "$data_dir/pri_person_addr.csv" --nodes:etel "$data_dir/pri_ent_tel.csv" --nodes:eaddr "$data_dir/pri_ent_addr.csv"  --relationships:inv "$data_dir/entorg_orginv_relation.csv"   --relationships:staff "$data_dir/position_relation.csv" --relationships:inv "$data_dir/ent_inv_relation.csv" --relationships:inv "$data_dir/person_inv_relation.csv"  --relationships:legal "$data_dir/lerepsign_relation.csv" --relationships:peraddr "$data_dir/pri_person_addr_relation.csv" --relationships:enttel "$data_dir/pri_ent_tel_relation.csv"  --relationships:entaddr "$data_dir/pri_ent_addr_relation.csv"  --relationships:hold "$data_dir/ent_invhold_relation.csv" --relationships:hold "$data_dir/entorg_orghold_relation.csv"  --relationships:hold "$data_dir/person_hold_relation.csv" --relationships:join "$data_dir/ent_invjoin_relation.csv"  --relationships:join "$data_dir/person_join_relation.csv"  --relationships:suspectaddr "$data_dir/ent_andentaddr_relation.csv" --relationships:suspecttel "$data_dir/ent_andenttel_relation.csv"  --relationships:merge "$data_dir/ent_invmerge_relation.csv" --relationships:merge "$data_dir/person_personmerge_relation.csv" --relationships:listedinvnode "$data_dir/listent.csv" --relationships:listedinvnode "$data_dir/listorg.csv" --relationships:listedinvnode "$data_dir/listperson.csv" --relationships:listedinvnode "$data_dir/teninvrl.csv" --relationships:listedinv "$data_dir/listedinvent.csv" --relationships:listedinv "$data_dir/listedinvorg.csv" --relationships:listedinv "$data_dir/listedinventperson.csv" --relationships:tenhold "$data_dir/teninventhold.csv" --relationships:tenhold "$data_dir/teninvpersonhold.csv" --relationships:tenhold "$data_dir/teninvorghold.csv"  --relationships:merge "$data_dir/org_orgmerge_relation.csv"  --relationships:merge_sz "$data_dir/person_personaddr_relation.csv"  --relationships:merge_sz "$data_dir/personmergesz_relation.csv" --relationships:merge_sz "$data_dir/entnmergesz_relation.csv" --relationships:merge_sz "$data_dir/orgmergesz_relation.csv" --relationships:teninvmerge "$data_dir/personinvmerge_relation.csv" --relationships:teninvmerge "$data_dir/entinvmerge_relation.csv" --relationships:teninvmerge "$data_dir/orginvmerge_relation.csv"  --relationships:tenholdmerge "$data_dir/personholdmerge_relation.csv"  --relationships:tenholdmerge "$data_dir/entholdmerge_relation.csv" --relationships:tenholdmerge "$data_dir/orgholdmerge_relation.csv"   --delimiter '|' --bad-tolerance 10000000 --skip-duplicate-nodes  > log.log
+
 sleep 30s
-/u01/neo4j-community-3.1.3-two/bin/neo4j-shell -c "create  index on :person(name);";
-/u01/neo4j-community-3.1.3-two/bin/neo4j-shell -c "create  index on :ent(name);";
-/u01/neo4j-community-3.1.3-two/bin/neo4j-shell -c "create  index on :ent(regno);";
-/u01/neo4j-community-3.1.3-two/bin/neo4j-shell -c "create  index on :ent(creditcode);";
-/u01/neo4j-community-3.1.3-two/bin/neo4j-shell -c "create  index on :person(zsid);";
-/u01/neo4j-community-3.1.3-two/bin/neo4j-shell -c "create  index on :ent(zsid);";
+# create  neo4j index
+$NEO4J_HOME/bin/neo4j start
+
+sleep 1m
+
+$NEO4J_HOME/bin/neo4j-shell -c "create  index on :person(name);";
+$NEO4J_HOME/bin/neo4j-shell -c "create  index on :ent(name);";
+$NEO4J_HOME/bin/neo4j-shell -c "create  index on :ent(regno);";
+$NEO4J_HOME/bin/neo4j-shell -c "create  index on :ent(creditcode);";
+$NEO4J_HOME/bin/neo4j-shell -c "create  index on :person(zsid);";
+$NEO4J_HOME/bin/neo4j-shell -c "create  index on :ent(zsid);";
+$NEO4J_HOME/bin/neo4j-shell -c "create  index on :eaddr(value);";
+$NEO4J_HOME/bin/neo4j-shell -c "create  index on :paddr(value);";
+$NEO4J_HOME/bin/neo4j-shell -c "create  index on :etel(value);";
+$NEO4J_HOME/bin/neo4j-shell -c "create  index on :person(encode_v1);";

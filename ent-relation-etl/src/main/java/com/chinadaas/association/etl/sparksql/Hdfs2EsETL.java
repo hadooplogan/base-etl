@@ -4,8 +4,9 @@ import com.chinadaas.association.etl.common.CommonApp;
 import com.chinadaas.common.common.CommonConfig;
 import com.chinadaas.common.common.DatabaseValues;
 import com.chinadaas.common.util.DataFrameUtil;
-import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.hive.HiveContext;
+import com.chinadaas.common.util.TimeUtil;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.SparkSession;
 
 import java.io.Serializable;
 
@@ -14,9 +15,11 @@ import java.io.Serializable;
  * Created by gongxs01 on 2017/5/15.
  */
 public class Hdfs2EsETL implements Serializable{
-    public String date;
-    public void setDate(String date) {
-        this.date = date;
+    public String date_day;
+
+
+    public void setDate_day(String date_day) {
+        this.date_day = date_day;
     }
 
     /**
@@ -24,23 +27,23 @@ public class Hdfs2EsETL implements Serializable{
      * @param sqlContext
      * @return
      */
-    public DataFrame getEntDataFrame(HiveContext sqlContext) {
+    public Dataset getEntDataFrame(SparkSession sqlContext) {
         getEntDataFrame01(sqlContext);
         return getEntDataFrame02(sqlContext);
     }
 
 
-    private DataFrame getEntDataFrame01(HiveContext sqlContext) {
+    private Dataset getEntDataFrame01(SparkSession sqlContext) {
         String hql =" select a.pripid,b.encode_v1 " +
-                "  from entInfoTmp03 a inner join " +
-                "  getcifindmaptmp01  b " +
+                "  from enterprisebaseinfocollect a inner join " +
+                "  s_cif_indmap  b " +
                 "  on a.zspid=b.zspid \n" +
                 " WHERE a.pripid <> '' and a.zspid<>'' and a.zspid<>'null'\n";
         return DataFrameUtil.getDataFrame(sqlContext,  hql, "entDataInfoTmp01");
     }
 
 
-    private DataFrame getEntDataFrame02(HiveContext sqlContext) {
+    private Dataset getEntDataFrame02(SparkSession sqlContext) {
         String hql ="select a.s_ext_nodenum,\n" +
                 "       a.pripid,\n" +
                 "       stringhandle(a.entname) as entname,\n" +
@@ -92,8 +95,12 @@ public class Hdfs2EsETL implements Serializable{
                 "       a.oriregno,\n" +
                 "       '1' as entityType, \n" +
                 "        b.encode_v1," +
-                "        c.shortname \n" +
-                "  from entInfoTmp03  a left join " +
+                "        c.shortname," +
+                "        a.s_ext_sequence, \n" +
+                "        a.data_date, \n" +
+                "        concat_ws('\\u0001', a.s_ext_nodenum, a.pripid, a.s_ext_sequence) as docid,\n" +
+                "       a.cbuitem\n" +
+                "  from enterprisebaseinfocollect  a left join " +
                 "  entDataInfoTmp01  b " +
                 "  on a.pripid=b.pripid " +
                 "  left join shortNameTmp01 c" +
@@ -103,7 +110,7 @@ public class Hdfs2EsETL implements Serializable{
 
 
 
-    public DataFrame getGtEntBaseInfo(HiveContext sqlContext){
+    public Dataset getGtEntBaseInfo(SparkSession sqlContext){
         String hql =
                 " select s_ext_nodenum,\n" +
                 "       pripid,\n" +
@@ -144,27 +151,33 @@ public class Hdfs2EsETL implements Serializable{
                 "       oriregno,\n" +
                 "       '2' as entityType," +
                 "       '' as encode_v1," +
-                "       '' as shortname\n" +
-                "  from e_gt_baseinfo_hdfs_ext_%s \n";
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "gtEntDataTmp01");
+                "       '' as shortname," +
+                "       s_ext_sequence, \n" +
+                "       data_date, \n" +
+                "       concat_ws('\\u0001', s_ext_nodenum, pripid, s_ext_sequence) as docid, \n" +
+                "       cbuitem\n" +
+                "  from e_gt_baseinfo \n";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "gtEntDataTmp01");
     }
 
-
-    public DataFrame getcifindmap(HiveContext sqlContext){
+    public Dataset getcifindmap(SparkSession sqlContext,String date){
         String hql =  "select distinct zspid,encode_v1 from  s_cif_indmap_hdfs_ext_%s ";
-        return DataFrameUtil.getDataFrame(sqlContext,  String.format(hql,date), "getcifindmaptmp01",DataFrameUtil.CACHETABLE_PARQUET);
+        return DataFrameUtil.getDataFrame(sqlContext,  String.format(hql,date), "S_CIF_INDMAP",DataFrameUtil.CACHETABLE_PARQUET);
     }
 
 
     //企业的投资企业
-    public  DataFrame getEntInvDf(HiveContext sqlContext){
-        CommonApp.loadAndRegiserTable(sqlContext,new String[]{CommonApp.ENT_INFO});
-        sqlContext.load(CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_INV_RADIO_PATH)).registerTempTable("e_inv_investment_parquet");
-        getcifindmap(sqlContext);
+    public Dataset getEntInvDf(SparkSession sqlContext){
+       /* CommonApp.loadAndRegiserTable(sqlContext,new String[]{CommonApp.ENT_INFO});
+        sqlContext.read().parquet(CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_PARQUET_TMP)+
+                CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_INV_PARQUET_PATH)).
+                registerTempTable(CommonConfig.getValue(DatabaseValues.CHINADAAS_ASSOCIATION_INV_PARQUET_PATH));*/
+
+//        getcifindmap(sqlContext,date_day);
         return getEntInfoDf02(sqlContext);
     }
 
-    private  DataFrame getEntInfoDf02(HiveContext sqlContext){
+    private  Dataset getEntInfoDf02(SparkSession sqlContext){
         String hql="select a.s_ext_nodenum,\n" +
                 "       a.pripid,\n" +
                 "       a.invid,\n" +
@@ -184,23 +197,24 @@ public class Hdfs2EsETL implements Serializable{
                 "       a.conam,\n" +
                 "       a.cerno_old,\n" +
                 "       a.zspid," +
-                "       b.encode_v1\n" +
-                "  from e_inv_investment_parquet a" +
-                "  left join getcifindmaptmp01 b " +
+                "       b.encode_v1," +
+                "       a.s_ext_sequence\n" +
+                "  from e_inv_investment a" +
+                "  left join s_cif_indmap b " +
                 "  on a.zspid=b.zspid " +
                 "  where a.zspid<>'null' and a.zspid<>'' ";
         return DataFrameUtil.getDataFrame(sqlContext,hql, "invDataTmp01");
     }
 
 
-    public  DataFrame getPersonManagerDf(HiveContext sqlContext){
-        CommonApp.loadAndRegiserTable(sqlContext,new String[]{CommonApp.ENT_PERSON_INFO});
+    public  Dataset getPersonManagerDf(SparkSession sqlContext){
+//        CommonApp.loadAndRegiserTable(sqlContext,new String[]{CommonApp.ENT_PERSON_INFO});
         getPersonManagerDf01(sqlContext);
         getPersonManagerDf02(sqlContext);
         return getPersonManagerDf03(sqlContext);
     }
 
-    private  DataFrame getPersonManagerDf01(HiveContext sqlContext){
+    private  Dataset getPersonManagerDf01(SparkSession sqlContext){
         String hql =  "select " +
                 "       a.s_ext_nodenum,\n" +
                 "       a.pripid,\n" +
@@ -215,20 +229,20 @@ public class Hdfs2EsETL implements Serializable{
                 "       a.offhfrom,\n" +
                 "       a.offhto,\n" +
                 "       case when a.zspid ='' or a.zspid='null' or a.zspid is null " +
-                "       then genrandom('_ZSPID') else a.zspid end zspid " +
-                " from entPersonTmp a" +
+                "       then genrandom('_ZSPID') else a.zspid end zspid,a.s_ext_sequence " +
+                " from e_pri_person a" +
                 " where a.pripid<>'' and a.pripid <> 'null'";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "epripersonTmp01");
     }
 
-    private  DataFrame getPersonManagerDf02(HiveContext sqlContext){
+    private  Dataset getPersonManagerDf02(SparkSession sqlContext){
         String hql = "select a.*,b.encode_v1" +
                 "     from epripersonTmp01 a " +
-                "     left join getcifindmaptmp01 b" +
+                "     left join S_CIF_INDMAP b" +
                 "     on a.zspid=b.zspid ";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "personDataTmp01");
     }
-    private  DataFrame getPersonManagerDf03(HiveContext sqlContext){
+    private  Dataset getPersonManagerDf03(SparkSession sqlContext){
         String hql ="select a.s_ext_nodenum,\n" +
                 "       a.pripid,\n" +
                 "       a.name,\n" +
@@ -247,19 +261,23 @@ public class Hdfs2EsETL implements Serializable{
                 "         else\n" +
                 "          a.zspid\n" +
                 "       end zspid,\n" +
-                "       a.encode_v1\n" +
+                "       a.encode_v1," +
+                "       a.s_ext_sequence\n" +
                 "  from personDataTmp01 a\n";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "invDataTmp05");
     }
 
 
-    public  DataFrame getGtPersonManagerDf(HiveContext sqlContext){
+    public  Dataset getGtPersonManagerDf(SparkSession sqlContext){
+//        getcifindmap(sqlContext);
+
         getGtPerson(sqlContext);
         getGtPersonManagerDf01(sqlContext);
-        return getGtPersonManagerDf02(sqlContext);
+        Dataset ds =  getGtPersonManagerDf02(sqlContext);
+        return ds;
     }
 
-    private  DataFrame getGtPersonManagerDf01(HiveContext sqlContext){
+    private  Dataset getGtPersonManagerDf01(SparkSession sqlContext){
         String hql ="select " +
                 "           b.s_ext_nodenum," +
                 "           b.pripid," +
@@ -274,16 +292,17 @@ public class Hdfs2EsETL implements Serializable{
                 "           '' as offhfrom," +
                 "           '' as offhto," +
                 "           b.zspid," +
-                "           c.encode_v1" +
+                "           c.encode_v1," +
+                "           b.s_ext_sequence" +
                 "    from gtpersonTmp01 b" +
-                "    left join getcifindmaptmp01 c " +
+                "    left join S_CIF_INDMAP c " +
                 "    on b.zspid=c.zspid " +
                 "    where b.pripid<>'' and b.pripid <> 'null'";
 
         return DataFrameUtil.getDataFrame(sqlContext, hql, "invDataTmp04");
     }
 
-    private  DataFrame getGtPersonManagerDf02(HiveContext sqlContext){
+    private  Dataset getGtPersonManagerDf02(SparkSession sqlContext){
         String hql =
                 "select b.s_ext_nodenum,\n" +
                 "       b.pripid,\n" +
@@ -303,20 +322,21 @@ public class Hdfs2EsETL implements Serializable{
                 "         else\n" +
                 "          b.zspid\n" +
                 "       end zspid,\n" +
-                "       b.encode_v1\n" +
-                "  from invDataTmp04 b " +
-                " inner join e_gt_baseinfo_hdfs_ext_%s c" +
+                "       b.encode_v1," +
+                        " b.s_ext_sequence\n" +
+                "  from invDataTmp04 b" +
+                        " inner join e_gt_baseinfo c" +
                 " on b.name=c.name  and b.pripid= c.pripid";
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "gtPersonManagerTmp01");
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "gtPersonManagerTmp01");
     }
 
 
-    public DataFrame getAlterDataDF(HiveContext sqlContext){
-        String hql = "select * from e_alter_recoder_hdfs_ext_%s";
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "invDataTmp02");
+    public Dataset getAlterDataDF(SparkSession sqlContext){
+        String hql = "select *,from_unixtime(unix_timestamp(),'yyyy-MM-dd') as write_date,concat_ws('-',s_ext_nodenum,pripid,s_ext_sequence) as alter_id from e_alter_recoder";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "invDataTmp02");
     }
 
-    public DataFrame getGtPerson(HiveContext sqlContext){
+    public Dataset getGtPerson(SparkSession sqlContext){
         String hql
                 = "select s_ext_nodenum," +
                 "            pripid," +
@@ -327,15 +347,15 @@ public class Hdfs2EsETL implements Serializable{
                 "            natdate," +
                 "            country," +
                 "            case when zspid ='' or zspid='null' or zspid is null " +
-                "            then genrandom('_ZSPID') else zspid end zspid " +
+                "            then genrandom('_ZSPID') else zspid end zspid,s_ext_sequence " +
                 "            from " +
-                "            e_gt_person_hdfs_ext_%s ";
-        return DataFrameUtil.getDataFrame(sqlContext, String.format(hql,date), "gtpersonTmp01");
+                "            e_gt_person ";
+        return DataFrameUtil.getDataFrame(sqlContext, hql, "gtpersonTmp01");
     }
 
 
 
-    private   DataFrame getEntInfoDf03(HiveContext sqlContext){
+    private   Dataset getEntInfoDf03(SparkSession sqlContext){
         String hql = "select hd.*\n" +
                 "  from (select * from entDataTmp where credit_code <> '') en,\n" +
                 "       (select * from invDataTmp01 where blicno <> '') hd\n" +
@@ -350,7 +370,7 @@ public class Hdfs2EsETL implements Serializable{
     }
 
 
-    private   DataFrame getEntInfoDf04(HiveContext sqlContext){
+    private   Dataset getEntInfoDf04(SparkSession sqlContext){
         String hql = "select s_ext_nodenum,\n" +
                 "                       pripid,\n" +
                 "                       invid,\n" +
@@ -375,12 +395,16 @@ public class Hdfs2EsETL implements Serializable{
         return DataFrameUtil.getDataFrame(sqlContext, hql.toString(), "invDataTmp04");
     }
 
-    private   DataFrame getEntInfoDf05(HiveContext sqlContext){
+    private   Dataset getEntInfoDf05(SparkSession sqlContext){
         String hql = "select * from (select *, row_number() over(partition by key) rk\n" +
                 "             from invDataTmp04) ent\n" +
                 "             where ent.rk = 1";
         return DataFrameUtil.getDataFrame(sqlContext, hql.toString(), "invDataTmp05");
     }
 
+    public Dataset getV1Code(SparkSession sqlContext){
+        String hql = "select encode_v1,zspid from S_CIF_INDMAP";
 
+       return DataFrameUtil.getDataFrame(sqlContext,hql,"tmpv1code");
+    }
 }

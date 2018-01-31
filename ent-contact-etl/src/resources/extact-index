@@ -1,0 +1,7 @@
+es的索引
+{"mappings":{"ENT-CONTACT-EXTRACT":{"properties":{"tel":{"type":"text","index":true},"email":{"type":"text","index":true},"address":{"type":"text","index":true},"entname":{"type":"keyword","index":true},"credit_code":{"type":"keyword","index":true},"pripid":{"type":"keyword","index":true}}}}}
+
+
+
+
+sudo -u hive sqoop import --connect   jdbc:oracle:thin:@192.168.205.55:1521/orcl --username NEWDAAS_AP --password 'NEWDAAS_AP' --table NEWDAAS_AP.S_TAX_BASEINFO  --hive-table S_TAX_BASEINFO  --hive-import --fields-terminated-by "\t" --lines-terminated-by "\n"  --hive-overwrite -m 1

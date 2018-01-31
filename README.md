@@ -17,7 +17,7 @@ date: 2017-06-30 11:50:43
    base-etl
     |---common-etl（公共）
     |---ent-relation-etl（各自业务数据etl）
-    |--xxxxxxx-etl
+    |--ent-next-etl
 ````
 **common-etl公共包说明**
 
@@ -52,12 +52,12 @@ date: 2017-06-30 11:50:43
 * Spark on yarn 方式
 ````
 /usr/lib/spark/spark-1.5.2-bin-hadoop2.4/bin/spark-submit 
---executor-memory 4G 
---num-executors 20 
---executor-cores 4  
+--executor-memory 10G 
+--num-executors 8 
+--executor-cores 10  
 --class com.chinadaas.association.etl.main.EntRelationApp 
 --master yarn ent-relation-etl-1.0-SNAPSHOT1.jar
-s
+
 ````
 
 #### 5、参数说明
@@ -70,6 +70,5 @@ s
 --executor-cores 每个executors的cpu核数
 
 
-
 详见官方文档
-[http://spark.apache.org/docs/1.5.1/configuration.html](http://spark.apache.org/docs/1.5.1/configuration.html)
+[http://spark.apache.org/docs/2.1.1/configuration.html](http://spark.apache.org/docs/2.1.1/configuration.html)

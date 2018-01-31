@@ -2,8 +2,8 @@ package com.chinadaas.association.etl.sparksql;
 
 import com.chinadaas.association.etl.common.CommonApp;
 import com.chinadaas.common.util.DataFrameUtil;
-import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.hive.HiveContext;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.SparkSession;
 
 /**
  * Created by gongxs01 on 2017/6/13.
@@ -13,7 +13,7 @@ public class FlushConpropETL {
     public void setDate(String date) {
         this.date = date;
     }
-    public DataFrame getFlushBadData(HiveContext sqlContext) {
+    public Dataset getFlushBadData(SparkSession sqlContext) {
         CommonApp.loadAndRegiserTable(sqlContext,new String[]{CommonApp.ENT_INFO,CommonApp.ENT_INV_INFO});
         getFlushBadData01(sqlContext);
         getFlushBadData011(sqlContext);
@@ -27,15 +27,15 @@ public class FlushConpropETL {
         getFlushBadData06(sqlContext);
         getFlushBadData061(sqlContext);
         getFlushBadData07(sqlContext);
-        DataFrame df = getFlushBadData08(sqlContext);
+        Dataset df = getFlushBadData08(sqlContext);
         return df;
     }
 
 
-    private DataFrame getFlushBadData01(HiveContext sqlContext){
+    private Dataset getFlushBadData01(SparkSession sqlContext){
         String hql = "select *\n" +
-                "  from (select a.pripid, b.regno, b.entname,b.regcap, a.conam / b.REGCAP as bili\n" +
-                "          from (select pripid, sum(SUBCONAM) as conam\n" +
+                "  from (select a.pripid, b.regno, b.entname,b.regcap, a.conam / b.regcap as bili\n" +
+                "          from (select pripid, sum(subconam) as conam\n" +
                 "                  from entInvTmp\n" +
                 "                 group by pripid) a\n" +
                 "          join (select pripid, regcap, regno, entname\n" +
@@ -49,32 +49,33 @@ public class FlushConpropETL {
         return DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp01",DataFrameUtil.CACHETABLE_EAGER);
     }
 
-    private DataFrame getFlushBadData011(HiveContext sqlContext){
+    private Dataset getFlushBadData011(SparkSession sqlContext){
         String hql = "select b.ancheid, b.regno, b.entname\n" +
                 "  from (select pripid, max(ancheyear) ancheyear\n" +
-                "          from C_GS_AN_BASEINFO\n" +
+                "          from e_annreport_baseinfo\n" +
                 "         group by pripid) a\n" +
-                "  join C_GS_AN_BASEINFO b\n" +
+                "  join e_annreport_baseinfo b\n" +
                 "    on a.pripid = b.pripid\n" +
                 "   and a.ancheyear = b.ancheyear\n";
         return DataFrameUtil.getDataFrame(sqlContext,hql,"CGSANBASEINFOTMP011");
     }
 
 
-    private DataFrame getFlushBadData02(HiveContext sqlContext){
+    private Dataset getFlushBadData02(SparkSession sqlContext){
         String hql = "select a.pripid, b.inv,case when b.lisubconam is null or b.lisubconam='' or b.lisubconam='null' then '0' else  b.lisubconam end liacconam\n" +
                 "    from (select b.ancheid, a.pripid\n" +
                 "            from probleDataTmp01 a\n" +
                 "            join CGSANBASEINFOTMP011 b\n" +
                 "              on a.regno = b.regno\n" +
                 "             and a.entname = b.entname) a\n" +
-                "    join C_GS_AN_SUBCAPITAL b\n" +
+                "    join e_annreport_subcapital b\n" +
                 "      on a.ancheid = b.ancheid ";
 
         return DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp02",DataFrameUtil.CACHETABLE_EAGER);
     }
 
-    private DataFrame getFlushBadData031(HiveContext sqlContext){
+
+    private Dataset getFlushBadData031(SparkSession sqlContext){
         String hql = "select pripid,\n" +
                 "               inv,\n" +
                 "               row_number() over(partition by pripid order by inv) rk\n" +
@@ -83,7 +84,7 @@ public class FlushConpropETL {
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp031");
     }
 
-    private DataFrame getFlushBadData03(HiveContext sqlContext){
+    private Dataset getFlushBadData03(SparkSession sqlContext){
         String hql = "select pripid, collect_set(inv) as inv\n" +
                 "  from probleDataTmp031 \n" +
                 " group by pripid";
@@ -91,7 +92,7 @@ public class FlushConpropETL {
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp03");
     }
 
-    private DataFrame getFlushBadData042(HiveContext sqlContext){
+    private Dataset getFlushBadData042(SparkSession sqlContext){
         String hql = "select a.pripid, b.inv\n" +
                 "                     from probleDataTmp01 a\n" +
                 "                     join entInvTmp b\n" +
@@ -100,14 +101,14 @@ public class FlushConpropETL {
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp042");
     }
 
-    private DataFrame getFlushBadData041(HiveContext sqlContext){
+    private Dataset getFlushBadData041(SparkSession sqlContext){
         String hql = "select pripid,inv, row_number() over(partition by pripid order by inv) rk\n" +
                 "             from probleDataTmp042";
 
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp041");
     }
 
-    private DataFrame getFlushBadData04(HiveContext sqlContext){
+    private Dataset getFlushBadData04(SparkSession sqlContext){
         String hql = "select pripid as pripidpro, " +
                 "            collect_set(inv) as invpro\n" +
                 "            from probleDataTmp041 \n" +
@@ -116,7 +117,7 @@ public class FlushConpropETL {
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp04");
     }
 
-    private DataFrame getFlushBadData05(HiveContext sqlContext){
+    private Dataset getFlushBadData05(SparkSession sqlContext){
         String hql = "select c.pripid\n" +
                 "  from (select pripid, collectsame(inv, invpro) as sety\n" +
                 "          from probleDataTmp03 \n" +
@@ -127,7 +128,7 @@ public class FlushConpropETL {
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp05");
     }
 
-    private DataFrame getFlushBadData06(HiveContext sqlContext){
+    private Dataset getFlushBadData06(SparkSession sqlContext){
         String hql = "select a.pripid, b.liacconam/a.regcap as radio,a.regcap\n" +
                 "  from (select a.pripid, cast(a.regcap as double) regcap\n" +
                 "          from probleDataTmp01 a\n" +
@@ -140,12 +141,12 @@ public class FlushConpropETL {
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp06");
     }
 
-    private DataFrame getFlushBadData061(HiveContext sqlContext){
+    private Dataset getFlushBadData061(SparkSession sqlContext){
         String hql = "select pripid,regcap from  probleDataTmp06 where radio > 0.95 and radio<1.05";
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp061",DataFrameUtil.CACHETABLE_EAGER);
     }
 
-    /*private void getFlushBadData062(HiveContext sqlContext){
+    /*private void getFlushBadData062(SparkSession sqlContext){
         String hql = "select a.s_ext_nodenum,\n" +
                 "       a.pripid,\n" +
                 "       a.s_ext_sequence,\n" +
@@ -190,7 +191,7 @@ public class FlushConpropETL {
         //return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp062");
     }*/
 
-    private DataFrame getFlushBadData07(HiveContext sqlContext){
+    private Dataset getFlushBadData07(SparkSession sqlContext){
         String hql = "select a.s_ext_nodenum,\n" +
                 "       a.pripid,\n" +
                 "       a.s_ext_sequence,\n" +
@@ -277,7 +278,7 @@ public class FlushConpropETL {
         return  DataFrameUtil.getDataFrame(sqlContext,hql,"probleDataTmp07");
     }
 
-    private DataFrame getFlushBadData08(HiveContext sqlContext){
+    private Dataset getFlushBadData08(SparkSession sqlContext){
         String hql = "select a.s_ext_nodenum,\n" +
                 "       a.pripid,\n" +
                 "       a.s_ext_sequence,\n" +
@@ -313,9 +314,13 @@ public class FlushConpropETL {
                 "       a.acconam,\n" +
                 "       a.subconamusd,\n" +
                 "       a.acconamusd,\n" +
-                "       a.conprop,\n" +
+                "       case when a.conprop ='' or a.conprop ='null' or a.conprop ='NULL' or a.conprop is null " +
+                "            then '0.0'" +
+                "       else a.conprop  end conprop,\n" +
                 "       a.conform,\n" +
-                "       a.condate,\n" +
+                "       case when a.condate='1900-01-01' " +
+                "            then '' " +
+                "            else a.condate end condate,\n" +
                 "       a.baldelper,\n" +
                 "       a.conam ,\n" +
                 "       a.exeaffsign,\n" +

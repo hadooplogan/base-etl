@@ -1,0 +1,11 @@
+create external table ent_contactinfo_full_20171113(pripid string,credit_code string,entname string,tel string,email string,address string,position string,source string) ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+STORED AS  PARQUET LOCATION'/next/entcontact/contactinfomation/'
+
+create external table entcontact_extract(pripid string,credit_code string,entname string,tel string,email string,address string) ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+STORED AS  PARQUET LOCATION'/next/uniquecontact/merged'
+
+
+
+
+es的索引
+{"mappings":{"ENTCONTACTINFO_INDEX":{"properties":{"pripid":{"type":"keyword"},"credit_code":{"type":"keyword","index":true},"entname":{"type":"keyword","index":true},"tel":{"type":"text","index":true},"email":{"type":"text","index":true},"position":{"type":"text","index":true},"source":{"type":"text","index":true}}}}}

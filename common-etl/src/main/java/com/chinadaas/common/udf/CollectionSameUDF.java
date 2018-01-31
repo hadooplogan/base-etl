@@ -1,29 +1,24 @@
 package com.chinadaas.common.udf;
 
-import org.apache.spark.SparkContext;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.api.java.UDF2;
-import org.apache.spark.sql.hive.HiveContext;
 import org.apache.spark.sql.types.DataTypes;
-import scala.Function1;
-import scala.collection.Seq;
-import scala.collection.JavaConversions;
 import scala.collection.mutable.WrappedArray;
 
-import java.util.List;
 
 /**
  * Created by gongxs01 on 2017/6/13.
  */
 public class CollectionSameUDF {
 
-    public static void collectSame(SparkContext sc, HiveContext sqlContext) {
+    public static void collectSame(SparkSession spark) {
 
-        sqlContext.udf().register("collectsame", new UDF2<WrappedArray, WrappedArray,String>() {
+        spark.udf().register("collectsame", new UDF2<WrappedArray, WrappedArray,String>() {
             /**
              *
              */
             private static final long serialVersionUID = -6709911270475566751L;
-
+            @Override
             public String call(WrappedArray inv1 ,WrappedArray inv2) {
                 return collectSameHandle(inv1,inv2);
             }

@@ -2,7 +2,7 @@
 
 采用nested方式存储企业
 ```
-enterprise
+entbaseinfo
    |--s_ext_nodenum
    |--pripid
    |--entname

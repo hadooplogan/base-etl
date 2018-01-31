@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.chinadaas.common.util.IDUtil;
 import org.apache.spark.SparkContext;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.hive.HiveContext;
 import org.apache.spark.sql.types.DataTypes;
@@ -16,8 +17,8 @@ public class RandomUDF {
 	/*
 	 * generate random number
 	 */
-	public static void genrandom(SparkContext sc, HiveContext sqlContext) {
-		sqlContext.udf().register("genrandom", new UDF1<String, String>() {
+	public static void genrandom(SparkSession spark) {
+		spark.udf().register("genrandom", new UDF1<String, String>() {
 			/**
 			 * 
 			 */

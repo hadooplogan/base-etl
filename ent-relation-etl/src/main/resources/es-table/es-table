@@ -1,11 +1,33 @@
-curl -XPUT 'http://192.168.207.14:59200/entbaseinfo' -d '{
+curl -XPUT 'http://192.168.207.14:59200/entbaseinfo_20180125' -d '{
   "settings": {
   "index": {
+  "max_result_window":200000,
   "number_of_shards": "5",
-  "number_of_replicas": "1",
+  "number_of_replicas": "0",
   "refresh_interval": "30s",
   "codec": "best_compression",
-  "translog.sync_interval": "5s"
+  "translog.sync_interval": "5s",
+    "analysis" : {
+            "analyzer" : {
+              "default" : {
+                "tokenizer" : "ik_max_word"
+              },
+              "pinyin_analyzer" : {
+                "tokenizer" : "my_pinyin"
+              }
+            },
+            "tokenizer" : {
+              "my_pinyin" : {
+                "type" : "pinyin",
+                 "keep_separate_first_letter" : false,
+                 "keep_full_pinyin" : true,
+                 "keep_original" : true,
+                 "limit_first_letter_length" : 16,
+                 "lowercase" : true,
+                 "remove_duplicated_term" : true
+              }
+            }
+          }
   }
   },
   "mappings": {
@@ -23,16 +45,16 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo' -d '{
   "type": "keyword"
   },
   "entname": {
-  "index": true,
-  "type": "keyword"
+  "analyzer": "ik_max_word",
+  "type": "text"
   },
   "exactentname": {
   "index": true,
   "type": "keyword"
   },
   "pinyinname": {
-  "index": true,
-  "type": "keyword"
+  "analyzer": "pinyin_analyzer",
+  "type": "text"
   },
   "regno": {
   "index": true,
@@ -51,9 +73,13 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo' -d '{
   "type": "keyword"
   },
   "abuitem": {
-  "index":false,
-  "type": "keyword"
+  "analyzer": "ik_max_word",
+  "type": "text"
   },
+   "cbuitem": {
+    "analyzer": "ik_max_word",
+    "type": "text"
+   },
   "opfrom": {
   "index": true,
   "type": "keyword"
@@ -182,6 +208,18 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo' -d '{
     "index": true,
     "type": "keyword"
   },
+  "data_date": {
+    "index": true,
+    "type": "keyword"
+  },
+  "write_date": {
+    "index": true,
+    "type": "keyword"
+  },
+   "s_ext_sequence": {
+      "index": true,
+      "type": "keyword"
+    },
   "inv": {
   "type": "nested",
   "include_in_parent":true,
@@ -205,7 +243,8 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo' -d '{
   "conam":    {"index": true, "type": "keyword"    },
   "cerno_old":    {"index": true, "type": "keyword"    },
   "zspid":    { "index": true,"type": "keyword"    },
-  "encode_v1":    {"index": true, "type": "keyword"    }
+  "encode_v1":    {"index": true, "type": "keyword"    },
+  "s_ext_sequence":    {"index": true, "type": "keyword"    }
   }
   },
   "person": {
@@ -225,7 +264,8 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo' -d '{
   "offhfrom":     {"index": true, "type": "keyword"   },
   "offhto":   {"index": true, "type": "keyword"   },
   "zspid":    {"index": true,"type":"keyword"    },
-  "encode_v1":    {"index": true, "type": "keyword"    }
+  "encode_v1":    {"index": true, "type": "keyword"    },
+  "s_ext_sequence":    {"index": true, "type": "keyword"    }
   }
   }
   }
@@ -235,11 +275,11 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo' -d '{
 
 
 
-curl -XPUT 'http://192.168.207.14:59200/ealterrecoder' -d '{
+curl -XPUT 'http://192.168.207.14:59200/ealterrecoder_20171219' -d '{
 "settings": {
 "index": {
 "number_of_shards": "5",
-"number_of_replicas": "1",
+"number_of_replicas": "0",
 "refresh_interval": "30s",
 "codec": "best_compression",
 "translog.sync_interval": "5s"
@@ -249,59 +289,66 @@ curl -XPUT 'http://192.168.207.14:59200/ealterrecoder' -d '{
 "EALTERRECODER": {
 "properties": {
 "s_ext_nodenum": {
-"type": "text",
+"type": "keyword",
 "index": true
 }
 ,
 "pripid": {
-"type": "text",
+"type": "keyword",
 "index": true
 },
 "s_ext_sequence": {
-"type": "text",
+"type": "keyword",
 "index": true
 },
 "alt_id": {
-"type": "text",
+"type": "keyword",
 "index": true
 },
 "altitem": {
-"type": "text",
+"type": "keyword",
 "index": true
 },
 "altbe": {
-"type": "text",
+"type": "keyword",
 "index": true
 },
 "altaf": {
-"type": "text",
+"type": "keyword",
 "index": true
 },
 "altdate": {
-"type": "text",
+"type": "keyword",
 "index": true
 },
 "alttime": {
-"type": "text",
+"type": "keyword",
 "index": true
 },
 "s_ext_timestamp": {
-"type": "text",
+"type": "keyword",
 "index": true
 },
 "s_ext_batch": {
-"type": "text",
+"type": "keyword",
+"index": true
+},
+"data_date": {
+"type": "keyword",
+"index": true
+},
+"write_date": {
+"type": "keyword",
 "index": true
 },
 "s_ext_validflag": {
-"type": "text",
+"type": "keyword",
 "index": true
 }
 }
 }
 }
 }'
-
 
 
 CREATE EXTERNAL  TABLE code(
@@ -312,3 +359,460 @@ type string,
 typedesc string)
 STORED BY 'org.elasticsearch.hadoop.hive.EsStorageHandler'
 TBLPROPERTIES('es.resource' = 'code/code','es.nodes'='192.168.207.14','es.port'='58200');
+
+
+
+curl -XPUT 'http://192.168.207.14:58200/ent_index' -d '{
+"settings": {
+"index": {
+"number_of_shards": "5",
+"number_of_replicas": "1",
+"refresh_interval": "30s",
+"codec": "best_compression",
+"translog.sync_interval": "5s"
+}
+},
+"mappings": {
+"ENT_INDEX": {
+"properties": {
+"A01": {
+"type": "text",
+"index": true
+}
+,
+"A02": {
+"type": "text",
+"index": true
+},
+"A03": {
+"type": "text",
+"index": true
+},
+"A06": {
+"type": "text",
+"index": true
+},
+"A07": {
+"type": "text",
+"index": true
+},
+"A08": {
+"type": "text",
+"index": true
+},
+"A09": {
+"type": "text",
+"index": true
+},
+"A10": {
+"type": "text",
+"index": true
+},
+"A12": {
+"type": "text",
+"index": true
+},
+"A13": {
+"type": "text",
+"index": true
+},
+"A14": {
+"type": "text",
+"index": true
+},
+"A16": {
+"type": "text",
+"index": true
+},
+"A17": {
+"type": "text",
+"index": true
+},
+"A18": {
+"type": "text",
+"index": true
+},
+"A19": {
+"type": "text",
+"index": true
+},
+"A20": {
+"type": "text",
+"index": true
+},
+"A21": {
+"type": "text",
+"index": true
+},
+"A22": {
+"type": "text",
+"index": true
+},
+"A23": {
+"type": "text",
+"index": true
+},
+"A24": {
+"type": "text",
+"index": true
+},
+"A25": {
+"type": "text",
+"index": true
+},
+"A26": {
+"type": "text",
+"index": true
+},
+"A27": {
+"type": "text",
+"index": true
+},
+"A28": {
+"type": "text",
+"index": true
+},
+"A29": {
+"type": "text",
+"index": true
+},
+"A30": {
+"type": "text",
+"index": true
+},
+"A31": {
+"type": "text",
+"index": true
+},
+"A32": {
+"type": "text",
+"index": true
+},
+"A33": {
+"type": "text",
+"index": true
+},
+"A34": {
+"type": "text",
+"index": true
+},
+"A35": {
+"type": "text",
+"index": true
+},
+"F01": {
+"type": "text",
+"index": true
+},
+"F02": {
+"type": "text",
+"index": true
+},
+"F03": {
+"type": "text",
+"index": true
+},
+"F04": {
+"type": "text",
+"index": true
+},
+"H01": {
+"type": "text",
+"index": true
+},
+"H02": {
+"type": "text",
+"index": true
+},
+"H03": {
+"type": "text",
+"index": true
+},
+"H04": {
+"type": "text",
+"index": true
+},
+"H05": {
+"type": "text",
+"index": true
+},
+"H06": {
+"type": "text",
+"index": true
+},
+"H07": {
+"type": "text",
+"index": true
+},
+"H08": {
+"type": "text",
+"index": true
+},
+"H09": {
+"type": "text",
+"index": true
+},
+"H10": {
+"type": "text",
+"index": true
+},
+"H13": {
+"type": "text",
+"index": true
+},
+"H14": {
+"type": "text",
+"index": true
+}
+}
+}
+}
+}'
+
+
+curl -XPUT 'http://192.168.207.14:59200/shanghaientbaseinfo_v2' -d '{
+  "settings": {
+  "index": {
+  "number_of_shards": "5",
+  "number_of_replicas": "0",
+  "refresh_interval": "30s",
+  "codec": "best_compression",
+  "translog.sync_interval": "5s",
+    "analysis" : {
+            "analyzer" : {
+              "default" : {
+                "tokenizer" : "ik_max_word"
+              }
+            }
+          }
+  }
+  },
+  "mappings": {
+  "SHANGHAIENTBASEINFO": {
+  "_all":{
+    "enabled": false
+  },
+  "properties": {
+  "s_ext_nodenum": {
+  "index": true,
+  "type": "keyword"
+  },
+  "pripid": {
+  "index": true,
+  "type": "keyword"
+  },
+  "entname": {
+  "analyzer": "ik_max_word",
+  "type": "text"
+  },
+  "entname_smart": {
+  "analyzer": "ik_smart",
+  "type": "text"
+  },
+  "exactentname": {
+  "index": true,
+  "type": "keyword"
+  },
+  "regno": {
+  "index": true,
+  "type": "keyword"
+  },
+  "enttype": {
+  "index": true,
+  "type": "keyword"
+  },
+  "industryphy": {
+  "index": true,
+  "type": "keyword"
+  },
+  "industryco": {
+  "index": true,
+  "type": "keyword"
+  },
+  "opfrom": {
+  "index": true,
+  "type": "keyword"
+  },
+  "opto": {
+  "index": true,
+  "type": "keyword"
+  },
+  "postalcode": {
+  "index": true,
+  "type": "keyword"
+  },
+  "tel": {
+  "index": true,
+  "type": "keyword"
+  },
+  "email": {
+  "index": true,
+  "type": "keyword"
+  },
+  "esdate": {
+  "index": true,
+  "type": "keyword"
+  },
+  "apprdate": {
+  "index": true,
+  "type": "keyword"
+  },
+  "regorg": {
+  "index": true,
+  "type": "keyword"
+  },
+  "entstatus": {
+  "index": true,
+  "type": "keyword"
+  },
+  "regcap": {
+  "index": true,
+  "type": "keyword"
+  },
+  "opscope": {
+  "index": false,
+  "type": "keyword"
+  },
+  "dom": {
+  "index": true,
+  "type": "keyword"
+  },
+  "regcapcur": {
+  "index": true,
+  "type": "keyword"
+  },
+  "licid": {
+  "index": true,
+  "type": "keyword"
+  },
+  "credit_code": {
+  "index": true,
+  "type": "keyword"
+  },
+  "tax_code": {
+  "index": true,
+  "type": "keyword"
+  },
+  "entname_old": {
+  "index":true,
+  "type": "keyword"
+  },
+  "name": {
+  "index": true,
+  "type": "keyword"
+  },
+  "revdate": {
+  "index": true,
+  "type": "keyword"
+  },
+  "candate": {
+  "index": true,
+  "type": "keyword"
+  },
+  "addr": {
+    "index": true,
+    "type": "keyword"
+    },
+  "ancheyear": {
+      "index": true,
+      "type": "keyword"
+  },
+  "regorgcode": {
+    "index": true,
+    "type": "keyword"
+  },
+  "ancheyear_tel": {
+    "index": true,
+    "type": "keyword"
+   },
+  "ancheyear_email": {
+   "index": true,
+   "type": "keyword"
+   },
+   "s_ext_sequence": {
+      "index": true,
+      "type": "keyword"
+      },
+  "inv": {
+    "type": "nested",
+    "include_in_parent":true,
+    "properties":{
+    "s_ext_nodenum":    {"index": true,"type":"keyword"    },
+    "pripid": {"index": true, "type": "keyword"  },
+    "inv":   {"index": true, "type": "keyword"   },
+    "invtype":    {"index": true,"type":"keyword"    },
+    "subconam":   { "index": true,"type": "keyword"   },
+    "condate":   {"index": true, "type": "keyword"   },
+    "currency":   {"index": true, "type": "keyword"   },
+    "s_ext_sequence":   {"index": true, "type": "keyword"   }
+    }
+    },
+  "oriregno": {
+  "index": true,
+  "type": "keyword"
+  }
+  }
+  }
+  }
+  }'
+
+
+  curl -XPUT 'http://192.168.207.14:58200/monitorindex' -d '{
+  "settings": {
+  "index": {
+  "number_of_shards": "5",
+  "number_of_replicas": "1",
+  "refresh_interval": "30s",
+  "codec": "best_compression",
+  "translog.sync_interval": "5s"
+  }
+  },
+  "mappings": {
+  "MONITORINDEX": {
+  "properties": {
+  "hf_entcount": {
+  "type": "keyword",
+  "index": true
+  }
+  ,
+  "hf_invcount": {
+  "type": "keyword",
+  "index": true
+  },
+  "hf_personcount": {
+  "type": "keyword",
+  "index": true
+  },
+  "es_entcount": {
+  "type": "keyword",
+  "index": true
+  },
+  "es_invcount": {
+  "type": "keyword",
+  "index": true
+  },
+  "es_personcount": {
+   "type": "keyword",
+   "index": true
+   },
+   "es_gtcount": {
+      "type": "keyword",
+      "index": true
+   },
+   "es_gtperson": {
+      "type": "keyword",
+      "index": true
+    },
+   "data_date": {
+      "type": "keyword",
+      "index": true
+    },
+    "write_date": {
+       "type": "keyword",
+       "index": true
+  }
+  }
+  }
+  }
+  }'
+

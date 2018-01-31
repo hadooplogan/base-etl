@@ -50,10 +50,10 @@ public class DataFormatConvertUtil {
 	}
 	
 	/************ date & string **************/
-	static private final String TAIKANG_DATAFORMAT = "yyyy-MM-dd hh:mm:ss";
+	static private final String CHINADAAS_DATAFORMAT = "yyyy-MM-dd hh:mm:ss";
 	static public String date2String(Date date) {
 		if (date != null) {
-			SimpleDateFormat df = new SimpleDateFormat(TAIKANG_DATAFORMAT);
+			SimpleDateFormat df = new SimpleDateFormat(CHINADAAS_DATAFORMAT);
 			return df.format(date);
 		} else {
 			return null;
@@ -61,7 +61,7 @@ public class DataFormatConvertUtil {
 	}
 	static public Date string2Date(String str) {
 		if (str != null) {
-			SimpleDateFormat df = new SimpleDateFormat(TAIKANG_DATAFORMAT);
+			SimpleDateFormat df = new SimpleDateFormat(CHINADAAS_DATAFORMAT);
 			df.setLenient(false);
 			try {
 				return df.parse(str);
@@ -91,6 +91,20 @@ public class DataFormatConvertUtil {
 			if (filesystem.exists(new Path(output))) {
 				filesystem.delete(new Path(output), true);
 			}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	public static void mkdir(String output) {
+		Configuration conf = new Configuration();
+		FileSystem filesystem;
+		try {
+			filesystem = FileSystem.get(conf);
+			if (!filesystem.exists(new Path(output))) {
+				filesystem.mkdirs(new Path(output));
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
