@@ -24,6 +24,8 @@ public class CommonApp implements Serializable {
 
     public static void main(String[] args) {
 
+
+
         String date = args[0];
 
         SparkConf conf = new SparkConf().setAppName("Chinadaas Common ETL APP");
