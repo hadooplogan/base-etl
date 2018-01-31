@@ -29,6 +29,7 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo_20180125' -d '{
             }
           }
   }
+
   },
   "mappings": {
   "ENTBASEINFO": {
