@@ -4,6 +4,11 @@ import com.chinadaas.common.util.DataFrameUtil;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 
+
+/**
+ * 2016年财报信息，2016相对于2015增长比率
+ *
+ */
 public class FinancialSituation {
 
     private static Dataset get2016(SparkSession spark){
@@ -154,7 +159,7 @@ public class FinancialSituation {
                 "when (c.vendinc/b.empnum) > 10000 then '11'\n" +
                 "when (c.vendinc/b.empnum) < 0 then'12'\n" +
                 "else '未知' end as ee0076\n" +
-                "from enterprisebaseinfocollect_full a \n" +
+                "from enterprisebaseinfocollect a \n" +
                 "left join s_en_nb_baseinfo b \n" +
                 "on a.pripid = b.pripid \n" +
                 "left join s_en_nb_capitalinfo c \n" +
@@ -177,7 +182,7 @@ public class FinancialSituation {
                 "case when c.ratgro is null and c.ratgro = '' then '未知' else c.ratgro end as ratgro,\n" +
                 "case when b.empnum is null and b.empnum = '' then '未知'  else cast ((c.progro/b.empnum) as decimal(10,4)) end as pcpm,\n" +
                 "case when b.empnum is null and b.empnum = '' then '未知' else b.empnum end as empnum\n" +
-                "from enterprisebaseinfocollect_full a \n" +
+                "from enterprisebaseinfocollect a \n" +
                 "left join s_en_nb_baseinfo b\n" +
                 "on a.pripid = b.pripid\n" +
                 "left join s_en_nb_capitalinfo c \n" +
@@ -190,37 +195,37 @@ public class FinancialSituation {
     private static Dataset getSpecific2015(SparkSession spark){
 
         String hql = "select a.pripid ,\n" +
-                "case when  b.assgro = '01' then '负数'\n" +
-                "when b.assgro = '02' then 25\n" +
-                "when b.assgro = '03' then 50\n" +
-                "when b.assgro = '04' then 150\n" +
-                "when b.assgro = '05' then 400\n" +
-                "when b.assgro = '06' then 750\n" +
-                "when b.assgro = '07' then 1500\n" +
-                "when b.assgro = '08' then 2500\n" +
-                "when b.assgro = '09' then 4000\n" +
-                "when b.assgro = '10' then 6500\n" +
-                "when b.assgro = '11' then 9000\n" +
-                "when b.assgro = '12' then 20000\n" +
-                "when b.assgro = '13' then 40000\n" +
-                "when b.assgro = '14' then 75000\n" +
+                "case when b.assgro = '01' then '负数'\n" +
+                "when b.assgro = '02' then 25.0\n" +
+                "when b.assgro = '03' then 50.0\n" +
+                "when b.assgro = '04' then 150.0\n" +
+                "when b.assgro = '05' then 400.0\n" +
+                "when b.assgro = '06' then 750.0\n" +
+                "when b.assgro = '07' then 1500.0\n" +
+                "when b.assgro = '08' then 2500.0\n" +
+                "when b.assgro = '09' then 4000.0\n" +
+                "when b.assgro = '10' then 6500.0\n" +
+                "when b.assgro = '11' then 9000.0\n" +
+                "when b.assgro = '12' then 20000.0\n" +
+                "when b.assgro = '13' then 40000.0\n" +
+                "when b.assgro = '14' then 75000.0\n" +
                 "when b.assgro = '15' then '未知'\n" +
                 "when b.assgro = '99' and b.assgro = '0' then '未知'\n" +
                 "else '未知' end as assgro,\n" +
                 "case when b.vendinc = '01' then 5\n" +
-                "when b.vendinc = '02' then 30\n" +
-                "when b.vendinc = '03' then 75\n" +
-                "when b.vendinc = '04' then 200\n" +
-                "when b.vendinc = '05' then 400\n" +
-                "when b.vendinc = '06' then 750\n" +
-                "when b.vendinc = '07' then 1500\n" +
-                "when b.vendinc = '08' then 2500\n" +
-                "when b.vendinc = '09' then 4000\n" +
-                "when b.vendinc = '10' then 6500\n" +
-                "when b.vendinc = '11' then 9000\n" +
-                "when b.vendinc = '12' then 20000\n" +
-                "when b.vendinc = '13' then 40000\n" +
-                "when b.vendinc = '14' then 75000\n" +
+                "when b.vendinc = '02' then 30.0\n" +
+                "when b.vendinc = '03' then 75.0\n" +
+                "when b.vendinc = '04' then 200.0\n" +
+                "when b.vendinc = '05' then 400.0\n" +
+                "when b.vendinc = '06' then 750.0\n" +
+                "when b.vendinc = '07' then 1500.0\n" +
+                "when b.vendinc = '08' then 2500.0\n" +
+                "when b.vendinc = '09' then 4000.0\n" +
+                "when b.vendinc = '10' then 6500.0\n" +
+                "when b.vendinc = '11' then 9000.0\n" +
+                "when b.vendinc = '12' then 20000.0\n" +
+                "when b.vendinc = '13' then 40000.0\n" +
+                "when b.vendinc = '14' then 75000.0\n" +
                 "when b.vendinc = '15' then '未知'\n" +
                 "when b.vendinc = '16' then '亏损'\n" +
                 "when b.vendinc = '99' and b.vendinc = '0' then '未知'\n" +
@@ -280,7 +285,7 @@ public class FinancialSituation {
                 "when b.empnum = '12' then '未知'\n" +
                 "when b.empnum = '99' then '未知'\n" +
                 "else '未知' end as empnum\n" +
-                "from enterprisebaseinfocollect_full a \n" +
+                "from enterprisebaseinfocollect a \n" +
                 "left join\n" +
                 "an_table b on a.pripid = b.pripid";
 
@@ -297,30 +302,30 @@ public class FinancialSituation {
                 "when b.assgro = '负数' and a.assgro > 0 then '扭亏为盈'\n" +
                 "when b.assgro = '负数' and a.assgro <= 0 then '亏损'\n" +
                 "when b.assgro = '未知' then '未知'\n" +
-                "else cast (((a.assgro - b.assgro)/abs(b.assgro)) as decimal(10,4)) end as ee0077,\n" +
+                "else cast (((a.assgro - b.assgro)/b.assgro) as decimal(10,4)) end as ee0077,\n" +
                 "case when a.vendinc is null then '未知'\n" +
                 "when b.vendinc = '亏损' and a.vendinc > 0 then '扭亏为盈'\n" +
                 "when b.vendinc = '亏损' and a.vendinc <= 0 then '亏损'\n" +
                 "when b.vendinc = '未知' then '未知'\n" +
-                "else cast (((a.vendinc - b.vendinc)/abs(b.vendinc)) as decimal(10,4)) end as ee0078,\n" +
+                "else cast (((a.vendinc - b.vendinc)/b.vendinc) as decimal(10,4)) end as ee0078,\n" +
                 "case when a.leverageratio is null or a.leverageratio = '' then '未知'\n" +
                 "when b.leverageratio = '负数' and a.leverageratio > 0 then '扭亏为盈'\n" +
                 "when b.leverageratio = '负数' and a.leverageratio <= 0 then '亏损'\n" +
                 "when b.leverageratio = '未知' then '未知'\n" +
-                "else cast (((a.leverageratio - b.leverageratio)/abs(b.leverageratio)) as decimal(10,4)) end as ee0080,\n" +
+                "else cast (((a.leverageratio - b.leverageratio)/b.leverageratio) as decimal(10,4)) end as ee0080,\n" +
                 "case when a.ratgro is null or a.ratgro = '' then '未知'\n" +
                 "when b.ratgro = '负数' and a.ratgro > 0 then '扭亏为盈'\n" +
                 "when b.ratgro = '负数' and a.ratgro <= 0 then '亏损'\n" +
                 "when b.ratgro = '未知' then '未知'\n" +
-                "else cast (((a.ratgro - b.ratgro)/abs(b.ratgro)) as decimal(10,4)) end as ee0081,\n" +
+                "else cast (((a.ratgro - b.ratgro)/b.ratgro) as decimal(10,4)) end as ee0081,\n" +
                 "case when a.pcpm is null then '未知'\n" +
                 "when b.pcpm = '未知' then '未知'\n" +
                 "when b.pcpm = '负数' and a.pcpm > 0 then '扭亏为盈'\n" +
                 "when b.pcpm = '负数' and a.pcpm <= 0 then '亏损'\n" +
-                "else cast (((a.pcpm - b.pcpm)/abs(b.pcpm)) as decimal(10,4)) end as ee0082,\n" +
+                "else cast (((a.pcpm - b.pcpm)/b.pcpm) as decimal(10,4)) end as ee0082,\n" +
                 "case when a.empnum = '未知' then '未知'\n" +
                 "when b.empnum = '未知' then '未知'\n" +
-                "else cast (((a.empnum - b.empnum)/abs(b.empnum)) as decimal(10,4)) end as ee0083\n" +
+                "else cast (((a.empnum - b.empnum)/b.empnum) as decimal(10,4)) end as ee0083\n" +
                 "from tmp2016 a left join tmp2015 b \n" +
                 "on a.pripid = b.pripid ";
 
@@ -344,14 +349,14 @@ public class FinancialSituation {
                 "a.ee0074,\n" +
                 "a.ee0075,\n" +
                 "a.ee0076,\n" +
-                "a.ee0077,\n" +
+                "b.ee0077,\n" +
                 "b.ee0078,\n" +
                 "b.ee0080,\n" +
                 "b.ee0081,\n" +
                 "b.ee0082,\n" +
                 "b.ee0083\n" +
                 "from \n" +
-                "tmpbasic a \n" +
+                "tmpbasic2016 a \n" +
                 "left join tmprate b on a.pripid = b.pripid";
 
 

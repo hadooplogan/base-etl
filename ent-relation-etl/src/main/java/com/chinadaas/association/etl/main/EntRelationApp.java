@@ -84,7 +84,7 @@ public class EntRelationApp {
         RegisterTable.regiserBZXRTable(spark,"DIS_BZXR_NEW",cfg.get("DIS_BZXR_NEW"));
         RegisterTable.regiserSXBZXRTable(spark,"DIS_SXBZXR_NEW",cfg.get("DIS_SXBZXR_NEW"));
         RegisterTable.regiserInMapTable(spark,"S_CIF_INDMAP_T",cfg.get("S_CIF_INDMAP"));
-        RegisterTable.registerUsednameTable(spark,"S_EN_USEDNAME",cfg.get("S_EN_USEDNAME"));
+       // RegisterTable.registerUsednameTable(spark,"S_EN_USEDNAME",cfg.get("S_EN_USEDNAME"));
 
     }
 

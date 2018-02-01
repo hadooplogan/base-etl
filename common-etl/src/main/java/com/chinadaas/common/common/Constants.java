@@ -78,6 +78,11 @@ public class Constants {
     //企业专利
     public static final String ENT_INDEX_PATENT_DIR = "chinadaas.ent_index.patent.dir";
 
+    //2016财报
+    public static final String ENT_INDEX_FINANCIAL_DIR = "chinadaas.ent_index.financial.dir";
+
+    //上市企业信息
+    public static final String ENT_INDEX_LISTED_DIR = "chinadaas.ent_index.listed.dir";
 
     /**
      * 联系信息参数

@@ -4,6 +4,9 @@ import com.chinadaas.common.util.DataFrameUtil;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 
+/**
+ * 企业上市信息
+ */
 public class ListedInformation {
 
     private static Dataset tmp01(SparkSession spark){
@@ -11,17 +14,17 @@ public class ListedInformation {
         String hql = "select distinct pripid ,\n" +
                 "compcode,\n" +
                 "islist from (select a.pripid ,b.compcode,b.islist \n" +
-                "\tfrom enterprisebaseinfocollect_full a \n" +
+                "\tfrom enterprisebaseinfocollect a \n" +
                 "\tleft join \n" +
                 "\tTQ_COMP_INFO b on a.entname = b.compname\n" +
                 " union all\n" +
                 "  select a.pripid ,b.compcode,b.islist \n" +
-                "  from enterprisebaseinfocollect_full a \n" +
+                "  from enterprisebaseinfocollect a \n" +
                 "  left join \n" +
                 "  TQ_COMP_INFO b on a.regno = b.bizlicenseno\n" +
                 " union all \n" +
                 " select a.pripid ,b.compcode,b.islist\n" +
-                "  from enterprisebaseinfocollect_full a \n" +
+                "  from enterprisebaseinfocollect a \n" +
                 "  left join \n" +
                 "  TQ_COMP_INFO b on  a.licid = regexp_replace(b.orgcode,'-','')) a ";
 
