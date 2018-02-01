@@ -121,7 +121,7 @@ public class EntInfo2EsApp {
         RegisterTable.regiserEntBaseInfoTable(spark,"enterprisebaseinfocollect",date,entPath);
         RegisterTable.regiserEpriPersonTable(spark,"e_pri_person",date,personPath);
         RegisterTable.regiserInvTable(spark,"e_inv_investment",date,invPath);
-        RegisterTable.regiserInMapTable(spark,"S_CIF_INDMAP",allcfg.get("S_CIF_INDMAP"));
+//        RegisterTable.regiserInMapTable(spark,"S_CIF_INDMAP",allcfg.get("S_CIF_INDMAP"));
 
         //有的批次不会有增量更新
        if(gtEnt!=null){

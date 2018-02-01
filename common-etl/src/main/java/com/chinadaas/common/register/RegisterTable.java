@@ -387,9 +387,10 @@ public class RegisterTable implements Serializable {
 
             }
         });
+
         spark.createDataFrame(persons, S_CIF_INDMAP.class).registerTempTable(tableNames + "");
 
-    //    DataFrameUtil.getDataFrame(spark, "select encode_v1,zspid from S_CIF_INDMAP_T", "S_CIF_INDMAP", DataFrameUtil.CACHETABLE_PARQUET);
+        DataFrameUtil.getDataFrame(spark, "select encode_v1,zspid from S_CIF_INDMAP_T", "S_CIF_INDMAP", DataFrameUtil.CACHETABLE_PARQUET);
     }
 
 
@@ -450,7 +451,7 @@ public class RegisterTable implements Serializable {
         JavaRDD<DIS_BZXR_NEW> persons = spark.read().textFile(path).toJavaRDD().filter(new Function<String, Boolean>() {
             @Override
             public Boolean call(String s) throws Exception {
-                if (s.split(regext, -1).length == 22) {
+                if (s.split(regext, -1).length == 23) {
                     return true;
                 } else {
                     return false;
@@ -480,7 +481,7 @@ public class RegisterTable implements Serializable {
         JavaRDD<DIS_SXBZXR_NEW> persons = spark.read().textFile(path).toJavaRDD().filter(new Function<String, Boolean>() {
             @Override
             public Boolean call(String s) throws Exception {
-                if (s.split(regext, -1).length == 30) {
+                if (s.split(regext, -1).length == 31) {
                     return true;
                 } else {
                     return false;
@@ -807,4 +808,25 @@ public class RegisterTable implements Serializable {
 
       spark.createDataFrame(person,TQ_COMP_INFO.class).registerTempTable(tableNames+"");
     }
+
+    /**
+     *  曾用名表（S_EN_USEDNAME）
+     *
+     * @param spark
+     * @param tableNames 注册表名
+     * @param path   路径全量或者增量路径
+     */
+    public static void registerUsednameTable(SparkSession spark, String tableNames, String path){
+        JavaRDD<S_EN_USEDNAME> persons = spark.read().textFile(path).toJavaRDD().map(new Function<String, S_EN_USEDNAME>() {
+            @Override
+            public S_EN_USEDNAME call(String row) throws Exception {
+                String[] person = row.split(regext, -1);
+                return new S_EN_USEDNAME(person[0], person[1], person[2], person[3]);
+
+            }
+        });
+        spark.createDataFrame(persons, S_EN_USEDNAME.class).registerTempTable(tableNames + "");
+
+    }
+
 }
