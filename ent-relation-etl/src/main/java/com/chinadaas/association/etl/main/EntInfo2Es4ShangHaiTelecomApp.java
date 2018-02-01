@@ -3,6 +3,7 @@ package com.chinadaas.association.etl.main;
 import com.chinadaas.association.etl.sparksql.Hdfs2EsETL;
 import com.chinadaas.association.etl.sparksql.Hdfs2EsETL4ShangHai;
 import com.chinadaas.association.etl.sparksql.ZuZhiJiGou;
+import com.chinadaas.association.etl.sparksql.usedNameInformation;
 import com.chinadaas.association.etl.table.EntBaseInfo4ShangHai;
 import com.chinadaas.association.etl.table.EntBaseInfo4ShangHai4ICP;
 import com.chinadaas.association.etl.table.EntBaseInfo4ShangHai4UsedName;
@@ -52,7 +53,7 @@ public class EntInfo2Es4ShangHaiTelecomApp {
         conf.set(DatabaseValues.ES_INDEX_AUTO_CREATE, "false");
         conf.set(DatabaseValues.ES_NODES,"192.168.207.11,192.168.207.12,192.168.207.13");
         conf.set(DatabaseValues.ES_PORT,"59200");
-            conf.set(DatabaseValues.ES_BATCH_SIZE_BYTES,"6m");
+        conf.set(DatabaseValues.ES_BATCH_SIZE_BYTES,"6m");
         conf.set(DatabaseValues.ES_BATCH_SIZE_ENTRIES,"50000");
 
         SparkSession spark = SparkSession
@@ -61,13 +62,17 @@ public class EntInfo2Es4ShangHaiTelecomApp {
                 .enableHiveSupport()
                 .getOrCreate();
 
+
         String date = args[0];
        // String cfgPath = args[1];
 
+        //注册udf
+        StringFormatUDF.stringHandle(spark);
+
+ //Map<String,String> cfg = MyFileUtil.getFileCfg(cfgPath);
+ //registerTable(spark,cfg,date);
 
 
-       // Map<String,String> cfg = MyFileUtil.getFileCfg(cfgPath);
-       // registerTable(spark,cfg,date);
 
         /**
          * 上海电信基础数据
@@ -81,13 +86,12 @@ public class EntInfo2Es4ShangHaiTelecomApp {
          * 企业曾用名信息
          */
         //曾用名path
-     //   String usedname = cfg.get("S_EN_USEDNAME");
-     //   getUsedName(spark,usedname,date);
+      //  usednameToES(spark,date);
 
         /**
          * 组织机构信息
          */
-        saveToEs(spark,date);
+      ogzsaveToEs(spark,date);
 
         spark.close();
     }
@@ -109,44 +113,7 @@ public class EntInfo2Es4ShangHaiTelecomApp {
 
     }
 
-    public static void getUsedName(SparkSession spark,String path,String datadate){
 
-        JavaRDD<String> rdd = spark.sparkContext().textFile(path, 100).toJavaRDD();
-        JavaRDD<String> flatMap = rdd.flatMap(new FlatMapFunction<String, String>() {
-            @Override
-            public Iterator<String> call(String s) throws Exception {
-                ArrayList<String> list = new ArrayList<>();
-                String[] split = s.split("\u0001");
-                if (split.length >= 4) {
-                        list.add(s);
-                }
-                return list.iterator();
-            }
-        });
-        JavaRDD<EntBaseInfo4ShangHai4UsedName> map = flatMap.map(new Function<String, EntBaseInfo4ShangHai4UsedName>() {
-            @Override
-            public EntBaseInfo4ShangHai4UsedName call(String v1) throws Exception {
-                String[] split = v1.split("\u0001");
-                String DATA_DATE = split[0];
-                String NODENUM = split[1];
-                String PRIPID = "";
-                if (!split[2].equals("") && split[2] != null) {
-                    PRIPID = split[2];
-                }
-                String USEDNAME = split[3];
-                String JOBID = "";
-                if (split.length == 5) {
-                    JOBID = split[4];
-                }
-                EntBaseInfo4ShangHai4UsedName entBaseInfo4ShangHai4UsedName = new EntBaseInfo4ShangHai4UsedName(
-                        PRIPID, DATA_DATE, NODENUM,  USEDNAME, JOBID
-                );
-                return entBaseInfo4ShangHai4UsedName;
-            }
-        });
-        JavaEsSpark.saveToEs(map,"ent_usedname_"+datadate+"/ENT_USEDNAME");
-        ImmutableMap.of("es.mapping.id", "pripid");
-    }
 
     public static void geticp(SparkSession spark){
         JavaRDD<String> rdd = spark.sparkContext().textFile("/tmp/spark_test/c_gs_icp_website.txt", 1000).toJavaRDD();
@@ -187,33 +154,37 @@ public class EntInfo2Es4ShangHaiTelecomApp {
         JavaEsSpark.saveToEs(map,"entbaseshanghaiicp/ENTBASESHANGHAIICP", ImmutableMap.of("es.mapping.id", "fba_id"));
     }
 
+
     public static void registerTable(SparkSession spark,Map<String,String> allcfg,String date){
 
-        String entPath = null;
-        String invPath = null;
-        String personPath = null;
+    //    String entPath = null;
+    //    String invPath = null;
+    //    String personPath = null;
+//
+    //    String gtEnt = null;
+    //    String gtPerson = null;
+    //    String alter = null;
+        String usedname = null;
 
-        String gtEnt = null;
-        String gtPerson = null;
-        String alter = null;
+  //     entPath =   allcfg.get("ENTERPRISEBASEINFOCOLLECT");
+  //         personPath = allcfg.get("E_PRI_PERSON");
+  //         invPath = allcfg.get("E_INV_INVESTMENT");
+  //         gtEnt = allcfg.get("E_GT_BASEINFO");
+  //         gtPerson = allcfg.get("E_GT_PERSON");
+  //         alter = allcfg.get("E_ALTER_RECODER");
+          usedname = allcfg.get("S_EN_USEDNAME");
 
-            entPath =   allcfg.get("ENTERPRISEBASEINFOCOLLECT");
-            personPath = allcfg.get("E_PRI_PERSON");
-            invPath = allcfg.get("E_INV_INVESTMENT");
-            gtEnt = allcfg.get("E_GT_BASEINFO");
-            gtPerson = allcfg.get("E_GT_PERSON");
-            alter = allcfg.get("E_ALTER_RECODER");
-
-        System.out.println("e_gt_baseinfo"+gtEnt);
+  //      System.out.println("e_gt_baseinfo"+gtEnt);
 //        RegisterTable.regiserGtEntBaseInfoTable(spark,"e_gt_baseinfo",date,gtEnt);
 //        RegisterTable.regiserEntBaseInfoTable(spark,"enterprisebaseinfocollect",date,entPath);
 //        RegisterTable.regiserInvTable(spark,"e_inv_investment",date,invPath);
 
-        spark.read().load("/relation/cachetable/e_gt_baseinfo").registerTempTable("e_gt_baseinfo");
-        spark.read().load("/relation/cachetable/enterprisebaseinfocollect").registerTempTable("enterprisebaseinfocollect");
+       // spark.read().load("/relation/cachetable/e_gt_baseinfo").registerTempTable("e_gt_baseinfo");
+       // spark.read().load("/relation/cachetable/enterprisebaseinfocollect").registerTempTable("enterprisebaseinfocollect");
+          RegisterTable.registerS_EN_USEDNAME(spark,"usednametable",usedname);
     }
 
-    public static void saveToEs(SparkSession spark,String date) {
+    public static void ogzsaveToEs(SparkSession spark,String date) {
         HashMap<String, String> cfg = new HashMap<>();
         cfg.put(DatabaseValues.ES_INDEX_AUTO_CREATE, CommonConfig.getValue(DatabaseValues.ES_INDEX_AUTO_CREATE));
         cfg.put(DatabaseValues.ES_NODES, CommonConfig.getValue(DatabaseValues.ES_NODES));
@@ -222,10 +193,26 @@ public class EntInfo2Es4ShangHaiTelecomApp {
         cfg.put(DatabaseValues.ES_BATCH_SIZE_ENTRIES, CommonConfig.getValue(DatabaseValues.ES_BATCH_SIZE_ENTRIES));
        // cfg.put("es.mapping.id", "pripid");
         cfg.put("es.resource.write", "ogzinfo-"+date+"/ogzinfo");
-        logger.info("------------查询合并数据到es---------------");
+        logger.info("------------写住址机构信息到es---------------");
         eda.writeData(ZuZhiJiGou.InformationGainStats(spark), cfg);
         logger.info("------------数据写入es成功----------");
     }
+
+
+    public static void usednameToES(SparkSession spark,String date) {
+        HashMap<String, String> cfg = new HashMap<>();
+        cfg.put(DatabaseValues.ES_INDEX_AUTO_CREATE, CommonConfig.getValue(DatabaseValues.ES_INDEX_AUTO_CREATE));
+        cfg.put(DatabaseValues.ES_NODES, CommonConfig.getValue(DatabaseValues.ES_NODES));
+        cfg.put(DatabaseValues.ES_PORT, CommonConfig.getValue(DatabaseValues.ES_PORT));
+        cfg.put(DatabaseValues.ES_BATCH_SIZE_BYTES, CommonConfig.getValue(DatabaseValues.ES_BATCH_SIZE_BYTES));
+        cfg.put(DatabaseValues.ES_BATCH_SIZE_ENTRIES, CommonConfig.getValue(DatabaseValues.ES_BATCH_SIZE_ENTRIES));
+       // cfg.put("es.mapping.id", "pripid");
+        cfg.put("es.resource.write", "ent_usedname_"+date+"/ENT_USEDNAME");
+        logger.info("------------写企业曾用名es---------------");
+        eda.writeData(usedNameInformation.getusedName(spark), cfg);
+        logger.info("------------数据写入es成功----------");
+    }
+
 
 
 }

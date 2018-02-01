@@ -1,20 +1,22 @@
 package com.chinadaas.common.table;
 
-public class S_EN_USEDNAME {
+import java.io.Serializable;
 
-    private String nodenum;
-    private String pripid;
-    private String usedname;
-    private String jobid;
+public class S_EN_USEDNAME implements Serializable{
+
+  private String nodenum    ;
+  private String pripid     ;
+  private String usedname   ;
+  private String jobid      ;
+
+
 
     public S_EN_USEDNAME(String nodenum, String pripid, String usedname, String jobid) {
         this.nodenum = nodenum;
         this.pripid = pripid;
         this.usedname = usedname;
         this.jobid = jobid;
-    }
 
-    public S_EN_USEDNAME() {
     }
 
     public String getNodenum() {
@@ -48,4 +50,6 @@ public class S_EN_USEDNAME {
     public void setJobid(String jobid) {
         this.jobid = jobid;
     }
+
+
 }

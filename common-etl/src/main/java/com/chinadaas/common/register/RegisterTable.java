@@ -177,6 +177,7 @@ public class RegisterTable implements Serializable {
 
             }
         });
+
         spark.createDataFrame(persons, E_ALTER_RECODER.class).registerTempTable(tableNames + "");
         DataFrameUtil.getDataFrame(spark, "select * from e_alter_recoder", "e_alter_recoder", DataFrameUtil.CACHETABLE_PARQUET);
     }
@@ -389,7 +390,6 @@ public class RegisterTable implements Serializable {
         spark.createDataFrame(persons, S_CIF_INDMAP.class).registerTempTable(tableNames + "");
 
     //    DataFrameUtil.getDataFrame(spark, "select encode_v1,zspid from S_CIF_INDMAP_T", "S_CIF_INDMAP", DataFrameUtil.CACHETABLE_PARQUET);
-        DataFrameUtil.getDataFrame(spark, "select encode_v1,zspid from S_CIF_INDMAP_T", "s_cif_indmap", DataFrameUtil.CACHETABLE_PARQUET);
     }
 
 
@@ -450,7 +450,7 @@ public class RegisterTable implements Serializable {
         JavaRDD<DIS_BZXR_NEW> persons = spark.read().textFile(path).toJavaRDD().filter(new Function<String, Boolean>() {
             @Override
             public Boolean call(String s) throws Exception {
-                if (s.split(regext, -1).length == 23) {
+                if (s.split(regext, -1).length == 22) {
                     return true;
                 } else {
                     return false;
@@ -480,7 +480,7 @@ public class RegisterTable implements Serializable {
         JavaRDD<DIS_SXBZXR_NEW> persons = spark.read().textFile(path).toJavaRDD().filter(new Function<String, Boolean>() {
             @Override
             public Boolean call(String s) throws Exception {
-                if (s.split(regext, -1).length == 31) {
+                if (s.split(regext, -1).length == 30) {
                     return true;
                 } else {
                     return false;
@@ -722,12 +722,12 @@ public class RegisterTable implements Serializable {
             }
         });
 
-        spark.createDataFrame(person,S_TAX_BASEINFO.class).registerTempTable(tableNames+"");
+ spark.createDataFrame(person,S_TAX_BASEINFO.class).registerTempTable(tableNames+"");
     }
 
 
     //组织机构
-    public static void registerS_OGZ_BASEINFO(SparkSession spark,String tablenames,String path) {
+    public static void registerS_OGZ_BASEINFO(SparkSession spark,String tablenames,String path){
 
         JavaRDD<S_OGZ_BASEINFO> person = spark.read().textFile(path).toJavaRDD().map(new Function<String, S_OGZ_BASEINFO>() {
             @Override
@@ -741,28 +741,70 @@ public class RegisterTable implements Serializable {
             }
         });
 
-        spark.createDataFrame(person, S_OGZ_BASEINFO.class).registerTempTable(tablenames + "");
+        spark.createDataFrame(person,S_OGZ_BASEINFO.class).registerTempTable(tablenames+"");
 
     }
-        /**
-         *  曾用名表（S_EN_USEDNAME）
-         *
-         * @param spark
-         * @param tableNames 注册表名
-         * @param path   路径全量或者增量路径
-         */
-        public static void registerUsednameTable(SparkSession spark, String tableNames, String path){
-            JavaRDD<S_EN_USEDNAME> persons = spark.read().textFile(path).toJavaRDD().map(new Function<String, S_EN_USEDNAME>() {
-                @Override
-                public S_EN_USEDNAME call(String row) throws Exception {
-                    String[] person = row.split(regext, -1);
-                    return new S_EN_USEDNAME(person[0], person[1], person[2], person[3]);
 
+
+
+//曾用名
+ public static void registerS_EN_USEDNAME(SparkSession spark,String tableNames,String path){
+
+     JavaRDD<S_EN_USEDNAME> person = spark.read().textFile(path).toJavaRDD().filter(new Function<String, Boolean>() {
+         @Override
+         public Boolean call(String s) throws Exception {
+             if (s.split(regext, -1).length == 4) {
+                 return true;
+             } else {
+                 return false;
+             }
+         }
+     }).map(new Function<String, S_EN_USEDNAME>() {
+         @Override
+         public S_EN_USEDNAME call(String row) throws Exception {
+
+             String[] person = row.split(regext, -1);
+             return new S_EN_USEDNAME(person[0], person[1], person[2], person[3]);
+
+         }
+     });
+
+     spark.createDataFrame(person,S_EN_USEDNAME.class).registerTempTable(tableNames+"");
+ }
+
+ //上市数据《机构资料表TQ_COMP_INFO》
+
+    public static void registerTQ_COMP_INFO(SparkSession spark,String tableNames,String path){
+
+        JavaRDD<TQ_COMP_INFO> person = spark.read().textFile(path).toJavaRDD().filter(new Function<String, Boolean>() {
+            @Override
+            public Boolean call(String v1) throws Exception {
+                if (v1.split(regext, -1).length == 60) {
+                    return true;
+                } else {
+                    return false;
                 }
-            });
-            spark.createDataFrame(persons, S_EN_USEDNAME.class).registerTempTable(tableNames + "");
+            }
+        }).map(new Function<String, TQ_COMP_INFO>() {
 
-        }
+
+            @Override
+            public TQ_COMP_INFO call(String v1) throws Exception {
+                String[] person = v1.split(regext, -1);
+
+                return new TQ_COMP_INFO(person[0], person[1], person[2], person[3], person[4]
+                        , person[5], person[6], person[7], person[8], person[9], person[10], person[11], person[12],
+                        person[13], person[14], person[15], person[16], person[17], person[18],
+                        person[19], person[20], person[21], person[22], person[23], person[24],
+                        person[25], person[26], person[27], person[28], person[29], person[30],
+                        person[31], person[32], person[33], person[34], person[35], person[36],
+                        person[37], person[38], person[39], person[40], person[41], person[42],
+                        person[43], person[44], person[45], person[46], person[47], person[48],
+                        person[49], person[50], person[51], person[52], person[53], person[54],
+                        person[55], person[56], person[57], person[58], person[59]);
+            }
+        });
+
+      spark.createDataFrame(person,TQ_COMP_INFO.class).registerTempTable(tableNames+"");
+    }
 }
-
-
