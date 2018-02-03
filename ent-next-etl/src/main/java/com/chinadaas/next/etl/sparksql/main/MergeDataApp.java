@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Auther: zhouzhen@chinadaas.com
+ * @author haoxing
  * @description:
  * @Date: 16:20 2017/9/8
  */
@@ -29,7 +29,7 @@ public class MergeDataApp {
                 .appName("Chinadaas MERGE_DATA_APP")
                 .enableHiveSupport()
                 .getOrCreate();
-        spark.sqlContext().conf().setConfString("spark.sql.shuffle.partitions", "1600");
+        spark.sqlContext().conf().setConfString("spark.sql.shuffle.partitions", "800");
         String date = args[0];
 
 
@@ -50,17 +50,20 @@ public class MergeDataApp {
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_TOPEXPERIENCE_DIR)).createOrReplaceTempView("topexperiencekpi");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_LEGALOFFICE_DIR)).createOrReplaceTempView("legalofficetmp");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_LEGALINVESTMENT_DIR)).createOrReplaceTempView("legalinvestmenttmp");
-        parquetDataAdapterImpl.loadData(spark,CommonConfig.getValue(Constants.ENT_INDEX_PATENT_DIR)).createOrReplaceTempView("patenttmp");
+        parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_PATENT_DIR)).createOrReplaceTempView("patenttmp");
+        parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_FINANCIAL_DIR)).createOrReplaceTempView("financial");
+        parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_LISTED_DIR)).createOrReplaceTempView("listed");
+
 
         logger.info("------------载入数据完成----------------------------");
 
-        saveDataToEs(spark,date);
+        saveDataToEs(spark, date);
         spark.stop();
 
     }
 
 
-    public static void saveDataToEs(SparkSession spark,String date) {
+    public static void saveDataToEs(SparkSession spark, String date) {
         Map cfg = new HashMap<String, String>();
 
         cfg.put(DatabaseValues.ES_INDEX_AUTO_CREATE, CommonConfig.getValue(DatabaseValues.ES_INDEX_AUTO_CREATE));
@@ -68,10 +71,10 @@ public class MergeDataApp {
         cfg.put(DatabaseValues.ES_PORT, CommonConfig.getValue(DatabaseValues.ES_PORT));
         cfg.put(DatabaseValues.ES_BATCH_SIZE_BYTES, CommonConfig.getValue(DatabaseValues.ES_BATCH_SIZE_BYTES));
         cfg.put(DatabaseValues.ES_BATCH_SIZE_ENTRIES, CommonConfig.getValue(DatabaseValues.ES_BATCH_SIZE_ENTRIES));
-        String index = "ent_index_"+date+"/ENT_INDEX_"+date;
+        String index = "ent_index_" + date + "/ENT_INDEX_" + date;
         cfg.put("es.mapping.id", "pripid");
-       // cfg.put("es.resource.write", "ent_index_20171217/ENT_INDEX_20171217");
-        cfg.put("es.resource.write",index);
+        // cfg.put("es.resource.write", "ent_index_20171217/ENT_INDEX_20171217");
+        cfg.put("es.resource.write", index);
         logger.info("------------查询合并数据到es----------------------------");
         ida.writeData(MergeDataETL.getMergeData(spark), cfg);
 

@@ -10,7 +10,7 @@ import org.apache.spark.sql.SparkSession;
 /**
  * @author haoxing
  *
- * 存储历史的数标签，加上了timestamp
+ * 存储历史的数标签，加上了timestamp，然后存储批次的数据到hdfs上
  */
 public class TimeNodeData {
     protected static LogUtil logger = LogUtil.getLogger(TimeNodeData.class);
