@@ -11,7 +11,6 @@ public class DatabaseValues {
     public static final String ES_INDEX_AUTO_CREATE="es.index.auto.create";
     public static final String ES_NODES="es.nodes";
     public static final String ES_PORT="es.port";
-    public static final String ES_PORT1="es.port1";
     public static final String ES_BATCH_SIZE_BYTES="es.batch.size.bytes";
     public static final String ES_BATCH_SIZE_ENTRIES="es.batch.size.entries";
     /**
