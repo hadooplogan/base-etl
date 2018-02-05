@@ -23,9 +23,18 @@ public class S_SIPO_PATENT_COPYRIGHT implements Serializable{
    private String idt                 ;
    private String udt                 ;
    private String date_seq            ;
+   private String pt_reg_group_pripid ;
 
 
-    public S_SIPO_PATENT_COPYRIGHT(String pt_patentright_id, String pt_reg_no, String pt_typeno, String pt_reg_per, String pt_reg_pripid, String pt_reg_group, String pt_reg_group_order, String pt_reg_num, String pt_reg_pertype, String rc1, String rc2, String pt_reg_gl_pertype, String data_status, String jobid, String idt, String udt, String date_seq) {
+    public String getPt_reg_group_pripid() {
+        return pt_reg_group_pripid;
+    }
+
+    public void setPt_reg_group_pripid(String pt_reg_group_pripid) {
+        this.pt_reg_group_pripid = pt_reg_group_pripid;
+    }
+
+    public S_SIPO_PATENT_COPYRIGHT(String pt_patentright_id, String pt_reg_no, String pt_typeno, String pt_reg_per, String pt_reg_pripid, String pt_reg_group, String pt_reg_group_order, String pt_reg_num, String pt_reg_pertype, String rc1, String rc2, String pt_reg_gl_pertype, String data_status, String jobid, String idt, String udt, String date_seq, String pt_reg_group_pripid) {
         this.pt_patentright_id = pt_patentright_id;
         this.pt_reg_no = pt_reg_no;
         this.pt_typeno = pt_typeno;
@@ -43,6 +52,7 @@ public class S_SIPO_PATENT_COPYRIGHT implements Serializable{
         this.idt = idt;
         this.udt = udt;
         this.date_seq = date_seq;
+        this.pt_reg_group_pripid = pt_reg_group_pripid;
 
     }
 

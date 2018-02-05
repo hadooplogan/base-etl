@@ -58,21 +58,21 @@ public class BaseBiKpiApp {
 
 
 
-        //execBase(spark);
-        //execAbnormity(spark);
-        //execBreakLaw(spark);
-        //execCaseInfo(spark);
-        //execPublishSoftwork(spark);
-        //execPublishCopyright(spark);
-        //execSubcompany(spark);
-        //execTradeMrkInfo(spark);
-        //execEnterpriseChange(spark);
-        //execTopExperienceKpi(spark);
-        //execEnterpriseInvestment(spark);
-        //execLegalInvestment(spark);
-        //execStockOfCompany(spark);
-        //execLegalOffice(spark);
-        //execPatent(spark);
+       // execBase(spark);
+       // execAbnormity(spark);
+        execBreakLaw(spark);
+        execCaseInfo(spark);
+        execPublishSoftwork(spark);
+        execPublishCopyright(spark);
+        execSubcompany(spark);
+        execTradeMrkInfo(spark);
+        execEnterpriseChange(spark);
+        execTopExperienceKpi(spark);
+        execEnterpriseInvestment(spark);
+        execLegalInvestment(spark);
+        execStockOfCompany(spark);
+        execLegalOffice(spark);
+        execPatent(spark);
 
         /*暂停处理的司法标签(暂时待定)*/
         //exectopLessCredit(spark);
@@ -84,10 +84,10 @@ public class BaseBiKpiApp {
 
         /*法人对外任职，与主题企业拥有合伙企业标签(修改中)*/
         //法人对外任职,非法人。完成法人对外任职。
-        // execListed(spark);
-         execFinancial(spark);
+        execListed(spark);
+       // execFinancial(spark);
 
-         execBase(spark);
+
 
          spark.stop();
     }
@@ -298,9 +298,9 @@ public class BaseBiKpiApp {
         RegisterTable.registerCopyRightOrg(spark, "s_en_copyrightorg", copyrightorgPath);
         RegisterTable.registerCopyRightInfo(spark, "s_en_copyrightinfo", copyrightinfoPath);
         //patent表
-       // RegisterTable.registerS_SIPO_PATENT_INFO(spark,"s_sipo_patent_info",patentinfo);
-       // RegisterTable.registerS_SIPO_PATENT_COPYRIGHT(spark,"s_sipo_patent_copyright",patentcopyright);
-       // RegisterTable.registerS_SIPO_PATENT_LAWSTATE(spark,"s_sipo_patent_lawstate",patentlawstate);
+        RegisterTable.registerS_SIPO_PATENT_INFO(spark,"s_sipo_patent_info",patentinfo);
+        RegisterTable.registerS_SIPO_PATENT_COPYRIGHT(spark,"s_sipo_patent_copyright",patentcopyright);
+        RegisterTable.registerS_SIPO_PATENT_LAWSTATE(spark,"s_sipo_patent_lawstate",patentlawstate);
         //2016年财报信息 不用注册
 
 

@@ -84,6 +84,28 @@ public class MergeDataETL {
                 "nvl(o.eb0061,0) as eb0061,\n" +
                 "nvl(o.eb0062,0) as eb0062,\n" +
                 "nvl(o.eb0112,0) as eb0112,\n"+
+              // "p.ee0066,\n" +
+              // "p.ee0067,\n" +
+              // "p.ee0068,\n" +
+              // "p.ee0069,\n" +
+              // "p.ee0070,\n" +
+              // "p.ee0071,\n" +
+              // "p.ee0072,\n" +
+              // "p.ee0073,\n" +
+              // "p.ee0074,\n" +
+              // "p.ee0075,\n" +
+              // "p.ee0076,\n" +
+              // "p.ee0077,\n" +
+              // "p.ee0078,\n" +
+              // "p.ee0080,\n" +
+              // "p.ee0081,\n" +
+              // "p.ee0082,\n" +
+              // "p.ee0083,\n" +
+                "q.ee0033,\n" +
+                "q.ee0034,\n" +
+                "q.ee0035,\n" +
+                "q.ee0036,\n" +
+                "q.ee0037,\n" +
                 "case when nvl(t.eb0043,0)-nvl(t.eb0044,0) > 0 then '是' else '否' end as eb0106\n" +
                 "from basebikpitemp a \n" +
                 "left join tmppublishsoftwork j on a.pripid = j.pripid\n" +
@@ -99,7 +121,9 @@ public class MergeDataETL {
                 "left join legalofficetmp l on a.pripid = l.pripid\n"+
                 "left join topexperiencekpi n on a.pripid = n.pripid\n" +
                 "left join legalinvestmenttmp m on a.pripid = m.pripid\n"+
-                "left join patenttmp o on a.pripid = o.pripid";
+                "left join patenttmp o on a.pripid = o.pripid\n" +
+               // "left join financial p on a.pripid = p,pripid\n" +
+                "left join listed q on a.pripid = q.pripid";
         return DataFrameUtil.getDataFrame(spark, hql, "mergeDataTmp");
     }
 }
