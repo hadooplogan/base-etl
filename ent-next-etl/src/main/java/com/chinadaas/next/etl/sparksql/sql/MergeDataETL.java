@@ -19,14 +19,14 @@ public class MergeDataETL {
                 "nvl(b.eb0092,0) as eb0092,\n" +
                 "nvl(b.eb0093,0) as eb0093,\n" +
                 "nvl(b.eb0094,0) as eb0094,\n" +
-                "nvl(c.eb0095,0) as eb0095,\n" +
+                "nvl(c.eb0095,'未知') as eb0095,\n" +
                 "nvl(c.eb0096,0) as eb0096,\n" +
                 "nvl(c.eb0097,0) as eb0097,\n" +
                 "nvl(c.eb0098,0) as eb0098,\n" +
                 "nvl(c.eb0099,0) as eb0099,\n" +
                 "nvl(d.eb0101,0) as eb0101,\n" +
                 "nvl(d.eb0100,0) as eb0100," +
-                "d.eb0107,\n" +
+                "nvl(d.eb0107,'未知')as eb0107,\n" +
                 "nvl(f.eb0070,0) as eb0070,\n" +
                 "nvl(f.eb0071,0) as eb0071,\n" +
                 "nvl(f.eb0072,0) as eb0072,\n" +
@@ -101,11 +101,11 @@ public class MergeDataETL {
               // "p.ee0081,\n" +
               // "p.ee0082,\n" +
               // "p.ee0083,\n" +
-                "q.ee0033,\n" +
-                "q.ee0034,\n" +
-                "q.ee0035,\n" +
-                "q.ee0036,\n" +
-                "q.ee0037,\n" +
+                "nvl(q.ee0033,'未知') as ee0033,\n" +
+                "nvl(q.ee0034,'未知') as ee0034,\n" +
+                "nvl(q.ee0035,'未知') as ee0035,\n" +
+                "nvl(q.ee0036,'未知') as ee0036,\n" +
+                "nvl(q.ee0037,'未知') as ee0037,\n" +
                 "case when nvl(t.eb0043,0)-nvl(t.eb0044,0) > 0 then '是' else '否' end as eb0106\n" +
                 "from basebikpitemp a \n" +
                 "left join tmppublishsoftwork j on a.pripid = j.pripid\n" +

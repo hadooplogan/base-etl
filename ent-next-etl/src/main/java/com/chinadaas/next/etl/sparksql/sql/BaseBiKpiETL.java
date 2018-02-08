@@ -151,8 +151,16 @@ public class BaseBiKpiETL {
                 " case when f.area_feature is null then '-9' when  f.area_feature = '99' then '-9' else f.area_feature end as eb0001,\n" +
                 " case when f.area_level is null then '-9' when f.area_level = '99' then '-9' else f.area_level end as eb0002,\n" +
                 " case when email is null then 0 else 1 end as ee0020,\n" +
-                " case when g.industry_feature is null then '-9' else g.industry_feature end as eb0003," +
-                " percent_rank() over(partition by a.s_ext_nodenum,substr(a.industryco,1,2) order by a.regcap) as eb0114\n" +//注册资本百分位 2018-01-8
+                " case when g.industry_feature is null then '-9' else g.industry_feature end as eb0003,\n" +
+                " case when a.entstatus = 1 and a.s_ext_nodenum <> '' and a.s_ext_nodenum <> 'null' and a.s_ext_nodenum is not null\n" +
+                " and a.regcap <> '' and a.regcap <> 'null' and a.regcap is not null \n" +
+                " and a.industryco <> '' and a.industryco is not null and a.industryco <> 'null' and length(a.industryco) >= 2\n" +
+                " then round(percent_rank() over(partition by a.s_ext_nodenum,substr(a.industryco,1,2) order by cast(a.regcap as double)),4)\n" +
+                " when a.entstatus = 1 and a.s_ext_nodenum = '' or a.s_ext_nodenum = 'null' or a.s_ext_nodenum is null\n" +
+                " or a.regcap = '' or a.regcap = 'null' or a.regcap is null \n" +
+                " or a.industryco = '' or a.industryco is null or a.industryco = 'null' or length(a.industryco) < 2\n" +
+                " then '未知'\n" +
+                " else '非在营' end as eb0114 \n" +//注册资本百分位 2018-01-8
                 " from enterprisebaseinfocollect a\n" +
                 " left join t_dex_app_codelist c on a.ecotecdevzone = c.codevalue\n" +
                 " left join industry_ent_fluctuation g on concat(a.industryphy,substr(a.industryco,1,2)) = g.id\n" +
