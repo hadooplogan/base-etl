@@ -41,20 +41,41 @@ public class BreakLawKpiETL {
          "(SELECT pripid, COUNT(1) as outyeartotal FROM s_en_break_law where regexp_replace(substr(BRL_ODAT,1,10),'-','') >= regexp_replace('" + TimeUtil.getYearAgo(1) + "','-','') group by pripid)e on a.pripid = e.pripid";
          return DataFrameUtil.getDataFrame(spark, hql.replaceAll("datadate", datadate), "breakLawKpiTmp");*/
 
-        //严重违法 修改与2018-01-05
+        /**   //严重违法 修改与2018-01-05
+         String hql = "select pripid,intoal as eb0096,\n" +
+         "inyear as eb0097,\n" +
+         "outtoal as eb0098,\n" +
+         "outyear as eb0099,\n" +
+         "case when (intoal - outtoal) > 0 then '是' else '否' end as eb0095 \n" +
+         "from \n" +
+         "(select pripid,\n" +
+         "sum(case when (((brl_idat <> '' and brl_idat <> 'null' and brl_idat is not null) or (brl_iorg <> '' and brl_iorg <> 'null' and brl_iorg is not null) or (brl_ino <> '' and brl_ino <> 'null' and brl_ino is null)or (brl_inr <> '' and brl_inr <> 'null' and brl_inr is not null)) then 1 else 0 end ) as intoal,\n" +
+         "sum(case when brl_idat <> '' and brl_idat <> 'null' and brl_idat is not null and regexp_replace(substr(BRL_IDAT,1,10),'-','') >= regexp_replace('" + TimeUtil.getYearAgo(1) + "','-','') then 1 else 0 end ) as inyear,\n" +
+         "sum(case when( brl_odat <> '' or brl_oorg <> '' or brl_ono <> '' or brl_onr <> '') then 1 else 0 end) as outtoal,\n" +
+         "sum(case when brl_odat <> '' and brl_odat <> 'null' and brl_odat is not null and regexp_replace(substr(BRL_ODAT,1,10),'-','') >= regexp_replace('" + TimeUtil.getYearAgo(1) + "','-','')  then 1 else 0 end) as outyear\n" +
+         "from s_en_break_law group by pripid) ";
+         */
+
         String hql = "select pripid,intoal as eb0096,\n" +
                 "inyear as eb0097,\n" +
                 "outtoal as eb0098,\n" +
                 "outyear as eb0099,\n" +
-                "case when (intoal - outtoal) > 0 then '是' else '否' end as eb0095 \n" +
-                "from \n" +
+                "case when (intoal - outtoal) > 0 then '是' else '否' end as eb0095\n" +
+                "from\n" +
                 "(select pripid,\n" +
-                "sum(case when (brl_idat <> '' or brl_iorg <> '' or brl_ino <> '' or brl_inr <> '') then 1 else 0 end ) as intoal,\n" +
-                "sum(case when brl_idat <> '' and regexp_replace(substr(BRL_IDAT,1,10),'-','') >= regexp_replace('" + TimeUtil.getYearAgo(1) + "','-','') then 1 else 0 end ) as inyear,\n" +
-                "sum(case when( brl_odat <> '' or brl_oorg <> '' or brl_ono <> '' or brl_onr <> '') then 1 else 0 end) as outtoal,\n" +
-                "sum(case when brl_odat <> '' and regexp_replace(substr(BRL_ODAT,1,10),'-','') >= regexp_replace('" + TimeUtil.getYearAgo(1) + "','-','')  then 1 else 0 end) as outyear\n" +
-                "from s_en_break_law group by pripid) ";
-
+                "sum(case when ((brl_idat <> '' and brl_idat <> 'null' and brl_idat is not null) \n" +
+                "or (brl_iorg <> '' and brl_iorg <> 'null' and brl_iorg is not null) \n" +
+                "or (brl_ino <> '' and brl_ino <> 'null' and brl_ino is null) \n" +
+                "or (brl_inr <> '' and brl_inr <> 'null' and brl_inr is not null)) \n" +
+                "then 1 else 0 end ) as intoal,\n" +
+                "sum(case when brl_idat <> '' and brl_idat <> 'null' and brl_idat is not null and regexp_replace(substr(BRL_IDAT,1,10),'-','') >= regexp_replace('" + TimeUtil.getYearAgo(1) + "','-','') then 1 else 0 end ) as inyear,\n" +
+                "sum(case when((brl_odat <> '' and brl_odat <> 'null' and brl_odat is not null) \n" +
+                "or (brl_oorg <> '' and brl_oorg <> 'null' and brl_oorg is not null) \n" +
+                "or (brl_ono <> '' and brl_ono <> 'null' and brl_ono is not null) \n" +
+                "or (brl_onr <> '' and brl_onr <> 'null' and brl_onr is not null)) \n" +
+                "then 1 else 0 end) as outtoal,\n" +
+                "sum(case when brl_odat <> '' and brl_odat <> 'null' and brl_odat is not null and regexp_replace(substr(BRL_ODAT,1,10),'-','') >= regexp_replace('" + TimeUtil.getYearAgo(1) + "','-','') then 1 else 0 end) as outyear\n" +
+                "from breakelaw_test group by pripid)";
         return DataFrameUtil.getDataFrame(spark, hql.replaceAll("datadate", datadate), "breakLawKpiTmp");
     }
 }

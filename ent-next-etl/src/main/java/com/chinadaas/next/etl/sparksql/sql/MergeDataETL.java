@@ -4,10 +4,11 @@ import com.chinadaas.common.util.DataFrameUtil;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 
+
 /**
- * @Auther: zhouzhen@chinadaas.com
- * @description:
- * @Date: 16:32 2017/9/8
+ * @author haoxing
+ * @date 20180208
+ *
  */
 public class MergeDataETL {
 
@@ -19,14 +20,14 @@ public class MergeDataETL {
                 "nvl(b.eb0092,0) as eb0092,\n" +
                 "nvl(b.eb0093,0) as eb0093,\n" +
                 "nvl(b.eb0094,0) as eb0094,\n" +
-                "nvl(c.eb0095,'未知') as eb0095,\n" +
-                "nvl(c.eb0096,0) as eb0096,\n" +
-                "nvl(c.eb0097,0) as eb0097,\n" +
-                "nvl(c.eb0098,0) as eb0098,\n" +
-                "nvl(c.eb0099,0) as eb0099,\n" +
+              //  "nvl(c.eb0095,'未知') as eb0095,\n" +
+              //  "nvl(c.eb0096,0) as eb0096,\n" +
+              //  "nvl(c.eb0097,0) as eb0097,\n" +
+              //  "nvl(c.eb0098,0) as eb0098,\n" +
+              //  "nvl(c.eb0099,0) as eb0099,\n" +
                 "nvl(d.eb0101,0) as eb0101,\n" +
                 "nvl(d.eb0100,0) as eb0100," +
-                "nvl(d.eb0107,'未知')as eb0107,\n" +
+                "nvl(d.eb0107,'否')as eb0107,\n" +
                 "nvl(f.eb0070,0) as eb0070,\n" +
                 "nvl(f.eb0071,0) as eb0071,\n" +
                 "nvl(f.eb0072,0) as eb0072,\n" +
@@ -79,11 +80,11 @@ public class MergeDataETL {
                 "nvl(n.eb0066,'否') as eb0066,\n" +
                 "nvl(n.eb0067,0) as eb0067,\n" +
                 "nvl(n.eb0068,0) as eb0068,\n" +
-                "nvl(o.eb0059,0) as eb0059,\n" +
-                "nvl(o.eb0060,0) as eb0060,\n" +
-                "nvl(o.eb0061,0) as eb0061,\n" +
-                "nvl(o.eb0062,0) as eb0062,\n" +
-                "nvl(o.eb0112,0) as eb0112,\n"+
+              //  "nvl(o.eb0059,0) as eb0059,\n" +
+              //  "nvl(o.eb0060,0) as eb0060,\n" +
+              //  "nvl(o.eb0061,0) as eb0061,\n" +
+              //  "nvl(o.eb0062,0) as eb0062,\n" +
+              //  "nvl(o.eb0112,0) as eb0112,\n"+
               // "p.ee0066,\n" +
               // "p.ee0067,\n" +
               // "p.ee0068,\n" +
@@ -101,16 +102,16 @@ public class MergeDataETL {
               // "p.ee0081,\n" +
               // "p.ee0082,\n" +
               // "p.ee0083,\n" +
-                "nvl(q.ee0033,'未知') as ee0033,\n" +
-                "nvl(q.ee0034,'未知') as ee0034,\n" +
-                "nvl(q.ee0035,'未知') as ee0035,\n" +
-                "nvl(q.ee0036,'未知') as ee0036,\n" +
-                "nvl(q.ee0037,'未知') as ee0037,\n" +
+                "nvl(q.ee0033,'否') as ee0033,\n" +
+                "nvl(q.ee0034,'无') as ee0034,\n" +
+                "nvl(q.ee0035,'否') as ee0035,\n" +
+                "nvl(q.ee0036,'无') as ee0036,\n" +
+                "nvl(q.ee0037,'无') as ee0037,\n" +
                 "case when nvl(t.eb0043,0)-nvl(t.eb0044,0) > 0 then '是' else '否' end as eb0106\n" +
                 "from basebikpitemp a \n" +
                 "left join tmppublishsoftwork j on a.pripid = j.pripid\n" +
                 "left join abnormitykpitemp b on a.pripid = b.pripid\n" +
-                "left join breaklawkpitemp c on a.pripid = c.pripid\n" +
+               // "left join breaklawkpitemp c on a.pripid = c.pripid\n" +
                 "left join caseinfokpitemp d on a.pripid = d.pripid\n" +
                 "left join tmpenterpriseChange f on a.pripid = f.pripid\n" +
                 "left join tmpsubconpany g on a.pripid = g.pripid\n" +
@@ -121,7 +122,7 @@ public class MergeDataETL {
                 "left join legalofficetmp l on a.pripid = l.pripid\n"+
                 "left join topexperiencekpi n on a.pripid = n.pripid\n" +
                 "left join legalinvestmenttmp m on a.pripid = m.pripid\n"+
-                "left join patenttmp o on a.pripid = o.pripid\n" +
+               // "left join patenttmp o on a.pripid = o.pripid\n" +
                // "left join financial p on a.pripid = p,pripid\n" +
                 "left join listed q on a.pripid = q.pripid";
         return DataFrameUtil.getDataFrame(spark, hql, "mergeDataTmp");
