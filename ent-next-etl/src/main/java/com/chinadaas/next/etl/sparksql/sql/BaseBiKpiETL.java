@@ -86,19 +86,19 @@ public class BaseBiKpiETL {
                 " when REGCAPCUR = '840' and 800000.0 < cast(regcap as double) and cast(regcap as double) <= 1000000.0 then '20'\n" +
                 " when REGCAPCUR = '840' and 1000000.0 < cast(regcap as double) then '21'\n" +
                 " else '-9' end as eb0007,\n" +
-                "case when enttype in('3100','4100','4110','4200','4210','4300','4310','4400','4410')then '01' \n" +
-                "when enttype in('3200','4120','4220','4320','4420') then '02'\n" +
-                "when enttype = '4500' then '03'\n" +
-                "when enttype in('9999','9500') then '04'\n" +
-                "when enttype in('3500','4600') then '05'\n" +
-                "when enttype in('1200','1210','1211','1212','1213','1219','1220','1221','1222','1223','1229','2200','2210','2211','2212','2213','2219','2220','2221','2222','2223','2229','3300','3400','4330','4340','4700') then '06'\n" +
-                "when enttype in('4540','4560') then '07'\n" +
-                "when enttype in('5000','5100','5110','5120','5130','5140','5150','5160','5190','5200','5210','5220','5230','5240','5290','5300','5310','5320','5390','5400','5410','5420','5430','5490','5800','5810','5820','5830','5840','5890','7000','7100','7110','7120','7130','7190','7200','7300','7310','7390') then '08'\n" +
-                "when enttype in('6000','6100','6110','6120','6130','6140','6150','6160','6170','6190','6200','6210','6220','6230','6240','6250','6260','6290','6300','6310','6320','6390','6400','6410','6420','6430','6490','6800','6810','6820','6830','6840','6890')then '09'\n" +
-                "when enttype in('1100','1110','1120','1121','1122','1123','1130','1140','1150','1151','1152','1153','1190','2100','2110','2120','2121','2122','2123','2130','2140','2150','2151','2152','2153','2190') then '10'\n" +
-                "when enttype in('4530','4531','4532','4533','4550','4551','4552','4553') then '11'\n" +
-                "when enttype in('1000','2000','3000','4000','8000','9000','9100','9200','9900') then '12'\n" +
-                "when enttype is null or enttype = '!' or enttype = 'null' then '未知' else '未知' end as ee0043,\n"+
+                "case when a.enttype in('3100','4100','4110','4200','4210','4300','4310','4400','4410')then '01' \n" +
+                "when a.enttype in('3200','4120','4220','4320','4420') then '02'\n" +
+                "when a.enttype = '4500' then '03'\n" +
+                "when a.enttype in('9999','9500') then '04'\n" +
+                "when a.enttype in('3500','4600') then '05'\n" +
+                "when a.enttype in('1200','1210','1211','1212','1213','1219','1220','1221','1222','1223','1229','2200','2210','2211','2212','2213','2219','2220','2221','2222','2223','2229','3300','3400','4330','4340','4700') then '06'\n" +
+                "when a.enttype in('4540','4560') then '07'\n" +
+                "when a.enttype in('5000','5100','5110','5120','5130','5140','5150','5160','5190','5200','5210','5220','5230','5240','5290','5300','5310','5320','5390','5400','5410','5420','5430','5490','5800','5810','5820','5830','5840','5890','7000','7100','7110','7120','7130','7190','7200','7300','7310','7390') then '08'\n" +
+                "when a.enttype in('6000','6100','6110','6120','6130','6140','6150','6160','6170','6190','6200','6210','6220','6230','6240','6250','6260','6290','6300','6310','6320','6390','6400','6410','6420','6430','6490','6800','6810','6820','6830','6840','6890')then '09'\n" +
+                "when a.enttype in('1100','1110','1120','1121','1122','1123','1130','1140','1150','1151','1152','1153','1190','2100','2110','2120','2121','2122','2123','2130','2140','2150','2151','2152','2153','2190') then '10'\n" +
+                "when a.enttype in('4530','4531','4532','4533','4550','4551','4552','4553') then '11'\n" +
+                "when a.enttype in('1000','2000','3000','4000','8000','9000','9100','9200','9900') then '12'\n" +
+                "when a.enttype is null or enttype = '!' or enttype = 'null' then '未知' else '未知' end as ee0043,\n" +
                 " a.enttype as ee0007,\n" +
                 " case  when a.enttype like '1%' or (a.enttype = '9900' and (a.entname not like '%分公司' or a.entname not like '%分店')) then '01' \n" +
                 " when a.enttype like '2%' or (a.enttype = '9900' and (a.entname like '%分公司' or a.entname like '%分店')) then '02'  \n" +
@@ -151,8 +151,16 @@ public class BaseBiKpiETL {
                 " case when f.area_feature is null then '-9' when  f.area_feature = '99' then '-9' else f.area_feature end as eb0001,\n" +
                 " case when f.area_level is null then '-9' when f.area_level = '99' then '-9' else f.area_level end as eb0002,\n" +
                 " case when email is null then 0 else 1 end as ee0020,\n" +
-                " case when g.industry_feature is null then '-9' else g.industry_feature end as eb0003," +
-                " percent_rank() over(partition by a.s_ext_nodenum,substr(a.industryco,1,2) order by a.regcap) as eb0114\n" +//注册资本百分位 2018-01-8
+                " case when g.industry_feature is null then '-9' else g.industry_feature end as eb0003,\n" +
+                " case when a.entstatus = 1 and a.s_ext_nodenum <> '' and a.s_ext_nodenum <> 'null' and a.s_ext_nodenum is not null\n" +
+                " and a.regcap <> '' and a.regcap <> 'null' and a.regcap is not null \n" +
+                " and a.industryco <> '' and a.industryco is not null and a.industryco <> 'null' and length(a.industryco) >= 2\n" +
+                " then round(percent_rank() over(partition by a.s_ext_nodenum,substr(a.industryco,1,2) order by cast(a.regcap as double)),4)\n" +
+                " when a.entstatus = 1 and a.s_ext_nodenum = '' or a.s_ext_nodenum = 'null' or a.s_ext_nodenum is null\n" +
+                " or a.regcap = '' or a.regcap = 'null' or a.regcap is null \n" +
+                " or a.industryco = '' or a.industryco is null or a.industryco = 'null' or length(a.industryco) < 2\n" +
+                " then '未知'\n" +
+                " else '非在营' end as eb0114 \n" +//注册资本百分位 2018-01-8
                 " from enterprisebaseinfocollect a\n" +
                 " left join t_dex_app_codelist c on a.ecotecdevzone = c.codevalue\n" +
                 " left join industry_ent_fluctuation g on concat(a.industryphy,substr(a.industryco,1,2)) = g.id\n" +

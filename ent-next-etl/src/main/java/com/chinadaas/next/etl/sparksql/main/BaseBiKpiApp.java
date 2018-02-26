@@ -51,34 +51,28 @@ public class BaseBiKpiApp {
 
         //全量更新 注册需要使用的hdfs表
         Map<String, String> allcfg = MyFileUtil.getFileCfg(AllCfgPath);
-        //  Map<String,String> cfg = MyFileUtil.getDateCfg(AllCfgPath);
+
 
         //把table.list里面的文档读取过来注册临时表
         registerTable(spark, date, allcfg);
 
-        //拿出需要日期拼串的表(读取分区表的方式)
-        //   String trademarkdate = cfg.get("S_EN_TRADEMARKINFO");
-        //   String productcopyrightinfodate = cfg.get("S_EN_PRODUCTCOPYRIGHTINFO");
-        //   String copyrightorgdate = cfg.get("S_EN_COPYRIGHTORG");
-        //   String copyrightinfodate = cfg.get("S_EN_COPYRIGHTINFO");
 
 
-
-        //execBase(spark);
-        //execAbnormity(spark);
+        execBase(spark);
+        execAbnormity(spark);
         //execBreakLaw(spark);
-        //execCaseInfo(spark);
-        //execPublishSoftwork(spark);
-        //execPublishCopyright(spark);
-        //execSubcompany(spark);
+        execCaseInfo(spark);
+        execPublishSoftwork(spark);
+        execPublishCopyright(spark);
+        execSubcompany(spark);
         execTradeMrkInfo(spark);
-        //execEnterpriseChange(spark);
-        //execTopExperienceKpi(spark);
-        //execEnterpriseInvestment(spark);
-        //execLegalInvestment(spark);
-        //execStockOfCompany(spark);
-        //execLegalOffice(spark);
-        //execPatent(spark);
+        execEnterpriseChange(spark);
+        execTopExperienceKpi(spark);
+        execEnterpriseInvestment(spark);
+        execLegalInvestment(spark);
+        execStockOfCompany(spark);
+        execLegalOffice(spark);
+       // execPatent(spark);
 
         /*暂停处理的司法标签(暂时待定)*/
         //exectopLessCredit(spark);
@@ -91,8 +85,12 @@ public class BaseBiKpiApp {
         /*法人对外任职，与主题企业拥有合伙企业标签(修改中)*/
         //法人对外任职,非法人。完成法人对外任职。
 
+        execListed(spark);
+       // execFinancial(spark);
 
-        spark.stop();
+
+
+         spark.stop();
     }
 
 
@@ -227,6 +225,23 @@ public class BaseBiKpiApp {
         logger.info("------结束计算企业专利指标------");
     }
 
+    public static void execFinancial(SparkSession spark){
+        logger.info("------开始计算财报信息------");
+
+        DataFrameUtil.saveAsParquetOverwrite(FinancialSituation.getFinancial(spark),CommonConfig.getValue(Constants.ENT_INDEX_FINANCIAL_DIR));
+
+        logger.info("------结束计算财报信息------");
+
+    }
+
+    public static void execListed(SparkSession spark){
+
+        logger.info("————————开始计算上市信息——————————");
+
+        DataFrameUtil.saveAsParquetOverwrite(ListedInformation.getListedInformation(spark),CommonConfig.getValue(Constants.ENT_INDEX_LISTED_DIR));
+
+        logger.info("————————结束计算上市信息——————————");
+    }
 
     //注册表，数据来自于我hive的hdfs文件
 
@@ -265,9 +280,9 @@ public class BaseBiKpiApp {
         copyrightinfoPath = allcfg.get("S_EN_COPYRIGHTINFO");
         trademarkinfopath = allcfg.get("S_EN_TRADEMARKINFO");
         //专利数据使用的表 2018-01-08
-        patentinfo = allcfg.get("S_SIPO_PATENT_INFO");
-        patentcopyright = allcfg.get("S_SIPO_PATENT_COPYRIGHT");
-        patentlawstate = allcfg.get("S_SIPO_PATENT_LAWSTATE");
+        //patentinfo = allcfg.get("S_SIPO_PATENT_INFO");
+        //patentcopyright = allcfg.get("S_SIPO_PATENT_COPYRIGHT");
+        //patentlawstate = allcfg.get("S_SIPO_PATENT_LAWSTATE");
 
         //注册临时表
 
@@ -284,9 +299,13 @@ public class BaseBiKpiApp {
         RegisterTable.registerCopyRightOrg(spark, "s_en_copyrightorg", copyrightorgPath);
         RegisterTable.registerCopyRightInfo(spark, "s_en_copyrightinfo", copyrightinfoPath);
         //patent表
-       // RegisterTable.registerS_SIPO_PATENT_INFO(spark,"s_sipo_patent_info",patentinfo);
-       // RegisterTable.registerS_SIPO_PATENT_COPYRIGHT(spark,"s_sipo_patent_copyright",patentcopyright);
-       // RegisterTable.registerS_SIPO_PATENT_LAWSTATE(spark,"s_sipo_patent_lawstate",patentlawstate);
+        //RegisterTable.registerS_SIPO_PATENT_INFO(spark,"s_sipo_patent_info",patentinfo);
+        //RegisterTable.registerS_SIPO_PATENT_COPYRIGHT(spark,"s_sipo_patent_copyright",patentcopyright);
+        //RegisterTable.registerS_SIPO_PATENT_LAWSTATE(spark,"s_sipo_patent_lawstate",patentlawstate);
+        //2016年财报信息 不用注册
+
+
+
     }
 }
 

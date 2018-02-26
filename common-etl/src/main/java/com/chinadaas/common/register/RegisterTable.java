@@ -404,7 +404,16 @@ public class RegisterTable implements Serializable {
      * @param path
      */
     public static void regiserBreakLawTable(SparkSession spark, String tableNames, String path) {
-        JavaRDD<S_EN_BREAK_LAW> persons = spark.read().textFile(path).toJavaRDD().map(new Function<String, S_EN_BREAK_LAW>() {
+        JavaRDD<S_EN_BREAK_LAW> persons = spark.read().textFile(path).toJavaRDD().filter(new Function<String, Boolean>() {
+            @Override
+            public Boolean call(String s) throws Exception {
+                if (s.split(regext, -1).length == 23) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }).map(new Function<String, S_EN_BREAK_LAW>() {
             @Override
             public S_EN_BREAK_LAW call(String row) throws Exception {
                 String[] person = row.split(regext, -1);
@@ -557,7 +566,7 @@ public class RegisterTable implements Serializable {
         JavaRDD<S_SIPO_PATENT_COPYRIGHT> persons = spark.read().textFile(path).toJavaRDD().filter(new Function<String, Boolean>() {
             @Override
             public Boolean call(String s) throws Exception {
-                if (s.split(regext, -1).length == 17) {
+                if (s.split(regext, -1).length == 18) {
                     return true;
                 } else {
                     return false;
@@ -569,7 +578,7 @@ public class RegisterTable implements Serializable {
                 String[] person = row.split(regext, -1);
                 return new S_SIPO_PATENT_COPYRIGHT(person[0], person[1], person[2], person[3], person[4]
                         , person[5], person[6], person[7], person[8], person[9], person[10], person[11], person[12],
-                        person[13], person[14], person[15], person[16]);
+                        person[13], person[14], person[15], person[16],person[17]);
             }
         });
 
