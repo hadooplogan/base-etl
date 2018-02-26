@@ -311,3 +311,9 @@ STORED AS  PARQUET
 LOCATION '/relation/cachetable/comp_info_tmp';
 
 
+CREATE EXTERNAL TABLE dev1_entorg_gxs(
+     key string,
+      name string)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+LOCATION '/relation/dstpath/relation/org';

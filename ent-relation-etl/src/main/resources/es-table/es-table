@@ -1,4 +1,4 @@
-curl -XPUT 'http://192.168.207.14:59200/entbaseinfo_20180125' -d '{
+curl -XPUT 'http://192.168.207.14:59200/entbaseinfo_20180206' -d '{
   "settings": {
   "index": {
   "max_result_window":200000,
@@ -119,7 +119,7 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo_20180125' -d '{
   },
   "regcap": {
   "index": true,
-  "type": "keyword"
+  "type": "double"
   },
   "opscope": {
   "index": false,
@@ -187,7 +187,7 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo_20180125' -d '{
   },
   "empnum": {
   "index": true,
-  "type": "keyword"
+  "type": "integer"
   },
   "cerno": {
   "index": true,
@@ -199,7 +199,7 @@ curl -XPUT 'http://192.168.207.14:59200/entbaseinfo_20180125' -d '{
   },
   "entitytype": {
   "index": true,
-  "type": "keyword"
+  "type": "integer"
   },
   "shortname": {
   "index": true,
@@ -664,11 +664,11 @@ curl -XPUT 'http://192.168.207.14:59200/shanghaientbaseinfo_v2' -d '{
   },
   "entstatus": {
   "index": true,
-  "type": "keyword"
+  "type": "integer"
   },
   "regcap": {
   "index": true,
-  "type": "keyword"
+  "type": "double"
   },
   "opscope": {
   "index": false,

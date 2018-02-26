@@ -390,6 +390,8 @@ public class RegisterTable implements Serializable {
 
         spark.createDataFrame(persons, S_CIF_INDMAP.class).registerTempTable(tableNames + "");
 
+        spark.sql("select * from S_CIF_INDMAP_T").limit(10).show();
+
         DataFrameUtil.getDataFrame(spark, "select encode_v1,zspid from S_CIF_INDMAP_T", "S_CIF_INDMAP", DataFrameUtil.CACHETABLE_PARQUET);
     }
 

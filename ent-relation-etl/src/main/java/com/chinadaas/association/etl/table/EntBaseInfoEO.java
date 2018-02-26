@@ -31,7 +31,7 @@ public class EntBaseInfoEO implements Serializable {
                          String entstatus, String regcap, String opscope, String opform, String dom, String reccap, String regcapcur,
                          String forentname, String country, String entname_old, String name, String ancheyear, String candate, String revdate,
                          String licid, String credit_code, String tax_code, String zspid,String empnum,String cerno,String oriregno,String entitytype,
-                         String encode_v1,String shortname,String s_ext_sequence,String data_date,String docid,String cbuitem) {
+                         String encode_v1,String shortname,String s_ext_sequence,String data_date,String docid,String cbuitem,String write_date) {
         this.s_ext_nodenum = s_ext_nodenum;
         this.pripid = pripid;
         this.entname = entname;
@@ -80,18 +80,18 @@ public class EntBaseInfoEO implements Serializable {
         this.docid = docid;
         this.s_ext_sequence=s_ext_sequence;
         this.data_date = data_date;
-        this.write_date = TimeUtil.getNowStr();
         this.cbuitem =  cbuitem;
+        this.write_date = write_date;
 
     }
 
-    public static JavaRDD<EntBaseInfoEO>  convertEntData(SparkSession sqlContext, Hdfs2EsETL hdfs) {
+    public static JavaRDD<EntBaseInfoEO>  convertEntData(SparkSession sqlContext, Hdfs2EsETL hdfs,String cur_date) {
         //股东
         JavaPairRDD<String, Iterable<JSONObject>> inv = getJavaRddEntInv(hdfs.getEntInvDf(sqlContext));
         //管理人员
         JavaPairRDD<String, Iterable<JSONObject>> person = getJavaRddPerson(hdfs.getPersonManagerDf(sqlContext));
         //主体企业
-        JavaPairRDD<String, EntBaseInfoEO> entda = getJavaRddEnt(hdfs.getEntDataFrame(sqlContext));
+        JavaPairRDD<String, EntBaseInfoEO> entda = getJavaRddEnt(hdfs.getEntDataFrame(sqlContext),cur_date);
 
 
         JavaPairRDD<String,EntBaseInfoEO> entInv = entda.leftOuterJoin(inv).mapToPair(new PairFunction<Tuple2<String,
@@ -127,11 +127,11 @@ public class EntBaseInfoEO implements Serializable {
         return entEsData;
     }
 
-    public static JavaRDD<EntBaseInfoEO> convertGtEntData(SparkSession sqlContext, Hdfs2EsETL hdfs) {
+    public static JavaRDD<EntBaseInfoEO> convertGtEntData(SparkSession sqlContext, Hdfs2EsETL hdfs,final String cur_date) {
         //管理人员
         JavaPairRDD<String, Iterable<JSONObject>> person = getJavaRddPerson(hdfs.getGtPersonManagerDf(sqlContext));
         //主体企业
-        JavaPairRDD<String, EntBaseInfoEO> entda = getJavaRddEnt(hdfs.getGtEntBaseInfo(sqlContext));
+        JavaPairRDD<String, EntBaseInfoEO> entda = getJavaRddEnt(hdfs.getGtEntBaseInfo(sqlContext),cur_date);
 
         return convertPersonData(entda,person);
     }
@@ -159,7 +159,7 @@ public class EntBaseInfoEO implements Serializable {
         }).groupByKey();
     }
 
-    public static JavaPairRDD<String, EntBaseInfoEO> getJavaRddEnt(Dataset df){
+    public static JavaPairRDD<String, EntBaseInfoEO> getJavaRddEnt(Dataset df,final String cur_date){
         return df.toJavaRDD().mapToPair(new PairFunction<Row, String, EntBaseInfoEO>() {
             @Override
             public Tuple2<String, EntBaseInfoEO> call(Row row) throws Exception {
@@ -174,7 +174,7 @@ public class EntBaseInfoEO implements Serializable {
                         row.getString(29), row.getString(30), row.getString(31), row.getString(32),
                         row.getString(33), row.getString(34), row.getString(35), row.getString(36),
                         row.getString(37),row.getString(38),row.getString(39),row.getString(40),row.getString(41),
-                        row.getString(42),row.getString(43)));
+                        row.getString(42),row.getString(43),cur_date));
             }
         });
     }

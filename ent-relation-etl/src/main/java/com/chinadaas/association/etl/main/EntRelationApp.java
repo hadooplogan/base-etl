@@ -69,10 +69,11 @@ public class EntRelationApp {
 
 
     public static void befor(SparkSession spark){
-
         preproccess2Json(spark);
 
-        CommonApp.loadAndRegiserTable(spark,new String[]{CommonApp.ENT_INFO,CommonApp.ENT_INV_INFO,CommonApp.ENT_PERSON_INFO,CommonApp.ABNORMITY,CommonApp.BREAKLAW,CommonApp.BZXR,CommonApp.SXBZR});
+        CommonApp.loadAndRegiserTable(spark,new String[]{CommonApp.ENT_INFO,
+                CommonApp.ENT_INV_INFO,CommonApp.ENT_PERSON_INFO,CommonApp.ABNORMITY,
+                CommonApp.BREAKLAW,CommonApp.BZXR,CommonApp.SXBZR});
 
 
     }

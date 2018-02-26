@@ -741,7 +741,7 @@ public class EntRelationETL implements Serializable {
                 "         where inv <> '') hd\n" +
                 " where hd.inv = en.entname";
 
-       /* val hql =   "select en.pripid   as startKey,\n" +
+        /*val hql =   "select en.pripid   as startKey,\n" +
                 "       en.entname,"+
                 "       hd.condate,\n" +
                 "       hd.subconam,\n" +
@@ -755,8 +755,7 @@ public class EntRelationETL implements Serializable {
                 "       (select inv, condate, currency, subconam, conprop, blicno, pripid\n" +
                 "          from e_inv_investment_parquet\n" +
                 "         where inv <> '') hd\n" +
-                " where hd.inv = en.entname";
-*/
+                " where hd.inv = en.entname";*/
         return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp001");
 
     }
@@ -775,9 +774,10 @@ public class EntRelationETL implements Serializable {
                 " where not exists  (select 1\n" +
                 "          from invRelaTmp001 b\n" +
                 "         where a.pripid = b.endKey\n" +
-                "           and a.inv = b.entname)";
+                "           and a.inv = b.entname)" +
+                " and a.invtype not in ('20', '21', '22', '30', '35', '36','77')";
 
-        /*val hql1 = "select a.inv,\n" +
+       /* val hql1 = "select a.inv,\n" +
                 "       a.condate,\n" +
                 "       a.currency,\n" +
                 "       a.subconam,\n" +
@@ -788,8 +788,7 @@ public class EntRelationETL implements Serializable {
                 " where not exists  (select 1\n" +
                 "          from invRelaTmp001 b\n" +
                 "         where a.pripid = b.endKey\n" +
-                "           and a.inv = b.entname)";
-*/
+                "           and a.inv = b.entname)";*/
         return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp002");
     }
 
