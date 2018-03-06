@@ -146,7 +146,7 @@ public class FinancialSituation {
                 "when (c.progro/b.empnum) > 10000 then '11'\n" +
                 "when (c.progro/b.empnum) < 0 then'12'\n" +
                 "else '未知' end as ee0075,\n" +
-                "case when (c.vendinc/b.empnum) >0 and (c.vendinc/b.empnum) <=10 then '01'\n" +
+                "case when (c.vendinc/b.empnum) > 0 and (c.vendinc/b.empnum) <=10 then '01'\n" +
                 "when (c.vendinc/b.empnum)  > 10 and (c.vendinc/b.empnum)  <= 50 then '02'\n" +
                 "when (c.vendinc/b.empnum)  > 50 and (c.vendinc/b.empnum)  <= 100 then '03'\n" +
                 "when (c.vendinc/b.empnum)  > 100 and (c.vendinc/b.empnum)  <= 300 then '04'\n" +
@@ -187,7 +187,7 @@ public class FinancialSituation {
                 "on a.pripid = b.pripid\n" +
                 "left join s_en_nb_capitalinfo c \n" +
                 "on b.task_id = c.task_id";
-     return    DataFrameUtil.getDataFrame(spark,hql,"tmp2016");
+     return    DataFrameUtil.getDataFrame(spark,hql,"tmp2016",0);
 
     }
 
@@ -329,7 +329,7 @@ public class FinancialSituation {
                 "from tmp2016 a left join tmp2015 b \n" +
                 "on a.pripid = b.pripid ";
 
-        return DataFrameUtil.getDataFrame(spark,hql,"tmprate");
+        return DataFrameUtil.getDataFrame(spark,hql,"tmprate",0);
 
     }
 

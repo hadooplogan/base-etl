@@ -85,23 +85,23 @@ public class MergeDataETL {
               //  "nvl(o.eb0061,0) as eb0061,\n" +
               //  "nvl(o.eb0062,0) as eb0062,\n" +
               //  "nvl(o.eb0112,0) as eb0112,\n"+
-              // "p.ee0066,\n" +
-              // "p.ee0067,\n" +
-              // "p.ee0068,\n" +
-              // "p.ee0069,\n" +
-              // "p.ee0070,\n" +
-              // "p.ee0071,\n" +
-              // "p.ee0072,\n" +
-              // "p.ee0073,\n" +
-              // "p.ee0074,\n" +
-              // "p.ee0075,\n" +
-              // "p.ee0076,\n" +
-              // "p.ee0077,\n" +
-              // "p.ee0078,\n" +
-              // "p.ee0080,\n" +
-              // "p.ee0081,\n" +
-              // "p.ee0082,\n" +
-              // "p.ee0083,\n" +
+               "p.ee0066,\n" +
+               "p.ee0067,\n" +
+               "p.ee0068,\n" +
+               "p.ee0069,\n" +
+               "p.ee0070,\n" +
+               "p.ee0071,\n" +
+               "p.ee0072,\n" +
+               "p.ee0073,\n" +
+               "p.ee0074,\n" +
+               "p.ee0075,\n" +
+               "p.ee0076,\n" +
+               "nvl(p.ee0077,'未知') as ee0077,\n" +
+               "nvl(p.ee0078,'未知') as ee0078,\n" +
+               "nvl(p.ee0080,'未知') as ee0080,\n" +
+               "(p.ee0081,'未知') as ee0081,\n" +
+               "(p.ee0082,'未知') as ee0082,\n" +
+               "(p.ee0083,'未知') as ee0083,\n" +
                 "nvl(q.ee0033,'否') as ee0033,\n" +
                 "nvl(q.ee0034,'无') as ee0034,\n" +
                 "nvl(q.ee0035,'否') as ee0035,\n" +
@@ -123,7 +123,7 @@ public class MergeDataETL {
                 "left join topexperiencekpi n on a.pripid = n.pripid\n" +
                 "left join legalinvestmenttmp m on a.pripid = m.pripid\n"+
                // "left join patenttmp o on a.pripid = o.pripid\n" +
-               // "left join financial p on a.pripid = p,pripid\n" +
+                "left join financial p on a.pripid = p.pripid\n" +
                 "left join listed q on a.pripid = q.pripid";
         return DataFrameUtil.getDataFrame(spark, hql, "mergeDataTmp");
     }

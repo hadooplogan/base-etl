@@ -1,0 +1,22 @@
+使用sqoop从oracle抽取数据
+
+有六个码表在使用
+
+sudo -u hive sqoop import --connect   jdbc:oracle:thin:@192.168.205.55:1521/bipdb --username  BI --password 'BI' --table T_DEX_APP_CODELIST_VIEW  --hive-table t_dex_app_codelist  --hive-import --fields-terminated-by "\t" --lines-terminated-by "\n"  --hive-overwrite -m 1 --delete-target-dir
+
+sudo -u hive sqoop import --connect   jdbc:oracle:thin:@192.168.205.55:1521/bipdb --username  BI --password 'BI' --table industry_ent_fluctuation  --hive-table industry_ent_fluctuation  --hive-import --fields-terminated-by "\t" --lines-terminated-by "\n"  --hive-overwrite -m 1 --delete-target-dir
+
+sudo -u hive sqoop import --connect   jdbc:oracle:thin:@192.168.205.55:1521/bipdb --username  BI --password 'BI' --table codelist_area  --hive-table codelist_area  --hive-import --fields-terminated-by "\t" --lines-terminated-by "\n"  --hive-overwrite -m 1 --delete-target-dir
+
+sudo -u hive sqoop import --connect   jdbc:oracle:thin:@192.168.205.55:1521/bipdb --username  BI --password 'BI' --table an_ent_scale_2015  --hive-table an_ent_scale_2015  --hive-import --fields-terminated-by "\t" --lines-terminated-by "\n"  --hive-overwrite -m 1 --delete-target-dir
+
+sudo -u hive sqoop import --connect   jdbc:oracle:thin:@192.168.205.55:1521/bipdb --username  NEWENT --password 'NEWENT' --table codelist_regorg  --hive-table codelist_regorg  --hive-import --fields-terminated-by "\t" --lines-terminated-by "\n"  --hive-overwrite -m 1 --delete-target-dir
+
+sudo -u hive sqoop import --connect   jdbc:oracle:thin:@192.168.205.55:1521/bipdb --username  BI --password 'BI' --table newent_area_distribution  --hive-table newent_area_distribution  --hive-import --fields-terminated-by "\t" --lines-terminated-by "\n"  --hive-overwrite -m 1 --delete-target-dir
+
+
+//转换了hive不支持的oracle格式的数据  上市公司的数据
+sudo -u hive sqoop import --connect   jdbc:oracle:thin:@192.168.201.221:1521/genius --username  fcdt --password 'NEWDAAS2017' --table TQ_COMP_INFO  --hive-table TQ_COMP_INFO  --hive-import --fields-terminated-by "\t" --lines-terminated-by "\n"  --hive-overwrite -m 1 --delete-target-dir --map-column-hive TMSTAMP=string
+
+
+sudo -u hive sqoop import --connect   jdbc:oracle:thin:@192.168.201.221:1521/genius --username  fcdt --password 'NEWDAAS2017' --table TQ_SK_BASICINFO  --hive-table TQ_SK_BASICINFO  --hive-import --fields-terminated-by "\t" --lines-terminated-by "\n"  --hive-overwrite -m 1 --delete-target-dir --map-column-hive TMSTAMP=string

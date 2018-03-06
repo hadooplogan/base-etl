@@ -1,4 +1,4 @@
-package com.chinadaas.newEnt.etl.main;
+hgpackage com.chinadaas.newEnt.etl.main;
 
 import com.chinadaas.newEnt.etl.cfg.Constants;
 import com.chinadaas.newEnt.etl.general.GeneralUtils;
