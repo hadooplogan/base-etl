@@ -38,7 +38,7 @@ public class MergeDataApp {
 
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_BASE_DIR)).createOrReplaceTempView("basebikpitemp");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_ABNORMITY_DIR)).createOrReplaceTempView("abnormitykpitemp");
-        //parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_BREAKLAW_DIR)).createOrReplaceTempView("breaklawkpitemp");
+        parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_BREAKLAW_DIR)).createOrReplaceTempView("breaklawkpitemp");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_CASEINFO_DIR)).createOrReplaceTempView("caseinfokpitemp");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_ENTERPRISE_EXCHANGE_DIR)).createOrReplaceTempView("tmpenterpriseChange");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_PUBLISHSOFTWORK_DIR)).createOrReplaceTempView("tmppublishsoftwork");
@@ -50,7 +50,7 @@ public class MergeDataApp {
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_TOPEXPERIENCE_DIR)).createOrReplaceTempView("topexperiencekpi");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_LEGALOFFICE_DIR)).createOrReplaceTempView("legalofficetmp");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_LEGALINVESTMENT_DIR)).createOrReplaceTempView("legalinvestmenttmp");
-        //parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_PATENT_DIR)).createOrReplaceTempView("patenttmp");
+        parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_PATENT_DIR)).createOrReplaceTempView("patenttmp");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_FINANCIAL_DIR)).createOrReplaceTempView("financial");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_LISTED_DIR)).createOrReplaceTempView("listed");
 

@@ -29,7 +29,7 @@ public class FinancialSituation {
                 "else '未知' end as ee0066,\n" +
                 "case when c.ratgro < 0 then '01'\n" +
                 "when c.ratgro > 0 and c.ratgro <= 10 then '02'\n" +
-                "when c.ratgro > 10 and c.ratgro <=20 then '03'\n" +
+                "when c.ratgro > 10 and c.ratgro <=50 then '03'\n" +
                 "when c.ratgro > 50 and c.ratgro <= 100 then '04' \n" +
                 "when c.ratgro > 100 and c.ratgro <= 300 then '05'\n" +
                 "when c.ratgro > 300 and c.ratgro <= 500 then '06'\n" +
@@ -45,53 +45,55 @@ public class FinancialSituation {
                 "when c.ratgro > 100000 then '16'\n" +
                 "else '未知' end as ee0069,\n" +
                 "case when c.assgro < 0 then '01'\n" +
-                "when c.assgro > 0 and c.assgro <= 10 then '02'\n" +
-                "when c.assgro > 10 and c.assgro <=50 then '03'\n" +
-                "when c.assgro > 50 and c.assgro <= 100 then '04'\n" +
-                "when c.assgro >100 and c.assgro <= 300 then '05'\n" +
-                "when c.assgro > 300 and c.assgro <= 500 then '06'\n" +
-                "when c.assgro > 500 and c.assgro <= 1000 then '07'\n" +
-                "when c.assgro > 1000 and c.assgro <= 2000 then '08'\n" +
-                "when c.assgro > 2000 and c.assgro <= 3000 then '09'\n" +
+                "when c.assgro > 0 and c.assgro <= 50 then '02'\n" +
+                "when c.assgro > 50 and c.assgro <= 100 then '03'\n" +
+                "when c.assgro > 100 and c.assgro <= 300 then '04'\n" +
+                "when c.assgro > 300 and c.assgro <= 500 then '05'\n" +
+                "when c.assgro > 500 and c.assgro <= 1000 then '06'\n" +
+                "when c.assgro > 1000 and c.assgro <= 2000 then '07'\n" +
+                "when c.assgro > 2000 and c.assgro <= 3000 then '08'\n" +
+                "when c.assgro > 3000 and c.assgro <= 5000 then '09'\n" +
                 "when c.assgro > 5000 and c.assgro <= 8000 then '10'\n" +
                 "when c.assgro > 8000 and c.assgro <= 10000 then '11'\n" +
                 "when c.assgro > 10000 and c.assgro <= 30000 then '12'\n" +
                 "when c.assgro > 30000 and c.assgro <= 50000 then '13'\n" +
-                "when c.assgro > 50000 and c.assgro <= 10 then '14'\n" +
+                "when c.assgro > 50000 and c.assgro <= 100000 then '14'\n" +
                 "when c.assgro > 100000 then '15'  \n" +
                 "else '未知' end as ee0067,\n" +
-                "case when c.vendinc < 0 then '15'\n" +
+                "case when c.vendinc < 0 then '16'\n" +
                 "when c.vendinc > 0 and c.vendinc <= 10 then '01'\n" +
-                "when c.vendinc > 10 and c.vendinc <=5 then '02'\n" +
+                "when c.vendinc > 10 and c.vendinc <= 50 then '02'\n" +
                 "when c.vendinc > 50 and c.vendinc <= 100 then '03'\n" +
                 "when c.vendinc >100 and c.vendinc <= 300 then '04'\n" +
                 "when c.vendinc > 300 and c.vendinc <= 500 then '05'\n" +
                 "when c.vendinc > 500 and c.vendinc <= 1000 then '06'\n" +
                 "when c.vendinc > 1000 and c.vendinc <= 2000 then '07'\n" +
                 "when c.vendinc > 2000 and c.vendinc <= 3000 then '08'\n" +
-                "when c.vendinc > 5000 and c.vendinc <= 8000 then '09'\n" +
-                "when c.vendinc > 8000 and c.vendinc <= 10000 then '10'\n" +
-                "when c.vendinc > 10000 and c.vendinc <= 30000 then '11'\n" +
-                "when c.vendinc > 30000 and c.vendinc <= 50000 then '12'\n" +
-                "when c.vendinc > 50000 and c.vendinc <= 100000 then '13'\n" +
-                "when c.vendinc > 100000 then '14' \n" +
-                "else '未知' end as ee0068,\n" +
-                "case when c.progro < 0 then '15'\n" +
-                "when c.progro > 0 and c.progro <= 100000 then '01'\n" +
-                "when c.progro > 100000 and c.progro <=50000 then '02'\n" +
-                "when c.progro > 500000 and c.progro <= 1000000 then '03'\n" +
-                "when c.progro >1000000 and c.progro <= 3000000 then '04'\n" +
-                "when c.progro > 3000000 and c.progro <= 5000000 then '05'\n" +
-                "when c.progro > 5000000 and c.progro <= 10000000 then '06'\n" +
-                "when c.progro > 10000000 and c.progro <= 20000000 then '07'\n" +
-                "when c.progro > 20000000 and c.progro <= 30000000 then '08'\n" +
-                "when c.progro > 50000000 and c.progro <= 80000000 then '09'\n" +
-                "when c.progro > 80000000 and c.progro <= 100000000 then '10'\n" +
-                "when c.progro > 100000000 and c.progro <= 300000000 then '11'\n" +
-                "when c.progro > 300000000 and c.progro <= 500000000 then '12'\n" +
-                "when c.progro > 500000000 and c.progro <= 1000000000 then '13'\n" +
-                "when c.progro > 1000000000 then '14' \n" +
-                "else '未知' end as ee0070,\n" +
+                "when c.vendinc > 3000 and c.vendinc <= 5000 then '09'\n" +
+                "when c.vendinc > 5000 and c.vendinc <= 8000 then '10'\n" +
+                "when c.vendinc > 8000 and c.vendinc <= 10000 then '11'\n" +
+                "when c.vendinc > 10000 and c.vendinc <= 30000 then '12'\n" +
+                "when c.vendinc > 30000 and c.vendinc <= 50000 then '13'\n" +
+                "when c.vendinc > 50000 and c.vendinc <= 100000 then '14'\n" +
+                "when c.vendinc > 100000 then '15' \n" +
+                "else '未知' end as ee0068, \n"+
+               "case when c.progro < 0 then '16'\n" +
+                "when c.progro > 0 and c.progro <= 10 then '01'\n" +
+                "when c.progro > 10 and c.progro <=50 then '02'\n" +
+                "when c.progro > 50 and c.progro <= 100 then '03'\n" +
+                "when c.progro >100 and c.progro <= 300 then '04'\n" +
+                "when c.progro > 300 and c.progro <= 500 then '05'\n" +
+                "when c.progro > 500 and c.progro <= 1000 then '06'\n" +
+                "when c.progro > 1000 and c.progro <= 2000 then '07'\n" +
+                "when c.progro > 2000 and c.progro <= 3000 then '08'\n" +
+                "when c.progro > 3000 and c.progro <= 5000 then '09'\n" +
+                "when c.progro > 5000 and c.progro <= 8000 then '10'\n" +
+                "when c.progro > 8000 and c.progro <= 10000 then '11'\n" +
+                "when c.progro > 10000 and c.progro <= 30000 then '12'\n" +
+                "when c.progro > 30000 and c.progro <= 50000 then '13'\n" +
+                "when c.progro > 50000 and c.progro <= 100000 then '14'\n" +
+                "when c.progro > 100000 then '15' \n" +
+                "else '-9' end as ee0070, \n"+
                 "case when (c.progro/c.vendinc)*100 <= -10 then '01' \n" +
                 "when (c.progro/c.vendinc)*100 > -10 and (c.progro/c.vendinc)*100 < 0 then '02'\n" +
                 "when (c.progro/c.vendinc)*100 > 0 and (c.progro/c.vendinc)*100 <= 10 then '03'\n" +
@@ -113,7 +115,7 @@ public class FinancialSituation {
                 "else '未知' \n" +
                 "end as ee0072,\n" +
                 "case when (c.netinc/c.totequ)*100 <= -20 then '01' \n" +
-                "when (c.netinc/c.totequ)*100 > -20 and (c.netinc/c.totequ)*100 < 10 then '02' \n" +
+                "when (c.netinc/c.totequ)*100 > -20 and (c.netinc/c.totequ)*100 <= 10 then '02' \n" +
                 "when (c.netinc/c.totequ)*100 > -10 and (c.netinc/c.totequ)*100 < 0 then '03'\n" +
                 "when (c.netinc/c.totequ)*100 > 0 and (c.netinc/c.totequ)*100 <= 5 then '04'\n" +
                 "when (c.netinc/c.totequ)*100 >5 and (c.netinc/c.totequ)*100 <= 10 then '05'\n" +
@@ -133,7 +135,7 @@ public class FinancialSituation {
                 "when ( c.liagro/c.totequ)*100 > 500 and ( c.liagro/c.totequ)*100 <= 800 then '07'\n" +
                 "when ( c.liagro/c.totequ)*100 > 800 then '08'\n" +
                 "else '未知' end as ee0074,\n" +
-                "case when (c.progro/b.empnum) >0 and (c.progro/b.empnum) <=10 then '01'\n" +
+                "case when (c.progro/b.empnum) > 0 and (c.progro/b.empnum) <= 10 then '01'\n" +
                 "when (c.progro/b.empnum)  > 10 and (c.progro/b.empnum)  <= 50 then '02'\n" +
                 "when (c.progro/b.empnum)  > 50 and (c.progro/b.empnum)  <= 100 then '03'\n" +
                 "when (c.progro/b.empnum)  > 100 and (c.progro/b.empnum)  <= 300 then '04'\n" +
@@ -146,7 +148,7 @@ public class FinancialSituation {
                 "when (c.progro/b.empnum) > 10000 then '11'\n" +
                 "when (c.progro/b.empnum) < 0 then'12'\n" +
                 "else '未知' end as ee0075,\n" +
-                "case when (c.vendinc/b.empnum) > 0 and (c.vendinc/b.empnum) <=10 then '01'\n" +
+                "case when (c.vendinc/b.empnum) > 0 and (c.vendinc/b.empnum) <= 10 then '01'\n" +
                 "when (c.vendinc/b.empnum)  > 10 and (c.vendinc/b.empnum)  <= 50 then '02'\n" +
                 "when (c.vendinc/b.empnum)  > 50 and (c.vendinc/b.empnum)  <= 100 then '03'\n" +
                 "when (c.vendinc/b.empnum)  > 100 and (c.vendinc/b.empnum)  <= 300 then '04'\n" +
@@ -197,8 +199,8 @@ public class FinancialSituation {
         String hql = "select a.pripid ,\n" +
                 "case when b.assgro = '01' then '负数'\n" +
                 "when b.assgro = '02' then 25.0\n" +
-                "when b.assgro = '03' then 50.0\n" +
-                "when b.assgro = '04' then 150.0\n" +
+                "when b.assgro = '03' then 75.0\n" +
+                "when b.assgro = '04' then 200.0\n" +
                 "when b.assgro = '05' then 400.0\n" +
                 "when b.assgro = '06' then 750.0\n" +
                 "when b.assgro = '07' then 1500.0\n" +
@@ -231,8 +233,8 @@ public class FinancialSituation {
                 "when b.vendinc = '99' and b.vendinc = '0' then '未知'\n" +
                 "else '未知' end as vendinc,\n" +
                 "case when b.leverageratio = '01' then '负数'\n" +
-                "when b.leverageratio = '02' then 0.2500\n" +
-                "when b.leverageratio = '03' then 0.7500\n" +
+                "when b.leverageratio = '02' then 0.2500 \n" +
+                "when b.leverageratio = '03' then 0.7500 \n" +
                 "when b.leverageratio = '04' then 1.5000\n" +
                 "when b.leverageratio = '05' then 2.5000\n" +
                 "when b.leverageratio = '06' then 4.0000\n" +
@@ -254,7 +256,8 @@ public class FinancialSituation {
                 "when b.ratgro = '12' then 9000\n" +
                 "when b.ratgro = '13' then 20000\n" +
                 "when b.ratgro = '14' then 40000\n" +
-                "when b.ratgro = '15' then '未知'\n" +
+                "when b.ratgro = '15' then 75000\n" +
+                "when b.ratgro = '16' then '未知'\n" +
                 "when b.ratgro = '99' then '未知'\n" +
                 "else '未知' end as ratgro,\n" +
                 "case when b.pcpm = '01' then 5\n" +
