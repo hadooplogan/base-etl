@@ -34,7 +34,7 @@ public class BaseBiKpiApp {
                 .getOrCreate();
 
         //提高任务并行度
-        spark.sqlContext().conf().setConfString("spark.sql.shuffle.partitions", "400");
+        spark.sqlContext().conf().setConfString("spark.sql.shuffle.partitions", "800");
 
         //读取生产环境全量表的配置文件 table.list
         //model  model = inc增量更新 model = all 全量更新  默认您全量更新 m
@@ -54,7 +54,7 @@ public class BaseBiKpiApp {
 
 
         //把table.list里面的文档读取过来注册临时表
-        registerTable(spark, date, allcfg);
+//        registerTable(spark, date, allcfg);
 
 
 
@@ -72,7 +72,7 @@ public class BaseBiKpiApp {
         //execLegalInvestment(spark);
         //execStockOfCompany(spark);
         //execLegalOffice(spark);
-        execPatent(spark);
+        //execPatent(spark);
 
         /*暂停处理的司法标签(暂时待定)*/
         //exectopLessCredit(spark);
@@ -85,7 +85,7 @@ public class BaseBiKpiApp {
         //法人对外任职,非法人。完成法人对外任职。
 
         //execListed(spark);
-       // execFinancial(spark);
+        execFinancial(spark);
 
 
 
@@ -279,9 +279,9 @@ public class BaseBiKpiApp {
         copyrightinfoPath = allcfg.get("S_EN_COPYRIGHTINFO");
         trademarkinfopath = allcfg.get("S_EN_TRADEMARKINFO");
         //专利数据使用的表 2018-01-08
-       // patentinfo = allcfg.get("S_SIPO_PATENT_INFO");
-       // patentcopyright = allcfg.get("S_SIPO_PATENT_COPYRIGHT");
-       // patentlawstate = allcfg.get("S_SIPO_PATENT_LAWSTATE");
+        patentinfo = allcfg.get("S_SIPO_PATENT_INFO");
+        patentcopyright = allcfg.get("S_SIPO_PATENT_COPYRIGHT");
+        patentlawstate = allcfg.get("S_SIPO_PATENT_LAWSTATE");
 
         //注册临时表
 
@@ -299,9 +299,9 @@ public class BaseBiKpiApp {
         RegisterTable.registerCopyRightInfo(spark, "s_en_copyrightinfo", copyrightinfoPath);
 
         //patent表
-       // RegisterTable.registerS_SIPO_PATENT_INFO(spark,"s_sipo_patent_info",patentinfo);
-       // RegisterTable.registerS_SIPO_PATENT_COPYRIGHT(spark,"s_sipo_patent_copyright",patentcopyright);
-       // RegisterTable.registerS_SIPO_PATENT_LAWSTATE(spark,"s_sipo_patent_lawstate",patentlawstate);
+        RegisterTable.registerS_SIPO_PATENT_INFO(spark,"s_sipo_patent_info",patentinfo);
+        RegisterTable.registerS_SIPO_PATENT_COPYRIGHT(spark,"s_sipo_patent_copyright",patentcopyright);
+        RegisterTable.registerS_SIPO_PATENT_LAWSTATE(spark,"s_sipo_patent_lawstate",patentlawstate);
 
 
 
