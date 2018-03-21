@@ -28,6 +28,7 @@ public class FlushConpropETL {
         getFlushBadData061(sqlContext);
         getFlushBadData07(sqlContext);
         Dataset df = getFlushBadData08(sqlContext);
+
         return df;
     }
 
