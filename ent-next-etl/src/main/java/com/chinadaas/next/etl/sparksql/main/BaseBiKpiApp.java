@@ -87,7 +87,6 @@ public class BaseBiKpiApp {
         //execListed(spark);
         //execFinancial(spark);
 
-         execTest(spark);
 
 
          spark.stop();
@@ -242,14 +241,6 @@ public class BaseBiKpiApp {
 
         logger.info("————————结束计算上市信息——————————");
     }
-
-    public static void execTest(SparkSession spark){
-
-        DataFrameUtil.saveAsTextFileOverwrite(PatentKpiETL.test(spark),"/next/ent_index/testKpi");
-
-    }
-
-    //注册表，数据来自于我hive的hdfs文件
 
 
     public static void registerTable(SparkSession spark, String date, Map<String, String> allcfg) {
