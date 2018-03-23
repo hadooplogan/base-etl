@@ -642,6 +642,28 @@ public class EntRelationETL implements Serializable {
                 "  from legalRelaTmp01tmp08 pri\n" +
                 " inner join entInfoTmp03 ent\n" +
                 "    on pri.pripid = ent.pripid" ;
+
+        val hql = "SELECT ENTNAME, REGNO, ENTTYPE, REGCAP, REGCAPCUR\n" +
+                "\t, ENTSTATUS, REGORG, ESDATE, CANDATE, REVDATE\n" +
+                "\t, REGORGCODE\n" +
+                "FROM frposition\n" +
+                "UNION\n" +
+                "SELECT ENTNAME, REGNO, ENTTYPE, REGCAP, REGCAPCUR\n" +
+                "\t, ENTSTATUS, REGORG, ESDATE, CANDATE, REVDATE\n" +
+                "\t, REGORGCODE\n" +
+                "FROM frinv\n" +
+                "UNION\n" +
+                "SELECT ENTJGNAME as ENTNAME, REGNO, ENTTYPE, REGCAP, REGCAPCUR\n" +
+                "\t, ENTSTATUS, REGORG, ESDATE, CANDATE, REVDATE\n" +
+                "\t, REGORGCODE\n" +
+                "FROM entinv";
+
+        val hql2 = "SELECT ENTNAME, REGNO, ENTTYPE, REGCAP, REGCAPCUR\n" +
+                "\t, ENTSTATUS, REGORG, ESDATE, CANDATE, REVDATE\n" +
+                "\t, REGORGCODE\n" +
+                "FROM basic";
+
+
         return DataFrameUtil.getDataFrame(sqlContext, hql, "legalRelaTmp02");
     }
 
@@ -741,7 +763,7 @@ public class EntRelationETL implements Serializable {
                 "         where inv <> '') hd\n" +
                 " where hd.inv = en.entname";
 
-        /*val hql =   "select en.pripid   as startKey,\n" +
+        val hql = "select en.pripid   as startKey,\n" +
                 "       en.entname,"+
                 "       hd.condate,\n" +
                 "       hd.subconam,\n" +
@@ -755,7 +777,7 @@ public class EntRelationETL implements Serializable {
                 "       (select inv, condate, currency, subconam, conprop, blicno, pripid\n" +
                 "          from e_inv_investment_parquet\n" +
                 "         where inv <> '') hd\n" +
-                " where hd.inv = en.entname";*/
+                " where hd.inv = en.entname";
         return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp001");
 
     }
