@@ -35,7 +35,7 @@ public class ListedInformation {
     private static Dataset tmp02(SparkSession spark) {
 
         String hql = "select pripid,\n" +
-                "'是' as ee0033,\n" +
+                "'y' as ee0033,\n" +
                 "case when substr(trim(b.symbol),1,3) = '002' then '02' \n" +
                 "when substr(trim(b.symbol),1,3) = '300' then '03'\n" +
                 "when substr(trim(b.symbol),1,1) = '0' \n" +

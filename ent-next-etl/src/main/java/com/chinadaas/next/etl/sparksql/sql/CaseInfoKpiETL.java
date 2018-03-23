@@ -15,7 +15,7 @@ import org.apache.spark.sql.SparkSession;
 public class CaseInfoKpiETL {
 
     public static Dataset getCaseInfoKpi(SparkSession spark, String datadate){
-        String hql = "select d.pripid, d.total as eb0101,case when d.total > 0 then '是' else '否' end as eb0107,  e.threetotal as eb0100 from " +
+        String hql = "select d.pripid, d.total as eb0101,case when d.total > 0 then 'y' else 'n' end as eb0107,  e.threetotal as eb0100 from " +
                 "(select c.pripid,count(1) as total from" +
                 "  (select a.PUBLICDATE,b.pripid from s_en_casebaseinfo a " +
                 "     left join s_en_casepartyinfo b on a.CASEID = b.CASEID where pripid <> '' " +

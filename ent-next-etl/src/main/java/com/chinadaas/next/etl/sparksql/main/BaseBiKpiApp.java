@@ -54,7 +54,7 @@ public class BaseBiKpiApp {
 
 
         //把table.list里面的文档读取过来注册临时表
-//        registerTable(spark, date, allcfg);
+       registerTable(spark, date, allcfg);
 
 
 
@@ -85,8 +85,9 @@ public class BaseBiKpiApp {
         //法人对外任职,非法人。完成法人对外任职。
 
         //execListed(spark);
-        execFinancial(spark);
+        //execFinancial(spark);
 
+         execTest(spark);
 
 
          spark.stop();
@@ -242,6 +243,12 @@ public class BaseBiKpiApp {
         logger.info("————————结束计算上市信息——————————");
     }
 
+    public static void execTest(SparkSession spark){
+
+        DataFrameUtil.saveAsTextFileOverwrite(PatentKpiETL.test(spark),"/next/ent_index/testKpi");
+
+    }
+
     //注册表，数据来自于我hive的hdfs文件
 
 
@@ -286,17 +293,17 @@ public class BaseBiKpiApp {
         //注册临时表
 
         RegisterTable.registerBaseInfoTable(spark, "enterprisebaseinfocollect", date, entPath);
-        RegisterTable.registerEpriPersonTable(spark, "e_pri_person", date, personPath);
-        RegisterTable.registerInvTable(spark, "e_inv_investment", date, invPath);
-        RegisterTable.registerAlterRecoderTable(spark, "e_alter_recoder", date, alterPath);
-        RegisterTable.regiserAbnormityTable(spark, "s_en_abnormity", abnormityPath);
-        RegisterTable.regiserBreakLawTable(spark, "s_en_break_law", breaklaw);
-        RegisterTable.registerCaseBaseInfo(spark, "s_en_casebaseinfo", caseBasePath);
-        RegisterTable.registerCaseParty(spark, "s_en_casepartyinfo", casePartyPath);
-        RegisterTable.registerTradeMarkInfo(spark, "s_en_trademarkinfo", trademarkinfopath);
-        RegisterTable.registerProductCopyRightInfo(spark, "s_en_productcopyrightinfo", productcpinfoPath);
-        RegisterTable.registerCopyRightOrg(spark, "s_en_copyrightorg", copyrightorgPath);
-        RegisterTable.registerCopyRightInfo(spark, "s_en_copyrightinfo", copyrightinfoPath);
+       // RegisterTable.registerEpriPersonTable(spark, "e_pri_person", date, personPath);
+       // RegisterTable.registerInvTable(spark, "e_inv_investment", date, invPath);
+       // RegisterTable.registerAlterRecoderTable(spark, "e_alter_recoder", date, alterPath);
+       // RegisterTable.regiserAbnormityTable(spark, "s_en_abnormity", abnormityPath);
+       // RegisterTable.regiserBreakLawTable(spark, "s_en_break_law", breaklaw);
+       // RegisterTable.registerCaseBaseInfo(spark, "s_en_casebaseinfo", caseBasePath);
+       // RegisterTable.registerCaseParty(spark, "s_en_casepartyinfo", casePartyPath);
+       // RegisterTable.registerTradeMarkInfo(spark, "s_en_trademarkinfo", trademarkinfopath);
+       // RegisterTable.registerProductCopyRightInfo(spark, "s_en_productcopyrightinfo", productcpinfoPath);
+       // RegisterTable.registerCopyRightOrg(spark, "s_en_copyrightorg", copyrightorgPath);
+       // RegisterTable.registerCopyRightInfo(spark, "s_en_copyrightinfo", copyrightinfoPath);
 
         //patent表
         RegisterTable.registerS_SIPO_PATENT_INFO(spark,"s_sipo_patent_info",patentinfo);

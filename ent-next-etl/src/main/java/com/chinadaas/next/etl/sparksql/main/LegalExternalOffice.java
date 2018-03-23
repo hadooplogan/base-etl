@@ -22,13 +22,14 @@ import java.util.Random;
 /**
  * 高管表里现阶段重复凉比较大的数据,在此我界定zspid重复大于1000就是重复数据
  * 法人中我拿出大于6000的zspid有大概6个(这几个最影响性能)
- *  打随机前缀与执行
+ * 打随机前缀与执行
  * 尝试解决数据倾斜的问题
  */
 
-public class  LegalExternalOffice {
+public class LegalExternalOffice {
 
     protected static LogUtil logger = LogUtil.getLogger(LegalExternalOffice.class);
+
     public static void main(String[] args) {
         SparkSession spark = SparkSession.
                 builder().
@@ -161,9 +162,9 @@ public class  LegalExternalOffice {
         logger.info("————————拿出均匀数据集————————");
         String hql1 = "select pripid,zspid from e_pri_person_full_20171207 where zspid not in(select zspid from skewid)";
         String hql2 = "select pripid,zspid from enterprisebaseinfocollect_full_20171207 where zspid not in(select zspid from skewid)";
-        String hql3 = "select a.pripid,b.pripid as x from nomarljoin a join normaldata b on a.zspid = b.zspid\n"+
-                      "and a.zspid is not null and a.zspid <> '' and a.zspid <> 'null'\n"+
-                      "and b.zspid is not null and b.zspid <> '' and b.zspid <> 'null'";
+        String hql3 = "select a.pripid,b.pripid as x from nomarljoin a join normaldata b on a.zspid = b.zspid\n" +
+                "and a.zspid is not null and a.zspid <> '' and a.zspid <> 'null'\n" +
+                "and b.zspid is not null and b.zspid <> '' and b.zspid <> 'null'";
 
         spark.sqlContext().sql(hql1).registerTempTable("normaldata");
         spark.sqlContext().sql(hql2).registerTempTable("nomarljoin");
@@ -184,9 +185,9 @@ public class  LegalExternalOffice {
     private static Dataset getDistinct(SparkSession spark) {
 
         String hql = "select distinct a.pripid,c.pripid as y,c.entstatus from \n" +
-                "enterprisebaseinfocollect_full_20171207 a join\n"+
+                "enterprisebaseinfocollect_full_20171207 a join\n" +
                 "tmpunion b\n" +
-                "on a.pripid = b.pripid\n"+
+                "on a.pripid = b.pripid\n" +
                 "join enterprisebaseinfocollect_full_20171207 c on b.x = c.pripid \n" +
                 "where a.entname <> c.entname";
 

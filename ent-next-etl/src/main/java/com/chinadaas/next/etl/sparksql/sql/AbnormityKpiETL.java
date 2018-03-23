@@ -46,7 +46,7 @@ public class AbnormityKpiETL {
                 "b.outtoal as eb0093,\n" +
                 "c.inyear as eb0092,\n" +
                 "d.outyear as eb0094,\n" +
-                "case when (b.outtoal - a.intoal) > 0 then '是' else '否' end as ee0023 from \n" +
+                "case when (b.outtoal - a.intoal) > 0 then 'y' else 'n' end as ee0023 from \n" +
                 "(select pripid ,count(1)  as intoal from s_en_abnormity where pripid <> '' and (indate <> '' or yr_regorg <> '' or inreason <> '') group by pripid) a \n" +
                 "left join\n" +
                 "(select pripid,count(1) as outtoal  from s_en_abnormity where pripid <> '' and ((outdate <> '' and outdate <> '1900-01-01') or outreason <> '' or yc_regorg <> '')group by pripid) b\n" +
@@ -55,7 +55,7 @@ public class AbnormityKpiETL {
                 "(select pripid,count(1) as inyear from s_en_abnormity where pripid <> '' and indate <> '' and substr(indate,1,10) >= regexp_replace('" + TimeUtil.getYearAgo(1) + "','-','')  group by pripid) c \n" +
                 "on a.pripid = c.pripid\n" +
                 "left join (select pripid,count(1) as outyear from s_en_abnormity where pripid<> '' and outdate <> '' and outdate <> '1900-01-01' and substr(outdate,1,10) >=regexp_replace('" + TimeUtil.getYearAgo(1) + "','-','') group by pripid) d \n" +
-                "on a.pripid =d.pripid";
+                "on a.pripid = d.pripid";
 
         return DataFrameUtil.getDataFrame(spark, hql.replaceAll("datadate", datadate), "abnormityKpiTmp");
 

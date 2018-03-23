@@ -15,7 +15,7 @@ public class MergeDataETL {
 
         String hql = "select a.*,\n" +
                 "nvl(b.eb0091,0) as eb0091,\n" +
-                "nvl(b.ee0023,'否') as ee0023,\n" +
+                "nvl(b.ee0023,'n') as ee0023,\n" +
                 "nvl(b.eb0092,0) as eb0092,\n" +
                 "nvl(b.eb0093,0) as eb0093,\n" +
                 "nvl(b.eb0094,0) as eb0094,\n" +
@@ -26,7 +26,7 @@ public class MergeDataETL {
                 "nvl(c.eb0099,0) as eb0099,\n" +
                 "nvl(d.eb0101,0) as eb0101,\n" +
                 "nvl(d.eb0100,0) as eb0100," +
-                "nvl(d.eb0107,'否')as eb0107,\n" +
+                "nvl(d.eb0107,'n')as eb0107,\n" +
                 "nvl(f.eb0070,0) as eb0070,\n" +
                 "nvl(f.eb0071,0) as eb0071,\n" +
                 "nvl(f.eb0072,0) as eb0072,\n" +
@@ -76,7 +76,7 @@ public class MergeDataETL {
                 "nvl(t.eb0044,0) as eb0044,\n" +
                 "nvl(t.eb0043,0)-nvl(t.eb0044,0) as eb0045,\n" +
                 "nvl(t.eb0021,'-9') as eb0021,\n" +
-                "nvl(n.eb0066,'否') as eb0066,\n" +
+                "nvl(n.eb0066,'n') as eb0066,\n" +
                 "nvl(n.eb0067,0) as eb0067,\n" +
                 "nvl(n.eb0068,0) as eb0068,\n" +
                 "nvl(o.eb0059,0) as eb0059,\n" +
@@ -101,11 +101,11 @@ public class MergeDataETL {
                 "nvl(p.ee0081,'未知') as ee0081,\n" +
                 "nvl(p.ee0082,'未知') as ee0082,\n" +
                 "nvl(p.ee0083,'未知') as ee0083,\n" +
-                "nvl(q.ee0033,'否') as ee0033,\n" +
+                "nvl(q.ee0033,'n') as ee0033,\n" +
                 "nvl(q.ee0034,'-9') as ee0034,\n" +
                 "nvl(q.ee0036,'-9') as ee0036,\n" +
                 "nvl(q.ee0037,'-9') as ee0037,\n" +
-                "case when nvl(t.eb0043,0)-nvl(t.eb0044,0) > 0 then '是' else '否' end as eb0106\n" +
+                "case when nvl(t.eb0043,0)-nvl(t.eb0044,0) > 0 then 'y' else 'n' end as eb0106\n" +
                 "from basebikpitemp a \n" +
                 "left join tmppublishsoftwork j on a.pripid = j.pripid\n" +
                 "left join abnormitykpitemp b on a.pripid = b.pripid\n" +
