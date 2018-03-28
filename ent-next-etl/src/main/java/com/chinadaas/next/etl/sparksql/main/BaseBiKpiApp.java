@@ -85,7 +85,7 @@ public class BaseBiKpiApp {
         //法人对外任职,非法人。完成法人对外任职。
 
         //execListed(spark);
-        //execFinancial(spark);
+        execFinancial(spark);
 
 
 
@@ -288,7 +288,7 @@ public class BaseBiKpiApp {
        // RegisterTable.registerInvTable(spark, "e_inv_investment", date, invPath);
        // RegisterTable.registerAlterRecoderTable(spark, "e_alter_recoder", date, alterPath);
        // RegisterTable.regiserAbnormityTable(spark, "s_en_abnormity", abnormityPath);
-       // RegisterTable.regiserBreakLawTable(spark, "s_en_break_law", breaklaw);
+        RegisterTable.regiserBreakLawTable(spark, "s_en_break_law", breaklaw);
        // RegisterTable.registerCaseBaseInfo(spark, "s_en_casebaseinfo", caseBasePath);
        // RegisterTable.registerCaseParty(spark, "s_en_casepartyinfo", casePartyPath);
        // RegisterTable.registerTradeMarkInfo(spark, "s_en_trademarkinfo", trademarkinfopath);

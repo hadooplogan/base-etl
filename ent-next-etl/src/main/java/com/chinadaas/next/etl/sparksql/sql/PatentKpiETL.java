@@ -17,7 +17,7 @@ public class PatentKpiETL {
     private static Dataset HistoryApplicant(SparkSession spark) {
 
         String hql =  "select pripid,count(1) as eb0061 from (select distinct a.pripid ,\n" +
-                "pt_reg_no \n" +
+                "c.pt_reg_no \n" +
                 "from enterprisebaseinfocollect a \n" +
                 "join s_sipo_patent_copyright b \n" +
                 "on a.pripid = b.pt_reg_group_pripid \n" +
@@ -478,6 +478,7 @@ public class PatentKpiETL {
         getAll1(spark);
         getDateFit1(spark);
         lawstate1(spark);
+        getShouquan1(spark);
         getRanked1(spark);
         getOk1(spark);
         getHistoryApplicant1(spark);
@@ -485,6 +486,7 @@ public class PatentKpiETL {
         getAll3(spark);
         getDateFit3(spark);
         lawstate3(spark);
+        getShouquan3(spark);
         getRanked3(spark);
         getOk3(spark);
         getHistoryApplicant3(spark);

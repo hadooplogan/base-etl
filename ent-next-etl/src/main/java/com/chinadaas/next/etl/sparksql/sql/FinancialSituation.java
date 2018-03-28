@@ -185,7 +185,9 @@ public class FinancialSituation {
                 "case when b.liagro is null or b.liagro = '' or b.totequ is null or b.totequ = ''\n" +
                 "then '未知' else cast ((b.liagro/b.totequ) as decimal(10,4)) end as leverageratio,\n" +
                 "case when b.ratgro is null or b.ratgro = ''  or b.ratgro = 0.0 then '未知' else b.ratgro end as ratgro,\n" +
-                "case when a.empnum is null or a.empnum = '' or a.empnum = 0.0 then '未知' else cast ((b.progro/a.empnum) as decimal(10,4)) end as pcpm,\n" +
+                "case when a.empnum is null or a.empnum = '' or a.empnum = 0.0 then '未知' \n" +
+                "when b.ratgro is null or b.ratgro = ''  or b.ratgro = 0.0 then '未知' \n" +
+                "else cast ((b.progro/a.empnum) as decimal(10,4)) end as pcpm,\n" +
                 "case when a.empnum is null or a.empnum = '' or a.empnum = 0.0 then '未知' else a.empnum end as empnum\n" +
                 "from s_en_nb_baseinfo a\n" +
                 "join s_en_nb_capitalinfo b \n" +
