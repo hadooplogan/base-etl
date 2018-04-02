@@ -23,7 +23,7 @@ public class TopExperience {
     public static Dataset tmp02(SparkSession spark, String datadate) {
 
         String hql = "select pripid,\n" +
-                "case when count(y) > 0 then '是' when count(y) = 0 then '否' else '否' end as eb0066,\n" +
+                "case when count(y) > 0 then 'y' when count(y) = 0 then 'n' else 'n' end as eb0066,\n" +
                 "sum(case when entstatus = '1' then 1 else 0 end) as eb0067,\n" +
                 "sum(case when entstatus <> '1' \n" +
                 "then 1 else 0 end) as eb0068\n" +

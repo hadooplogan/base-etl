@@ -50,8 +50,9 @@ public class MergeDataApp {
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_TOPEXPERIENCE_DIR)).createOrReplaceTempView("topexperiencekpi");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_LEGALOFFICE_DIR)).createOrReplaceTempView("legalofficetmp");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_LEGALINVESTMENT_DIR)).createOrReplaceTempView("legalinvestmenttmp");
-        parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_PATENT_DIR)).createOrReplaceTempView("patenttmp");
-        parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_FINANCIAL_DIR)).createOrReplaceTempView("financial");
+
+        // parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_PATENT_DIR)).createOrReplaceTempView("patenttmp");
+        // parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_FINANCIAL_DIR)).createOrReplaceTempView("financial");
         parquetDataAdapterImpl.loadData(spark, CommonConfig.getValue(Constants.ENT_INDEX_LISTED_DIR)).createOrReplaceTempView("listed");
 
 
@@ -67,12 +68,14 @@ public class MergeDataApp {
         Map cfg = new HashMap<String, String>();
 
         cfg.put(DatabaseValues.ES_INDEX_AUTO_CREATE, CommonConfig.getValue(DatabaseValues.ES_INDEX_AUTO_CREATE));
-        cfg.put(DatabaseValues.ES_NODES, CommonConfig.getValue(DatabaseValues.ES_NODES));
+       // cfg.put(DatabaseValues.ES_NODES, CommonConfig.getValue(DatabaseValues.ES_NODES));
+        cfg.put("es.nodes","192.168.100.16,192.168.100.17");
+        cfg.put("es.port","9200");
         //cfg.put(DatabaseValues.ES_PORT, CommonConfig.getValue(DatabaseValues.ES_PORT));
-        cfg.put("es.port","58200");
+        //cfg.put("es.port","58200");
         cfg.put(DatabaseValues.ES_BATCH_SIZE_BYTES, CommonConfig.getValue(DatabaseValues.ES_BATCH_SIZE_BYTES));
         cfg.put(DatabaseValues.ES_BATCH_SIZE_ENTRIES, CommonConfig.getValue(DatabaseValues.ES_BATCH_SIZE_ENTRIES));
-        String index = "ent_index_" + date + "/ent_index";
+        String index = "ent_index_" + date +"/ent_index";
         cfg.put("es.mapping.id", "pripid");
         //cfg.put("es.resource.write", "ent_index_20171217/ENT_INDEX_20171217");
         cfg.put("es.resource.write", index);

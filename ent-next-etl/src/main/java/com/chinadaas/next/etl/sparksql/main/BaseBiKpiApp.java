@@ -58,7 +58,7 @@ public class BaseBiKpiApp {
 
 
 
-        //execBase(spark);
+        execBase(spark);
         //execAbnormity(spark);
         //execBreakLaw(spark);
         //execCaseInfo(spark);
@@ -85,7 +85,7 @@ public class BaseBiKpiApp {
         //法人对外任职,非法人。完成法人对外任职。
 
         //execListed(spark);
-        execFinancial(spark);
+        //execFinancial(spark);
 
 
 

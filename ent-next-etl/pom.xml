@@ -18,6 +18,13 @@
         <artifactId>common-etl</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch-hadoop -->
+    <dependency>
+        <groupId>org.elasticsearch</groupId>
+        <artifactId>elasticsearch-hadoop</artifactId>
+        <version>6.2.1</version>
+    </dependency>
+
 
 </dependencies>
     <build>

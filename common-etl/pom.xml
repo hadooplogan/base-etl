@@ -14,13 +14,15 @@
 
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch-spark-20 -->
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch-spark-20_2.11</artifactId>
-            <version>5.3.2</version>
+            <version>6.2.1</version>
         </dependency>
 
-         <dependency>
+
+        <dependency>
              <groupId>com.databricks</groupId>
              <artifactId>spark-csv_2.11</artifactId>
              <version>1.5.0</version>

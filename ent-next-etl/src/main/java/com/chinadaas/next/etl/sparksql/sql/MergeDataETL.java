@@ -79,28 +79,28 @@ public class MergeDataETL {
                 "nvl(n.eb0066,'n') as eb0066,\n" +
                 "nvl(n.eb0067,0) as eb0067,\n" +
                 "nvl(n.eb0068,0) as eb0068,\n" +
-                "nvl(o.eb0059,0) as eb0059,\n" +
-                "nvl(o.eb0060,0) as eb0060,\n" +
-                "nvl(o.eb0061,0) as eb0061,\n" +
-                "nvl(o.eb0062,0) as eb0062,\n" +
-                "nvl(o.eb0112,0) as eb0112,\n" +
-                "nvl(p.ee0066,'未知') as ee0066,\n" +
-                "nvl(p.ee0067,'未知') as ee0067,\n" +
-                "nvl(p.ee0068,'未知') as ee0068,\n" +
-                "nvl(p.ee0069,'未知') as ee0069,\n" +
-                "nvl(p.ee0070,'未知') as ee0070,\n" +
-                "nvl(p.ee0071,'未知') as ee0071,\n" +
-                "nvl(p.ee0072,'未知') as ee0072,\n" +
-                "nvl(p.ee0073,'未知') as ee0073,\n" +
-                "nvl(p.ee0074,'未知') as ee0074,\n" +
-                "nvl(p.ee0075,'未知') as ee0075,\n" +
-                "nvl(p.ee0076,'未知') as ee0076,\n" +
-                "nvl(p.ee0077,'未知') as ee0077,\n" +
-                "nvl(p.ee0078,'未知') as ee0078,\n" +
-                "nvl(p.ee0080,'未知') as ee0080,\n" +
-                "nvl(p.ee0081,'未知') as ee0081,\n" +
-                "nvl(p.ee0082,'未知') as ee0082,\n" +
-                "nvl(p.ee0083,'未知') as ee0083,\n" +
+              //"nvl(o.eb0059,0) as eb0059,\n" +
+              //"nvl(o.eb0060,0) as eb0060,\n" +
+              //"nvl(o.eb0061,0) as eb0061,\n" +
+              //"nvl(o.eb0062,0) as eb0062,\n" +
+              //"nvl(o.eb0112,0) as eb0112,\n" +
+              //  "nvl(p.ee0066,'未知') as ee0066,\n" +
+              //  "nvl(p.ee0067,'未知') as ee0067,\n" +
+              //  "nvl(p.ee0068,'未知') as ee0068,\n" +
+              //  "nvl(p.ee0069,'未知') as ee0069,\n" +
+              //  "nvl(p.ee0070,'未知') as ee0070,\n" +
+              //  "nvl(p.ee0071,'未知') as ee0071,\n" +
+              //  "nvl(p.ee0072,'未知') as ee0072,\n" +
+              //  "nvl(p.ee0073,'未知') as ee0073,\n" +
+              //  "nvl(p.ee0074,'未知') as ee0074,\n" +
+              //  "nvl(p.ee0075,'未知') as ee0075,\n" +
+              //  "nvl(p.ee0076,'未知') as ee0076,\n" +
+              //  "nvl(p.ee0077,'未知') as ee0077,\n" +
+              //  "nvl(p.ee0078,'未知') as ee0078,\n" +
+              //  "nvl(p.ee0080,'未知') as ee0080,\n" +
+              //  "nvl(p.ee0081,'未知') as ee0081,\n" +
+              //  "nvl(p.ee0082,'未知') as ee0082,\n" +
+              //  "nvl(p.ee0083,'未知') as ee0083,\n" +
                 "nvl(q.ee0033,'n') as ee0033,\n" +
                 "nvl(q.ee0034,'-9') as ee0034,\n" +
                 "nvl(q.ee0036,'-9') as ee0036,\n" +
@@ -120,8 +120,8 @@ public class MergeDataETL {
                 "left join legalofficetmp l on a.pripid = l.pripid\n" +
                 "left join topexperiencekpi n on a.pripid = n.pripid\n" +
                 "left join legalinvestmenttmp m on a.pripid = m.pripid\n" +
-                "left join patenttmp o on a.pripid = o.pripid\n" +
-                "left join financial p on a.pripid = p.pripid\n" +
+              //  "left join patenttmp o on a.pripid = o.pripid\n"+
+              //  "left join financial p on a.pripid = p.pripid\n" +
                 "left join listed q on a.pripid = q.pripid";
         return DataFrameUtil.getDataFrame(spark, hql, "mergeDataTmp");
     }

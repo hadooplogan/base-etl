@@ -11,7 +11,7 @@
 
     <modules>
         <module>common-etl</module>
-        <module>ent-relation-etl</module>
+        <!--module>ent-relation-etl</module-->
         <module>ent-next-etl</module>
         <module>ent-recommend</module>
         <module>ent-contact-etl</module>
