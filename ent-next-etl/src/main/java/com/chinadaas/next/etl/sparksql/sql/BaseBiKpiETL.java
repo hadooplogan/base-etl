@@ -111,7 +111,7 @@ public class BaseBiKpiETL {
                 " case when a.credlevel is null then '-9'  when a.credlevel = '!' then '-9' when a.credlevel = '99' then '-9' when a.credlevel = '' then '-9'  else a.credlevel end as ee0014,\n" +
                 " case when a.parform is null then '-9' when a.parform = '!'then '-9' when a.parform = '' then '-9' when a.parform = '99' then '-9' else a.parform end as ee0015,\n" +
                 " case when a.hypotaxis is null then '-9' when a.hypotaxis = '' then '-9' when a.hypotaxis = '99' then '-9' else a.hypotaxis end as ee0016,\n" +
-                " case when a.sconform  is null then '-9' when a.sconform = '' then '-9' when a.sconform = '!' then '-9' when a.sconform = '99' then '-9' else a.sconform end as ee0017,\n" +
+               // " case when a.sconform  is null then '-9' when a.sconform = '' then '-9' when a.sconform = '!' then '-9' when a.sconform = '99' then '-9' else a.sconform end as ee0017,\n" +   这个标签需要重新拟定逻辑
                 " case when a.insform = '!' then '-9' when a.insform = '' then '-9' when a.insform is null then '-9' when a.insform = '99' then '-9' else a.insform end as ee0018,\n" +
                 " case when a.tel regexp'^(13|15|18|17)[0-9]{9}$'\n" +
                 " or a.tel regexp'^[(|（]?(13|15|18|17)[0-9]{9}[-|(|)|）|\\\\|*| |,|，|/]{1,6}+(13|15|18|17)[0-9]{9}'\n" +
@@ -148,7 +148,7 @@ public class BaseBiKpiETL {
                 " when a.entstatus = 1 and a.s_ext_nodenum = '' or a.s_ext_nodenum = 'null' or a.s_ext_nodenum is null\n" +
                 " or a.regcap = '' or a.regcap = 'null' or a.regcap is null \n" +
                 " or a.industryco = '' or a.industryco is null or a.industryco = 'null' or length(a.industryco) < 2\n" +
-                " then '未知'\n" +
+                " then '-9'\n" +
                 " else '非在营' end as eb0114 \n" +//注册资本百分位 2018-01-8
                 " from enterprisebaseinfocollect a\n" +
                 " left join t_dex_app_codelist c on a.ecotecdevzone = c.codevalue\n" +
