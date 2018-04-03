@@ -84,7 +84,7 @@ public class EntInfo2EsApp {
 
 
 //        EsSparkSQL.saveToEs(hdfs.getV1Code(spark),"v1_code/V1_CODE", JavaConversions.mapAsScalaMap(ImmutableMap.of("es.mapping.id","zspid")));
-        JavaEsSpark.saveToEs(EntBaseInfoEO.convertEntData(spark,hdfs,cur_data),"entbaseinfo_20180206/ENTBASEINFO", ImmutableMap.of("es.mapping.id", "docid"));
+        JavaEsSpark.saveToEs(EntBaseInfoEO.convertEntData(spark,hdfs,cur_data),"entbaseinfo_20180329/ENTBASEINFO", ImmutableMap.of("es.mapping.id", "docid"));
 
         EsSparkSQL.saveToEs(hdfs.getAlterDataDF(spark),"ealterrecoder_20171219/EALTERRECODER", JavaConversions.mapAsScalaMap(ImmutableMap.of("es.mapping.id", "alter_id")));
         spark.close();
@@ -130,7 +130,7 @@ public class EntInfo2EsApp {
        if(gtEnt!=null){
         RegisterTable.regiserGtEntBaseInfoTable(spark,"e_gt_baseinfo",date,gtEnt);
         RegisterTable.regiserGtPersonTable(spark,"e_gt_person",date,gtPerson);
-        JavaEsSpark.saveToEs(EntBaseInfoEO.convertGtEntData(spark,hdfs,cur_data),"entbaseinfo_20180206/ENTBASEINFO",ImmutableMap.of("es.mapping.id", "docid"));
+        JavaEsSpark.saveToEs(EntBaseInfoEO.convertGtEntData(spark,hdfs,cur_data),"entbaseinfo_20180329/ENTBASEINFO",ImmutableMap.of("es.mapping.id", "docid"));
        }
        RegisterTable.regiserAlterRecoderTable(spark,"e_alter_recoder",date,alter);
     }

@@ -93,7 +93,7 @@ public class Hdfs2EsETL implements Serializable{
                 "       a.empnum,\n" +
                 "       a.cerno,\n" +
                 "       a.oriregno,\n" +
-                "       '1' as entityType, \n" +
+                "        1 as entityType, \n" +
                 "        b.encode_v1," +
                 "        c.shortname," +
                 "        a.s_ext_sequence, \n" +
@@ -149,7 +149,7 @@ public class Hdfs2EsETL implements Serializable{
                 "       empnum,\n" +
                 "       '' as cerno,\n" +
                 "       oriregno,\n" +
-                "       '2' as entityType," +
+                "       2 as entityType," +
                 "       '' as encode_v1," +
                 "       '' as shortname," +
                 "       s_ext_sequence, \n" +

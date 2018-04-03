@@ -13,6 +13,9 @@ if [ ! -d './logs' ]; then
 mkdir ./logs
 fi
 
+#$SPARK_HOME/bin/spark-submit --executor-memory 13G --num-executors 10 --executor-cores 4 --conf spark.network.timeout=300000 --class com.chinadaas.association.etl.main.EntInfo2EsApp --master yarn  ent-relation-etl-1.0-SNAPSHOT-jar-with-dependencies.jar  20171211 inc /home/new_load_data/table.list  /home/new_load_data/table_inc.list
+
+
 $SPARK_HOME/bin/spark-submit --executor-memory 13G --num-executors 10 --executor-cores 4 --conf spark.network.timeout=300000 --class com.chinadaas.association.etl.main.EntInfo2EsApp --master yarn  hdfs-data-2es.jar  $1 $2 > ./logs/association-hdfs-2es-${LOG_SUFFIX}.log 2>&1
 
 if [ $? -ne 0 ] ;then

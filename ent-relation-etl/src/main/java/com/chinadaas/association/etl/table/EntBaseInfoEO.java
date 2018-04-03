@@ -28,9 +28,9 @@ public class EntBaseInfoEO implements Serializable {
 
     public EntBaseInfoEO(String s_ext_nodenum, String pripid, String entname, String regno, String enttype, String industryphy, String industryco,
                          String abuitem, String opfrom, String opto, String postalcode, String tel, String email, String esdate, String apprdate, String regorg,
-                         String entstatus, String regcap, String opscope, String opform, String dom, String reccap, String regcapcur,
+                         String entstatus, Double regcap, String opscope, String opform, String dom, String reccap, String regcapcur,
                          String forentname, String country, String entname_old, String name, String ancheyear, String candate, String revdate,
-                         String licid, String credit_code, String tax_code, String zspid,String empnum,String cerno,String oriregno,String entitytype,
+                         String licid, String credit_code, String tax_code, String zspid,Integer empnum,String cerno,String oriregno,Integer entitytype,
                          String encode_v1,String shortname,String s_ext_sequence,String data_date,String docid,String cbuitem,String write_date) {
         this.s_ext_nodenum = s_ext_nodenum;
         this.pripid = pripid;
@@ -77,9 +77,9 @@ public class EntBaseInfoEO implements Serializable {
 
         this.encode_v1=encode_v1;
         this.shortname=shortname;
-        this.docid = docid;
         this.s_ext_sequence=s_ext_sequence;
         this.data_date = data_date;
+        this.docid = docid;
         this.cbuitem =  cbuitem;
         this.write_date = write_date;
 
@@ -93,6 +93,9 @@ public class EntBaseInfoEO implements Serializable {
         //主体企业
         JavaPairRDD<String, EntBaseInfoEO> entda = getJavaRddEnt(hdfs.getEntDataFrame(sqlContext),cur_date);
 
+
+
+        System.out.println(entda.first()._2.toString());
 
         JavaPairRDD<String,EntBaseInfoEO> entInv = entda.leftOuterJoin(inv).mapToPair(new PairFunction<Tuple2<String,
                         Tuple2<EntBaseInfoEO, Optional<Iterable<JSONObject>>>>, String, EntBaseInfoEO>() {
@@ -168,12 +171,12 @@ public class EntBaseInfoEO implements Serializable {
                         row.getString(5), row.getString(6), row.getString(7), row.getString(8),
                         row.getString(9), row.getString(10), row.getString(11), row.getString(12),
                         row.getString(13), row.getString(14), row.getString(15), row.getString(16),
-                        row.getString(17), row.getString(18), row.getString(19), row.getString(20),
+                        Double.valueOf(row.getString(17)), row.getString(18), row.getString(19), row.getString(20),
                         row.getString(21), row.getString(22), row.getString(23), row.getString(24),
                         row.getString(25), row.getString(26), row.getString(27), row.getString(28),
                         row.getString(29), row.getString(30), row.getString(31), row.getString(32),
-                        row.getString(33), row.getString(34), row.getString(35), row.getString(36),
-                        row.getString(37),row.getString(38),row.getString(39),row.getString(40),row.getString(41),
+                        row.getString(33), Integer.valueOf(row.getString(34)), row.getString(35), row.getString(36),
+                        (Integer) row.getAs("entityType"),row.getString(38),row.getString(39),row.getString(40),row.getString(41),
                         row.getString(42),row.getString(43),cur_date));
             }
         });
@@ -297,7 +300,7 @@ public class EntBaseInfoEO implements Serializable {
     private String apprdate;
     private String regorg;
     private String entstatus;
-    private String regcap;
+    private Double regcap;
     private String opscope;
     private String opform;
     private String dom;
@@ -314,10 +317,10 @@ public class EntBaseInfoEO implements Serializable {
     private String credit_code;
     private String tax_code;
     private String zspid;
-    private String empnum;
+    private Integer empnum;
     private String cerno;
     private String oriregno;
-    private String entitytype;
+    private Integer entitytype;
     private String exactentname;
     private String pinyinname;
 //    private String engname;
@@ -434,13 +437,6 @@ public class EntBaseInfoEO implements Serializable {
         return serialVersionUID;
     }
 
-    public String getEmpnum() {
-        return empnum;
-    }
-
-    public void setEmpnum(String empnum) {
-        this.empnum = empnum;
-    }
 
     public String getCerno() {
         return cerno;
@@ -458,13 +454,6 @@ public class EntBaseInfoEO implements Serializable {
         this.oriregno = oriregno;
     }
 
-    public String getEntitytype() {
-        return entitytype;
-    }
-
-    public void setEntitytype(String entitytype) {
-        this.entitytype = entitytype;
-    }
 
     public List<JSONObject> getInv() {
         return inv;
@@ -618,12 +607,24 @@ public class EntBaseInfoEO implements Serializable {
         this.entstatus = entstatus;
     }
 
-    public String getRegcap() {
+    public Double getRegcap() {
         return regcap;
     }
 
-    public void setRegcap(String regcap) {
+    public void setRegcap(Double regcap) {
         this.regcap = regcap;
+    }
+
+    public Integer getEmpnum() {
+        return empnum;
+    }
+
+    public void setEmpnum(Integer empnum) {
+        this.empnum = empnum;
+    }
+
+    public void setEntitytype(Integer entitytype) {
+        this.entitytype = entitytype;
     }
 
     public String getOpscope() {
@@ -754,4 +755,7 @@ public class EntBaseInfoEO implements Serializable {
         this.zspid = zspid;
     }
 
+    public Integer getEntitytype() {
+        return entitytype;
+    }
 }

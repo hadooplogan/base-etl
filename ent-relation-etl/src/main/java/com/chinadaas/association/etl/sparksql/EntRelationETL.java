@@ -398,14 +398,14 @@ public class EntRelationETL implements Serializable {
                     public Iterator<EntConvertData> call(Row row) throws Exception {
                         List<EntConvertData> ent = new ArrayList<>();
 
-                        List<String> list =  row.getList(0);
+                        List<Object> list =  row.getList(0);
 
                         String dom = row.getAs("dtcpara");
                         for(int i=0;i<list.size();i++){
                             for(int j=i+1;j<list.size();j++){
                                 EntConvertData data = new EntConvertData();
-                                data.setFromid(list.get(i));
-                                data.setToid(list.get(j));
+                                data.setFromid(list.get(i).toString());
+                                data.setToid(list.get(j).toString());
                                 data.setPara(dom);
                                 ent.add(data);
                             }
@@ -643,27 +643,6 @@ public class EntRelationETL implements Serializable {
                 " inner join entInfoTmp03 ent\n" +
                 "    on pri.pripid = ent.pripid" ;
 
-        val hql = "SELECT ENTNAME, REGNO, ENTTYPE, REGCAP, REGCAPCUR\n" +
-                "\t, ENTSTATUS, REGORG, ESDATE, CANDATE, REVDATE\n" +
-                "\t, REGORGCODE\n" +
-                "FROM frposition\n" +
-                "UNION\n" +
-                "SELECT ENTNAME, REGNO, ENTTYPE, REGCAP, REGCAPCUR\n" +
-                "\t, ENTSTATUS, REGORG, ESDATE, CANDATE, REVDATE\n" +
-                "\t, REGORGCODE\n" +
-                "FROM frinv\n" +
-                "UNION\n" +
-                "SELECT ENTJGNAME as ENTNAME, REGNO, ENTTYPE, REGCAP, REGCAPCUR\n" +
-                "\t, ENTSTATUS, REGORG, ESDATE, CANDATE, REVDATE\n" +
-                "\t, REGORGCODE\n" +
-                "FROM entinv";
-
-        val hql2 = "SELECT ENTNAME, REGNO, ENTTYPE, REGCAP, REGCAPCUR\n" +
-                "\t, ENTSTATUS, REGORG, ESDATE, CANDATE, REVDATE\n" +
-                "\t, REGORGCODE\n" +
-                "FROM basic";
-
-
         return DataFrameUtil.getDataFrame(sqlContext, hql, "legalRelaTmp02");
     }
 
@@ -763,7 +742,7 @@ public class EntRelationETL implements Serializable {
                 "         where inv <> '') hd\n" +
                 " where hd.inv = en.entname";
 
-        val hql = "select en.pripid   as startKey,\n" +
+       /* val hql = "select en.pripid   as startKey,\n" +
                 "       en.entname,"+
                 "       hd.condate,\n" +
                 "       hd.subconam,\n" +
@@ -777,7 +756,7 @@ public class EntRelationETL implements Serializable {
                 "       (select inv, condate, currency, subconam, conprop, blicno, pripid\n" +
                 "          from e_inv_investment_parquet\n" +
                 "         where inv <> '') hd\n" +
-                " where hd.inv = en.entname";
+                " where hd.inv = en.entname";*/
         return DataFrameUtil.getDataFrame(sqlContext, hql, "invRelaTmp001");
 
     }
@@ -1823,18 +1802,43 @@ public class EntRelationETL implements Serializable {
                 "   on a.compcode = b.compcode\n" +
                 "  and a.enddate = b.enddate";
 
+         /*val hql1="select a.compcode, a.shholdername, a.shholdertype,round(a.holderrto, 1) as holderrto,a.sharestype,a.holderamt\n" +
+                 " from TQ_SK_SHAREHOLDER a\n" +
+                 " join (select compcode, max(enddate) as enddate \n" +
+                 "         from TQ_SK_SHAREHOLDER\n" +
+                 "        group by compcode) b\n" +
+                 "   on a.compcode = b.compcode\n" +
+                 "  and a.enddate = b.enddate";*/
         return   DataFrameUtil.getDataFrame(sqlContext, hql, "listed_ent_tmp");
     }
 
+    //    上市公司匹配曾用名字段
+
+    private Dataset beListedPersonInvInfo02(SparkSession sqlContext){
+        String hql="select distinct a.usedname,b.entname\n" +
+                "               from S_EN_USEDNAME a\n" +
+                "               join entInfoTmp03 b\n" +
+                "                 on a.pripid=b.pripid\n" ;
+
+       /* val hql="select distinct a.usedname,b.entname\n" +
+                "               from S_EN_USEDNAME a\n" +
+                "               join entInfoTmp03 b\n" +
+                "                 on a.pripid=b.pripid\n" ;*/
+        return   DataFrameUtil.getDataFrame(sqlContext, hql, "usename_tmp");
+    }
     //企业和股东(人和企业)
+
     private Dataset beListedPersonInvInfo01(SparkSession sqlContext){
-        String hql="select distinct b.pripid, a.shholdername,a.shholdertype,a.holderrto,a.sharestype,a.holderamt\n" +
+        String hql="select distinct b.pripid, case when s.entname is null then a.shholdername else s.entname end shholdername,a.shholdertype,a.holderrto,a.sharestype,a.holderamt\n" +
                 "               from listed_ent_tmp a\n" +
                 "               join comp_info_tmp b\n" +
-                "                 on a.compcode = b.compcode\n" ;
+                "                 on a.compcode = b.compcode\n" +
+                "               left join usename_tmp s" +
+                "                 on a.shholdername = s.usedname\n" ;
 
         return   DataFrameUtil.getDataFrame(sqlContext, hql, "listed_ent_tmp01",DataFrameUtil.CACHETABLE_PARQUET);
     }
+
 
     //企业股东
     private Dataset beListedEntInvInfo(SparkSession sqlContext){
@@ -1877,6 +1881,7 @@ public class EntRelationETL implements Serializable {
 
     public Dataset beListedEntInfo(SparkSession sqlContext){
         beListedEntInfo01(sqlContext);
+        beListedPersonInvInfo02(sqlContext);
         beListedPersonInvInfo01(sqlContext);
         beListedEntInvInfo(sqlContext);
         beListedPersonInvInfo(sqlContext);
