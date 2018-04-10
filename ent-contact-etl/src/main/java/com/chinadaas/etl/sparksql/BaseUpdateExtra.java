@@ -78,7 +78,7 @@ public class BaseUpdateExtra {
 
     }
 
-    //在营的变更数据,更新后的数据(确认变更，使用的是没有过滤的新增数据做比对)
+    //在营的变更数据,更新后的数据
 
     private static Dataset getChangeData(SparkSession spark){
 
