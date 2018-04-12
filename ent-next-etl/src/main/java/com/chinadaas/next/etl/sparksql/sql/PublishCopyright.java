@@ -7,7 +7,7 @@ import org.apache.spark.sql.SparkSession;
 
 /**
  * @author haoxing
- * 软著发布著作权指标。优化merge，减少临时表。
+ * 软著发布著作权指标。
  */
 public class PublishCopyright {
 

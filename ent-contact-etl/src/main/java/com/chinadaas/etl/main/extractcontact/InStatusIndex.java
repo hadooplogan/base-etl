@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * @author haoxing
- * 全量数据表中拿到各个数据的时间优先级最新且不为空的数据
+ * 全量数据表中拿到各个数据的以时间优先级最新，且不为空的数据
  * 1.tel
  * 2.email
  * 3.address

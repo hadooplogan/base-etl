@@ -11,6 +11,7 @@ import org.apache.spark.sql.SparkSession;
 public class BaseBiKpiETL {
 
     /**
+     * 企业状态
      * 1	在营（开业）
      * 2	吊销
      * 21	吊销，未注销

@@ -6,7 +6,7 @@ import org.apache.spark.sql.SparkSession;
 
 /**
  * @author haoxing
- * 子公司的指标计算，优化merge
+ * 子公司的指标计算
  */
 public class Subcompany {
     public static Dataset Subcompany(SparkSession spark,String datadate){

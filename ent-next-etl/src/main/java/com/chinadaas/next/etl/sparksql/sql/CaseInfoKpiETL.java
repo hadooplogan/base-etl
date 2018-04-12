@@ -9,7 +9,7 @@ import org.apache.spark.sql.SparkSession;
  * @Auther: zhouzhen@chinadaas.com
  * @description:
  * @Date: 10:19 2017/9/12
- *
+ *  行政处罚标签
  *  增加eb0107,就是判断eb0101是否大于0，如果大于0 则为是，否则为否
  */
 public class CaseInfoKpiETL {

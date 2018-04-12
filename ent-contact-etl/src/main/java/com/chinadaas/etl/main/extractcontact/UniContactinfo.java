@@ -12,7 +12,8 @@ import org.apache.spark.sql.SparkSession;
 
 import java.util.Map;
 
-/**
+/**放弃了
+ * 这个逻辑
  * @author haoxing
  * 存入unique数据到hdfs
  * 1，处理照面信息拿出企业名称和社会统一信用代码
@@ -20,6 +21,7 @@ import java.util.Map;
  * 3，按照优先级处理唯一性联系地址
  * 4，按照唯一性处理联系email信息
  * 5，地址长度小于6的处理算法逻辑。
+ *
  */
 public class UniContactinfo {
     static LogUtil logger = LogUtil.getLogger(UniContactinfo.class);

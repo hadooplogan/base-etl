@@ -7,7 +7,7 @@ import org.apache.spark.sql.SparkSession;
 
 /**
  * @author haoxing
- * 公司商标指标的计算。优化merge
+ * 公司商标指标的计算。
  */
 public class TradeMarkInfo {
 

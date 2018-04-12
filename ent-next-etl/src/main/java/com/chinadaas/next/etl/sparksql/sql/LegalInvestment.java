@@ -6,6 +6,7 @@ import org.apache.spark.sql.SparkSession;
 
 /**
  * @author haoxing
+ * 法人对外投资相关标签
  */
 
 public class LegalInvestment {

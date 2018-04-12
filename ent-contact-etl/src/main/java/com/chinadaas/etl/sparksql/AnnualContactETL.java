@@ -24,7 +24,7 @@ public class AnnualContactETL {
     }
 
 
-    //15年年报数据(并且在营)
+    //15年年报数据(并且在营)，且15年年报没有pripid，所以使用企业名称关联 拿到pripid，设置数据的更新时间为20160330.
     private static Dataset getfifteenYearContact(SparkSession spark) {
         String hql = "select concat_ws('',b.pripid,'2015') as id,\n" +
                 "b.pripid,\n" +
@@ -40,7 +40,7 @@ public class AnnualContactETL {
         return DataFrameUtil.getDataFrame(spark, hql, "tmpfifteen");
     }
 
-    //16年年报数据
+    //16年年报数据，设置数据的更新时间udt为20170630
     private static Dataset getSixeenYearContact(SparkSession spark) {
         String hql = "select concat_ws('',pripid,'2016') as id,\n" +
                 " pripid,\n" +

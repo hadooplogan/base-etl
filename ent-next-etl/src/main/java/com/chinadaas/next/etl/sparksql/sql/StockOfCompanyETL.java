@@ -31,7 +31,7 @@ public class StockOfCompanyETL {
     }
 
 
-    //实缴与认缴比
+    //实缴与认缴比例
     public static Dataset getRateOfSubA(SparkSession spark, String datadate) {
 
         String hql = "select a.pripid, round(sum(b.acconam)/sum(b.subconam),4) as eb0021 \n" +
